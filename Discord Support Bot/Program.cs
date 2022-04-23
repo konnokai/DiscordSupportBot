@@ -1,22 +1,8 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using Discord_Support_Bot.Command;
-using Discord_Support_Bot.SQLite.Table;
-using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+﻿using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using StackExchange.Redis;
 
 namespace Discord_Support_Bot
 {

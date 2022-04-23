@@ -1,15 +1,9 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using Discord_Support_Bot.SQLite.Activity;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using DiscordChatExporter.Core.Discord;
+using DiscordChatExporter.Core.Exporting;
+using DiscordChatExporter.Core.Exporting.Filtering;
+using DiscordChatExporter.Core.Exporting.Partitioning;
+using DiscordChatExporter.Core.Utils.Extensions;
 using System.IO.Compression;
-using System.Linq;
-using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Discord_Support_Bot.Command.Administration
 {
@@ -518,13 +512,12 @@ namespace Discord_Support_Bot.Command.Administration
             var list = await Context.Guild.GetEmotesAsync().ConfigureAwait(false);
             var exportNum = 0;
 
-            using FileStream fs = new FileStream(Program.GetDataFilePath($"{Context.Guild.Id}_Emoji.zip"), FileMode.OpenOrCreate);
-            using WebClient webClient = new WebClient();
+            using FileStream fs = new FileStream(Program.GetDataFilePath($"{Context.Guild.Id}_Emoji.zip"), FileMode.OpenOrCreate);           
             using (ZipArchive zipArchive = new ZipArchive(fs, ZipArchiveMode.Update))
             {
                 foreach (var item in list)
                 {
-                    byte[] bytes = await webClient.DownloadDataTaskAsync(item.Url).ConfigureAwait(false);
+                    byte[] bytes = await _service.httpClient.GetByteArrayAsync(item.Url).ConfigureAwait(false);
                     var zipArchiveEntry = zipArchive.CreateEntry(item.Name + Path.GetExtension(item.Url), CompressionLevel.Optimal);
 
                     using (var zipStream = zipArchiveEntry.Open())
@@ -549,14 +542,20 @@ namespace Discord_Support_Bot.Command.Administration
         [Alias("ImE")]
         [RequireBotPermission(GuildPermission.ManageEmojisAndStickers)]
         [RequireUserPermission(GuildPermission.ManageEmojisAndStickers)]
-        public async Task ImportEmoji()
+        public async Task ImportEmoji(string url = "")
         {
-            if (Context.Message.Attachments.Count != 1)
+            if (string.IsNullOrEmpty(url))
             {
-                await Context.Channel.SendErrorAsync("附件數量不為1");
-                return;
+                if (Context.Message.Attachments.Count != 1)
+                {
+                    await Context.Channel.SendErrorAsync("附件數量不為1");
+                    return;
+                }
+
+                url = Context.Message.Attachments.First().Url;
             }
-            if (!Context.Message.Attachments.First().Filename.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
+
+            if (!url.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
             {
                 await Context.Channel.SendErrorAsync("副檔名非.zip");
                 return;
@@ -565,8 +564,7 @@ namespace Discord_Support_Bot.Command.Administration
             await Context.Channel.SendConfirmAsync("Working...");
 
             var inportNum = 0;
-            using WebClient webClient = new WebClient();
-            byte[] bytes = await webClient.DownloadDataTaskAsync(Context.Message.Attachments.First().Url).ConfigureAwait(false);
+            byte[] bytes = await _service.httpClient.GetByteArrayAsync(url).ConfigureAwait(false);
 
             try
             {
@@ -605,6 +603,50 @@ namespace Discord_Support_Bot.Command.Administration
             catch { }
         }
 
+        // https://github.com/Tyrrrz/DiscordChatExporter
+        [Command("ExportChannelMessage")]
+        [Summary("匯出頻道聊天紀錄")]
+        [Alias("ExpChannelMeg")]
+        [RequireContext(ContextType.Guild)]
+        [RequireBotPermission(GuildPermission.ReadMessageHistory)]
+        [RequireUserPermission(GuildPermission.ManageMessages)]
+        [RequireOwner]
+        public async Task ExportChannel()
+        {
+            if (_service._exportedChannelId.Contains(Context.Channel.Id))
+            {
+                await Context.Channel.SendErrorAsync("已經匯出過了，無法重複使用");
+                return;
+            }
+
+            _service._exportedChannelId.Add(Context.Channel.Id);
+            await Context.Channel.SendConfirmAsync("Working...");
+
+            var guild = await _service._discordClient.GetGuildAsync(new Snowflake(Context.Guild.Id));
+            var channels = await _service._discordClient.GetGuildChannelsAsync(guild.Id);
+            var textChannel = channels.First((x) => x.Id == new Snowflake(Context.Channel.Id));
+            System.DateTime.UtcNow.AddHours(8).ToString("yyyy/MM/dd HH:mm:ss");
+            var request = new ExportRequest(
+                guild,
+                textChannel,
+                Program.GetDataFilePath($"Export"),
+                ExportFormat.HtmlDark,
+                null,
+                null,
+                PartitionLimit.Null,
+                MessageFilter.Null,
+                ShouldDownloadMedia: true,
+                ShouldReuseMedia:true,
+                DateFormat: "yyyy-MM-dd hh:mm tt"
+            );
+
+            await _service._channelExporter.ExportChannelAsync(
+                request
+            );
+
+            await Context.Channel.SendConfirmAsync("Done");
+        }
+
         //[Command("EN")]
         //[Summary("EN")]
         //[RequireBotPermission(GuildPermission.ManageChannels)]
@@ -615,8 +657,8 @@ namespace Discord_Support_Bot.Command.Administration
         //    foreach (var item in guild.CategoryChannels)
         //    {
         //        if (item.Id == 877230478820778074) continue;
-        //            await item.AddPermissionOverwriteAsync(guild.GetRole(877457819429924864), new OverwritePermissions(viewChannel: PermValue.Allow));
-        //            Console.WriteLine($"Done: {item.Name} ({item.Id})");
+        //        await item.AddPermissionOverwriteAsync(guild.GetRole(877457819429924864), new OverwritePermissions(viewChannel: PermValue.Allow));
+        //        Console.WriteLine($"Done: {item.Name} ({item.Id})");
         //        //foreach (var item2 in item.PermissionOverwrites.Where((x) => x.TargetType == PermissionTarget.Role))
         //        //{
 

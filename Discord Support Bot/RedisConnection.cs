@@ -1,6 +1,4 @@
 ﻿using StackExchange.Redis;
-using System;
-using System.Linq;
 
 public sealed class RedisConnection
 {

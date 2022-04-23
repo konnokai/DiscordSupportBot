@@ -1,5 +1,4 @@
-﻿using Discord_Support_Bot.SQLite.Table;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Discord_Support_Bot.SQLite
 {

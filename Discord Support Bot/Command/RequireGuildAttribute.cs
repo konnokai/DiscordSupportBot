@@ -1,8 +1,4 @@
-﻿using Discord.Commands;
-using System;
-using System.Threading.Tasks;
-
-namespace Discord_Support_Bot.Command
+﻿namespace Discord_Support_Bot.Command
 {
     public class RequireGuildAttribute : PreconditionAttribute
     {

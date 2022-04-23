@@ -1,12 +1,5 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using System;
-using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Discord_Support_Bot.SQLite.Activity;
 
 namespace Discord_Support_Bot.Command
 {

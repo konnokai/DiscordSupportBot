@@ -1,20 +1,23 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using DiscordChatExporter.Core.Discord;
+using DiscordChatExporter.Core.Exporting;
 
 namespace Discord_Support_Bot.Command.Administration
 {
     public class AdministraionService : IService
     {
         private DiscordSocketClient _client;
+        private BotConfig _botConfig;
+        internal readonly DiscordClient _discordClient;
+        internal readonly HttpClient httpClient = new HttpClient();
+        internal readonly ChannelExporter _channelExporter;
+        internal readonly HashSet<ulong> _exportedChannelId = new HashSet<ulong>();
 
-        public AdministraionService(DiscordSocketClient client)
+        public AdministraionService(DiscordSocketClient client, BotConfig botConfig)
         {
             _client = client;
+            _botConfig = botConfig;
+            _discordClient = new DiscordClient(botConfig.DiscordToken);
+            _channelExporter = new ChannelExporter(_discordClient);
         }
  
         public async Task ClearUser(ITextChannel textChannel)

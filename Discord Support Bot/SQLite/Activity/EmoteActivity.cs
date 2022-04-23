@@ -1,11 +1,5 @@
 ﻿using Dapper;
 using Microsoft.Data.Sqlite;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Discord_Support_Bot.SQLite.Activity
 {

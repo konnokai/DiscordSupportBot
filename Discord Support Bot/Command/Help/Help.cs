@@ -1,11 +1,4 @@
-﻿using Discord;
-using Discord.Commands;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Discord_Support_Bot.Command.Help
+﻿namespace Discord_Support_Bot.Command.Help
 {
     public class Help : TopLevelModule<HelpService>
     {

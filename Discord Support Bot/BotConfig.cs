@@ -1,8 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.IO;
-
-public class BotConfig
+﻿public class BotConfig
 {
     public string DiscordToken { get; set; } = "";
     public string WebHookUrl { get; set; } = "";

@@ -1,9 +1,4 @@
-﻿using Discord;
-using Discord.Commands;
-using System;
-using System.Linq;
-
-namespace Discord_Support_Bot.Command.Help
+﻿namespace Discord_Support_Bot.Command.Help
 {
     public class HelpService : IService
     {

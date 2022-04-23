@@ -1,9 +1,4 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using System.Threading.Tasks;
-
-namespace Discord_Support_Bot.Command
+﻿namespace Discord_Support_Bot.Command
 {
     public abstract class TopLevelModule : ModuleBase<SocketCommandContext>
     {

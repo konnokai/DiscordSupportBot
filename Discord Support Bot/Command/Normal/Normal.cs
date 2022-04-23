@@ -1,12 +1,4 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using System;
-using System.Threading.Tasks;
-using System.Linq;
-using Discord_Support_Bot.SQLite;
-
-namespace Discord_Support_Bot.Command.Normal
+﻿namespace Discord_Support_Bot.Command.Normal
 {
     public class Normal : TopLevelModule<NormalService>
     {

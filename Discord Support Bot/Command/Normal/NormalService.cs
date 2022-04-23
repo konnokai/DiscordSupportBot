@@ -1,12 +1,4 @@
-﻿using Discord;
-using Discord.WebSocket;
-using Discord_Support_Bot.SQLite;
-using System;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Threading;
-using Tweetinvi;
+﻿using Tweetinvi;
 using Tweetinvi.Models;
 
 namespace Discord_Support_Bot.Command.Normal
