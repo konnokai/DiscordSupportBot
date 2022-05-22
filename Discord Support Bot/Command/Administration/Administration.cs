@@ -632,7 +632,7 @@ namespace Discord_Support_Bot.Command.Administration
                 }
 
                 _service._exportedChannelId.Add(Context.Channel.Id);
-                await Context.Channel.SendConfirmAsync($"({i}/{needExportChannel}) {item.Name} Working...");
+                await Context.Channel.SendConfirmAsync($"({i}/{needExportChannel.Count()}) {item.Name} Working...");
 
                 var guild = await _service._discordClient.GetGuildAsync(new Snowflake(Context.Guild.Id));
                 var channels = await _service._discordClient.GetGuildChannelsAsync(guild.Id);
