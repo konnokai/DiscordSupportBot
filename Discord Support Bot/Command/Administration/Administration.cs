@@ -605,44 +605,65 @@ namespace Discord_Support_Bot.Command.Administration
 
         // https://github.com/Tyrrrz/DiscordChatExporter
         [Command("ExportChannelMessage")]
-        [Summary("匯出頻道聊天紀錄")]
-        [Alias("ExpChannelMeg")]
+        [Summary("匯出類別下的所有頻道聊天紀錄")]
+        [Alias("ExpChannelMsg")]
         [RequireContext(ContextType.Guild)]
         [RequireBotPermission(GuildPermission.ReadMessageHistory)]
         [RequireUserPermission(GuildPermission.ManageMessages)]
         [RequireOwner]
-        public async Task ExportChannel()
+        public async Task ExportChannel(ulong categoryId = 0)
         {
-            if (_service._exportedChannelId.Contains(Context.Channel.Id))
+            var category = Context.Guild.GetCategoryChannel(categoryId);
+            if (category == null)
             {
-                await Context.Channel.SendErrorAsync("已經匯出過了，無法重複使用");
+                await Context.Channel.SendErrorAsync("分類不存在!");
                 return;
             }
 
-            _service._exportedChannelId.Add(Context.Channel.Id);
-            await Context.Channel.SendConfirmAsync("Working...");
+            var needExportChannel = category.Channels.Where((x) => x is SocketTextChannel);
+            int i = 0;
+            foreach (var item in needExportChannel)
+            {
+                i++;
+                if (_service._exportedChannelId.Contains(item.Id))
+                {
+                    await Context.Channel.SendErrorAsync($"{item.Name} 已經匯出過了，無法重複使用");
+                    continue;
+                }
 
-            var guild = await _service._discordClient.GetGuildAsync(new Snowflake(Context.Guild.Id));
-            var channels = await _service._discordClient.GetGuildChannelsAsync(guild.Id);
-            var textChannel = channels.First((x) => x.Id == new Snowflake(Context.Channel.Id));
-            System.DateTime.UtcNow.AddHours(8).ToString("yyyy/MM/dd HH:mm:ss");
-            var request = new ExportRequest(
-                guild,
-                textChannel,
-                Program.GetDataFilePath($"Export"),
-                ExportFormat.HtmlDark,
-                null,
-                null,
-                PartitionLimit.Null,
-                MessageFilter.Null,
-                ShouldDownloadMedia: true,
-                ShouldReuseMedia:true,
-                DateFormat: "yyyy-MM-dd hh:mm tt"
-            );
+                _service._exportedChannelId.Add(Context.Channel.Id);
+                await Context.Channel.SendConfirmAsync($"({i}/{needExportChannel}) {item.Name} Working...");
 
-            await _service._channelExporter.ExportChannelAsync(
-                request
-            );
+                var guild = await _service._discordClient.GetGuildAsync(new Snowflake(Context.Guild.Id));
+                var channels = await _service._discordClient.GetGuildChannelsAsync(guild.Id);
+                var textChannel = channels.First((x) => x.Id == new Snowflake(item.Id));
+                //DateTime.UtcNow.AddHours(8).ToString("yyyy/MM/dd HH:mm:ss");
+                string exportFileName = ExportRequest.GetDefaultOutputFileName(guild, textChannel, ExportFormat.HtmlDark, null, null);
+                string exportFilePath = Path.GetDirectoryName(exportFileName);
+                var request = new ExportRequest(
+                    guild,
+                    textChannel,
+                    Program.GetDataFilePath($"Export_temp"),
+                    ExportFormat.HtmlDark,
+                    null,
+                    null,
+                    PartitionLimit.Null,
+                    MessageFilter.Null,
+                    ShouldDownloadMedia: true,
+                    ShouldReuseMedia: true,
+                    DateFormat: "yyyy-MM-dd hh:mm tt"
+                );
+                
+                await _service._channelExporter.ExportChannelAsync(
+                    request
+                );
+
+                if (!Directory.Exists(Program.GetDataFilePath("Export"))) Directory.CreateDirectory(Program.GetDataFilePath("Export"));
+                ZipFile.CreateFromDirectory(
+                    Program.GetDataFilePath($"Export_temp"),
+                    Program.GetDataFilePath($"Export\\{Path.GetFileNameWithoutExtension(exportFileName)}.zip"));
+                Directory.Delete(Program.GetDataFilePath($"Export_temp"), true);
+            }
 
             await Context.Channel.SendConfirmAsync("Done");
         }
