@@ -4,6 +4,7 @@ using DiscordChatExporter.Core.Exporting.Filtering;
 using DiscordChatExporter.Core.Exporting.Partitioning;
 using DiscordChatExporter.Core.Utils.Extensions;
 using System.IO.Compression;
+using System.Runtime.InteropServices;
 
 namespace Discord_Support_Bot.Command.Administration
 {
@@ -661,7 +662,7 @@ namespace Discord_Support_Bot.Command.Administration
                 if (!Directory.Exists(Program.GetDataFilePath("Export"))) Directory.CreateDirectory(Program.GetDataFilePath("Export"));
                 ZipFile.CreateFromDirectory(
                     Program.GetDataFilePath($"Export_temp"),
-                    Program.GetDataFilePath($"Export\\{Path.GetFileNameWithoutExtension(exportFileName)}.zip"));
+                    Program.GetDataFilePath($"Export" + (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "\\" : "/") + $"{Path.GetFileNameWithoutExtension(exportFileName)}.zip"));
                 Directory.Delete(Program.GetDataFilePath($"Export_temp"), true);
             }
 
