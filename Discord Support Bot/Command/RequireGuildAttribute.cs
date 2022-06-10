@@ -1,4 +1,6 @@
-﻿namespace Discord_Support_Bot.Command
+﻿using Discord.Commands;
+
+namespace Discord_Support_Bot.Command
 {
     public class RequireGuildAttribute : PreconditionAttribute
     {

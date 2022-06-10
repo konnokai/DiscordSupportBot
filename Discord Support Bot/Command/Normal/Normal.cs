@@ -1,4 +1,6 @@
-﻿namespace Discord_Support_Bot.Command.Normal
+﻿using Discord.Commands;
+
+namespace Discord_Support_Bot.Command.Normal
 {
     public class Normal : TopLevelModule<NormalService>
     {
@@ -56,7 +58,7 @@
         {
             await Context.Channel.TriggerTypingAsync().ConfigureAwait(false);
 
-            var userActivity = (await SQLite.Activity.UserActivity.GetActivityAsync(Context.Guild.Id).ConfigureAwait(false)).OrderByDescending((x) => x.ActivityNum).ToList();
+            var userActivity = (await UserActivity.GetActivityAsync(Context.Guild.Id).ConfigureAwait(false)).OrderByDescending((x) => x.ActivityNum).ToList();
             if (userActivity == null) return;
             var user = userActivity.FirstOrDefault((x) => x.UserID == Context.User.Id);
 

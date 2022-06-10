@@ -1,9 +1,10 @@
 ﻿using DiscordChatExporter.Core.Discord;
 using DiscordChatExporter.Core.Exporting;
+using Discord.Commands;
 
 namespace Discord_Support_Bot.Command.Administration
 {
-    public class AdministraionService : IService
+    public class AdministraionService : ICommandService
     {
         private DiscordSocketClient _client;
         private BotConfig _botConfig;
@@ -16,8 +17,7 @@ namespace Discord_Support_Bot.Command.Administration
         {
             _client = client;
             _botConfig = botConfig;
-            _discordClient = new DiscordClient(botConfig.DiscordToken);
-            _channelExporter = new ChannelExporter(_discordClient);
+            _channelExporter = new ChannelExporter(new DiscordClient(botConfig.DiscordToken));
         }
  
         public async Task ClearUser(ITextChannel textChannel)

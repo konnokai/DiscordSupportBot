@@ -1,4 +1,6 @@
-﻿namespace Discord_Support_Bot.Command.Help
+﻿using Discord.Commands;
+
+namespace Discord_Support_Bot.Command.Help
 {
     public class Help : TopLevelModule<HelpService>
     {
@@ -82,7 +84,7 @@
 #if DEBUG
                 embed.Title += " (測試版)";
 #endif
-                embed.WithDescription(System.IO.File.ReadAllText(Program.GetDataFilePath("HelpDescription.txt")).Replace("\\n", "\n") + $"\n\n您可以透過：\nPatreon <{PatreonUrl}> \nPaypal <{PaypalUrl}>\n來贊助輔助小幫手");
+                embed.WithDescription(File.ReadAllText(Program.GetDataFilePath("HelpDescription.txt")).Replace("\\n", "\n") + $"\n\n您可以透過：\nPatreon <{PatreonUrl}> \nPaypal <{PaypalUrl}>\n來贊助輔助小幫手");
                 await ReplyAsync("", false, embed.Build());
                 return;
             }

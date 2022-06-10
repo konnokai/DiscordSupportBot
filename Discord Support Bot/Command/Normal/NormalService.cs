@@ -3,7 +3,7 @@ using Tweetinvi.Models;
 
 namespace Discord_Support_Bot.Command.Normal
 {
-    public class NormalService : IService
+    public class NormalService : ICommandService
     {
         public TwitterClient TwitterAppClient { get; set; }
 

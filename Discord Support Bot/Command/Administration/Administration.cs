@@ -5,6 +5,7 @@ using DiscordChatExporter.Core.Exporting.Partitioning;
 using DiscordChatExporter.Core.Utils.Extensions;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
+using Discord.Commands;
 
 namespace Discord_Support_Bot.Command.Administration
 {

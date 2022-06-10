@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Discord.Commands;
+using Discord.Interactions;
+using Discord_Support_Bot.Interaction;
+using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 using System.Diagnostics;
 using System.Reflection;
@@ -44,7 +47,7 @@ namespace Discord_Support_Bot
             if (!Directory.Exists(Path.GetDirectoryName(GetDataFilePath(""))))
                 Directory.CreateDirectory(Path.GetDirectoryName(GetDataFilePath("")));
 
-            using (var db = new SQLite.SupportContext())
+            using (var db = new SupportContext())
             {
                 if (!File.Exists(GetDataFilePath("DataBase.db")))
                 {
@@ -96,7 +99,7 @@ namespace Discord_Support_Bot
         {
             if (isDisconnect) return;
 
-            using (var db = new SQLite.SupportContext())
+            using (var db = new SupportContext())
             {
                 foreach (var item in db.UpdateGuildInfo.ToList().Where((x) => x.ChannelMemberId != 0 || x.ChannelNitroId != 0))
                 {
@@ -161,7 +164,7 @@ namespace Discord_Support_Bot
         {
             if (isDisconnect) return;
 
-            await SQLite.Activity.EmoteActivity.SaveDatebaseAsync();
+            await EmoteActivity.SaveDatebaseAsync();
         }
 
         private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
@@ -233,25 +236,44 @@ namespace Discord_Support_Bot
 #if RELEASE
                 Thread.Sleep(2000);
 
-                await SQLite.Activity.EmoteActivity.InitActivityAsync();
-                await SQLite.Activity.UserActivity.InitActivityAsync();
+                await EmoteActivity.InitActivityAsync();
+                await UserActivity.InitActivityAsync();
 #else
                 Log.FormatColorWrite("準備完成", ConsoleColor.Green);
 #endif
             };
 
-            #region 初始化指令系統
-            var s = new ServiceCollection()
+            #region 初始化互動指令系統
+            var interactionServices = new ServiceCollection()
+                //.AddHttpClient()
+                .AddSingleton(Client)
+                .AddSingleton(botConfig)
+                .AddSingleton(new InteractionService(Client, new InteractionServiceConfig()
+                {
+                    AutoServiceScopes = true,
+                    UseCompiledLambda = true,
+                    EnableAutocompleteHandlers = false,
+                    DefaultRunMode = Discord.Interactions.RunMode.Async
+                }));
+
+            interactionServices.LoadInteractionFrom(Assembly.GetAssembly(typeof(InteractionHandler)));
+            IServiceProvider iService = interactionServices.BuildServiceProvider();
+            await iService.GetService<InteractionHandler>().InitializeAsync();
+            #endregion
+
+            #region 初始化一般指令系統
+            var commandServices = new ServiceCollection()
+                //.AddHttpClient()
                 .AddSingleton(Client)
                 .AddSingleton(botConfig)
                 .AddSingleton(new CommandService(new CommandServiceConfig()
                 {
                     CaseSensitiveCommands = false,
-                    DefaultRunMode = RunMode.Async
+                    DefaultRunMode = Discord.Commands.RunMode.Async
                 }));
 
-            s.LoadFrom(Assembly.GetAssembly(typeof(CommandHandler)));
-            IServiceProvider service = s.BuildServiceProvider();
+            commandServices.LoadCommandFrom(Assembly.GetAssembly(typeof(CommandHandler)));
+            IServiceProvider service = commandServices.BuildServiceProvider();
             await service.GetService<CommandHandler>().InitializeAsync();
             #endregion
 
@@ -266,8 +288,8 @@ namespace Discord_Support_Bot
 
 #if RELEASE
             Log.Info("保存資料庫中...");
-            await SQLite.Activity.EmoteActivity.SaveDatebaseAsync();
-            await SQLite.Activity.UserActivity.SaveDatebaseAsync();            
+            await EmoteActivity.SaveDatebaseAsync();
+            await UserActivity.SaveDatebaseAsync();            
 #endif
             await Client.StopAsync();
 

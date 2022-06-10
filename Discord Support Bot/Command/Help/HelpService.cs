@@ -1,6 +1,8 @@
-﻿namespace Discord_Support_Bot.Command.Help
+﻿using Discord.Commands;
+
+namespace Discord_Support_Bot.Command.Help
 {
-    public class HelpService : IService
+    public class HelpService : ICommandService
     {
         public EmbedBuilder GetCommandHelp(CommandInfo com)
         {
