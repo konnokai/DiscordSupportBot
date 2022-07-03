@@ -208,7 +208,7 @@ namespace Discord_Support_Bot
 
             Client.JoinedGuild += (guild) =>
             {
-                SendMessageToDiscord($"加入 {guild.Name}({guild.Id})\n擁有者: {guild.Owner.Username}({guild.Owner.Mention})");
+                SendMessageToDiscord($"加入 {guild.Name}({guild.Id})\n擁有者: {guild.OwnerId}");
                 return Task.CompletedTask;
             };
 
