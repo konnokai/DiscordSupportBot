@@ -10,22 +10,22 @@ namespace Discord_Support_Bot.SQLite.Activity
 
         public static async Task InitActivityAsync()
         {
-            IsInited = false;
+            //IsInited = false;
 
-            if (File.Exists(Program.GetDataFilePath("UserActivity.db")))
-            {
-                foreach (var item in Select<Table.Guild>("sqlite_master", "name", "WHERE type = 'table' AND name NOT LIKE 'sqlite_%';"))
-                {
-                    try
-                    {
-                        foreach (var item2 in Select<UserTable>(item.name.ToString()))
-                        {
-                            await RedisConnection.RedisDb.StringSetAsync($"SupportBot:Activity:UserMessage:{item.name}:{item2.UserID}", item2.ActivityNum).ConfigureAwait(false);
-                        }
-                    }
-                    catch { }
-                }
-            }
+            //if (File.Exists(Program.GetDataFilePath("UserActivity.db")))
+            //{
+            //    foreach (var item in Select<Table.Guild>("sqlite_master", "name", "WHERE type = 'table' AND name NOT LIKE 'sqlite_%';"))
+            //    {
+            //        try
+            //        {
+            //            foreach (var item2 in Select<UserTable>(item.name.ToString()))
+            //            {
+            //                await RedisConnection.RedisDb.StringSetAsync($"SupportBot:Activity:UserMessage:{item.name}:{item2.UserID}", item2.ActivityNum).ConfigureAwait(false);
+            //            }
+            //        }
+            //        catch { }
+            //    }
+            //}
 
             IsInited = true;
         }
@@ -38,7 +38,7 @@ namespace Discord_Support_Bot.SQLite.Activity
             }
             catch (Exception ex)
             {
-                Log.FormatColorWrite(ex.Message, ConsoleColor.DarkRed);
+                Log.Error(ex.ToString());
             }
         }
 
@@ -46,30 +46,35 @@ namespace Discord_Support_Bot.SQLite.Activity
         {
             try
             {
-                List<UserTable> userList = new List<UserTable>();
-
-                var redisKeyList = RedisConnection.RedisServer.Keys(pattern: $"SupportBot:Activity:UserMessage:{gid}:*", cursor: 0, pageSize: 2500);
-                var users = Program.Client.GetGuild(gid).Users;
+                var userTables = Select<UserTable>(gid.ToString());
+                var redisKeyList = RedisConnection.RedisServer.Keys(2, pattern: $"SupportBot:Activity:UserMessage:{gid}:*", cursor: 0, pageSize: 10000);
 
                 foreach (var item in redisKeyList)
                 {
                     var uid = ulong.Parse(item.ToString().Split(new char[] { ':' })[4]);
-                    var user = users.FirstOrDefault((x) => x.Id == uid);
+                    IUser user = Program.Client.GetUser(uid);
                     if (user == null)
                     {
-                        user = Program.Client.GetGuild(gid).GetUser(uid);
-                        if (user == null) continue;
+                        try { user = await Program.Client.Rest.GetUserAsync(uid); }
+                        catch { }
+                        if (user == null) 
+                            continue;
                     }
 
                     var activityNum = int.Parse((await RedisConnection.RedisDb.StringGetAsync(item).ConfigureAwait(false)).ToString());
-                    userList.Add(new UserTable() { UserID = uid, UserName = user.Username, ActivityNum = activityNum });
+
+                    var userTable = userTables.FirstOrDefault((x) => x.UserID == uid);
+                    if (userTable == null)                    
+                        userTables.Add(new UserTable() { UserID = uid, UserName = user.Username, ActivityNum = activityNum });
+                    else                    
+                        userTable.ActivityNum += activityNum;
                 }
 
-                return userList;
+                return userTables;
             }
             catch (Exception ex)
             {
-                Log.FormatColorWrite(ex.Message, ConsoleColor.DarkRed);
+                Log.Error(ex.ToString());
                 return null;
             }
         }
@@ -77,7 +82,7 @@ namespace Discord_Support_Bot.SQLite.Activity
         public static async Task SaveDatebaseAsync()
         {
             var userNum = 0;
-            var guilds = Select<Table.Guild>("sqlite_master", "name", "WHERE type = 'table' AND name NOT LIKE 'sqlite_%';");
+            var guilds = Select<Guild>("sqlite_master", "name", "WHERE type = 'table' AND name NOT LIKE 'sqlite_%';");
 
             foreach (var item in Program.Client.Guilds)
             {
@@ -89,26 +94,41 @@ namespace Discord_Support_Bot.SQLite.Activity
                        "PRIMARY KEY(\"UserID\"));");
                 }
 
-                var redisKeyList = RedisConnection.RedisServer.Keys(pattern: $"SupportBot:Activity:UserMessage:{item.Id}:*", cursor: 0, pageSize: 100000);
+                var redisKeyList = RedisConnection.RedisServer.Keys(2, pattern: $"SupportBot:Activity:UserMessage:{item.Id}:*", cursor: 0, pageSize: 100000);
                 if (!redisKeyList.Any()) continue;
+                userNum += redisKeyList.Count();
+
                 var userTables = Select<UserTable>(item.Id.ToString());
 
                 using (var cn = new SqliteConnection(ConnectString))
                 {
                     foreach (var item2 in redisKeyList)
                     {
+                        int activityNumInt = 0;
                         var uid = ulong.Parse(item2.ToString().Split(new char[] { ':' })[4]);
-                        var activityNum = int.Parse((await RedisConnection.RedisDb.StringGetAsync(item2).ConfigureAwait(false)).ToString());
+                        try
+                        {
+                            var activityNum = await RedisConnection.RedisDb.StringGetDeleteAsync(item2).ConfigureAwait(false);
+                            if (!activityNum.HasValue)
+                                continue;
 
-                        if (userTables.Any((x) => x.UserID == uid) && userTables.First((x) => x.UserID == uid).ActivityNum == activityNum)
+                            activityNumInt = int.Parse(activityNum);
+                        }
+                        catch (Exception ex) 
+                        {
+                            Log.Error($"UserActivity-SaveDatebaseAsync: {ex}");
                             continue;
+                        }
 
-                        UserTable userTable = new UserTable() { UserID = uid, ActivityNum = activityNum };
+                        var userTable = userTables.FirstOrDefault((x) => x.UserID == uid);
+                        if (userTable == null)
+                            userTable = new UserTable() { UserID = uid, ActivityNum = activityNumInt };
+                        else
+                            userTable.ActivityNum += activityNumInt;
+
                         await ExecuteSQLCommandAsync($@"INSERT OR REPLACE INTO `{item.Id}` VALUES (@UserID, @ActivityNum)", userTable);
                     }
                 }
-
-                userNum += redisKeyList.Count();
             }
 
             Log.Info($"使用者發言保存完成: {userNum}位使用者");
@@ -143,7 +163,8 @@ namespace Discord_Support_Bot.SQLite.Activity
                 }
                 catch (Exception ex)
                 {
-                    Log.FormatColorWrite($"SELECT {tableName} 失敗\r\n{ex.Message}", ConsoleColor.DarkRed);
+                    Log.Error($"SELECT {tableName} 失敗");
+                    Log.Error(ex.ToString());
                     return new List<T>();
                 }
             }

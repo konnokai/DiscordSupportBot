@@ -10,34 +10,34 @@ namespace Discord_Support_Bot.SQLite.Activity
 
         public static async Task InitActivityAsync()
         {
-            IsInited = false;
+            //IsInited = false;
 
-            if (File.Exists(Program.GetDataFilePath("EmoteActivity.db")))
-            {
-                foreach (var item in Select<Table.Guild>("sqlite_master", "name", "WHERE type = 'table' AND name NOT LIKE 'sqlite_%';"))
-                {
-                    try
-                    {
-                        var guild = Program.Client.Guilds.FirstOrDefault((x) => x.Id == item.name);
-                        if (guild == null) continue;
+            //if (File.Exists(Program.GetDataFilePath("EmoteActivity.db")))
+            //{
+            //    foreach (var item in Select<Guild>("sqlite_master", "name", "WHERE type = 'table' AND name NOT LIKE 'sqlite_%';"))
+            //    {
+            //        try
+            //        {
+            //            var guild = Program.Client.Guilds.FirstOrDefault((x) => x.Id == item.name);
+            //            if (guild == null) continue;
 
-                        var temp = Select<EmoteTable>(item.name.ToString());
+            //            var temp = Select<EmoteTable>(item.name.ToString());
 
-                        foreach (var item2 in temp)
-                        {
-                            try
-                            {
-                                var tempEmote = guild.Emotes.FirstOrDefault((x) => x.Id == item2.EmoteID);
-                                if (tempEmote == null) continue; 
+            //            foreach (var item2 in temp)
+            //            {
+            //                try
+            //                {
+            //                    var tempEmote = guild.Emotes.FirstOrDefault((x) => x.Id == item2.EmoteID);
+            //                    if (tempEmote == null) continue; 
 
-                                await RedisConnection.RedisDb.StringSetAsync($"SupportBot:Activity:Emote:{item.name}:{item2.EmoteID}", item2.ActivityNum).ConfigureAwait(false);
-                            }
-                            catch { }
-                        }
-                    }
-                    catch { }
-                }
-            }
+            //                    await RedisConnection.RedisDb.StringSetAsync($"SupportBot:Activity:Emote:{item.name}:{item2.EmoteID}", item2.ActivityNum).ConfigureAwait(false);
+            //                }
+            //                catch { }
+            //            }
+            //        }
+            //        catch { }
+            //    }
+            //}
 
             IsInited = true;
         }
@@ -50,7 +50,7 @@ namespace Discord_Support_Bot.SQLite.Activity
             }
             catch (Exception ex)
             {
-                Log.FormatColorWrite(ex.Message, ConsoleColor.DarkRed);
+                Log.Error(ex.ToString());
             }
         }
 
@@ -58,9 +58,8 @@ namespace Discord_Support_Bot.SQLite.Activity
         {
             try
             {
-                List<EmoteTable> emoteList = new List<EmoteTable>();
-
-                var redisKeyList = RedisConnection.RedisServer.Keys(pattern: $"SupportBot:Activity:Emote:{gid}:*", cursor: 0, pageSize: 2500);
+                var emoteTables = Select<EmoteTable>(gid.ToString());
+                var redisKeyList = RedisConnection.RedisServer.Keys(2, pattern: $"SupportBot:Activity:Emote:{gid}:*", cursor: 0, pageSize: 2500);
                 var emotes = await Program.Client.GetGuild(gid).GetEmotesAsync().ConfigureAwait(false);
 
                 foreach (var item in redisKeyList)
@@ -70,14 +69,19 @@ namespace Discord_Support_Bot.SQLite.Activity
                     if (emote == null) continue;
 
                     var activityNum = int.Parse((await RedisConnection.RedisDb.StringGetAsync(item).ConfigureAwait(false)).ToString());
-                    emoteList.Add(new EmoteTable() { EmoteID = eid, EmoteName = emote.ToString(), ActivityNum = activityNum });
+
+                    var emoteTable = emoteTables.FirstOrDefault((x) => x.EmoteID == eid);
+                    if (emoteTable == null)
+                        emoteTables.Add(new EmoteTable() { EmoteID = eid, EmoteName = emote.Name, ActivityNum = activityNum });
+                    else
+                        emoteTable.ActivityNum += activityNum;
                 }
 
-                return emoteList;
+                return emoteTables;
             }
             catch (Exception ex)
             {
-                Log.FormatColorWrite(ex.Message, ConsoleColor.DarkRed);
+                Log.Error(ex.ToString());
                 return null;
             }
         }
@@ -85,7 +89,7 @@ namespace Discord_Support_Bot.SQLite.Activity
         public static async Task SaveDatebaseAsync()
         {
             var emoteNum = 0;
-            var guilds = Select<Table.Guild>("sqlite_master", "name", "WHERE type = 'table' AND name NOT LIKE 'sqlite_%';");
+            var guilds = Select<Guild>("sqlite_master", "name", "WHERE type = 'table' AND name NOT LIKE 'sqlite_%';");
 
             foreach (var item in Program.Client.Guilds)
             {
@@ -95,28 +99,43 @@ namespace Discord_Support_Bot.SQLite.Activity
                       "\"EmoteID\" BIGINT, " +
                       "\"ActivityNum\" INT, " +
                       "PRIMARY KEY(\"EmoteID\"));");
-                }                
+                }
 
-                var redisKeyList = RedisConnection.RedisServer.Keys(pattern: $"SupportBot:Activity:Emote:{item.Id}:*", cursor: 0, pageSize: 1000);
+                var redisKeyList = RedisConnection.RedisServer.Keys(2, pattern: $"SupportBot:Activity:Emote:{item.Id}:*", cursor: 0, pageSize: 1000);
                 if (!redisKeyList.Any()) continue;
+                emoteNum += redisKeyList.Count();
+
                 var emoteTables = Select<EmoteTable>(item.Id.ToString());
 
                 using (var cn = new SqliteConnection(ConnectString))
                 {
                     foreach (var item2 in redisKeyList)
                     {
+                        int activityNumInt = 0;
                         var eid = ulong.Parse(item2.ToString().Split(new char[] { ':' })[4]);
-                        var activityNum = int.Parse((await RedisConnection.RedisDb.StringGetAsync(item2).ConfigureAwait(false)).ToString());
+                        try
+                        {
+                            var activityNum = await RedisConnection.RedisDb.StringGetDeleteAsync(item2).ConfigureAwait(false);
+                            if (!activityNum.HasValue)
+                                continue;
 
-                        if (emoteTables.Any((x) => x.EmoteID == eid) && emoteTables.First((x) => x.EmoteID == eid).ActivityNum == activityNum)
+                            activityNumInt = int.Parse(activityNum);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error($"EmoteActivity-SaveDatebaseAsync: {ex}");
                             continue;
+                        }
 
-                        EmoteTable emoteTable = new EmoteTable() { EmoteID = eid, ActivityNum = activityNum };
+                        var emoteTable = emoteTables.FirstOrDefault((x) => x.EmoteID == eid);
+                        if (emoteTable == null)
+                            emoteTable = new EmoteTable() { EmoteID = eid, ActivityNum = activityNumInt };
+                        else
+                            emoteTable.ActivityNum += activityNumInt;
+
                         await ExecuteSQLCommandAsync($@"INSERT OR REPLACE INTO `{item.Id}` VALUES (@EmoteID, @ActivityNum)", emoteTable);
                     }
                 }
-
-                emoteNum += redisKeyList.Count();
             }
 
             Log.Info($"表情保存完成: {emoteNum}個表情");
@@ -151,7 +170,8 @@ namespace Discord_Support_Bot.SQLite.Activity
                 }
                 catch (Exception ex)
                 {
-                    Log.FormatColorWrite($"SELECT {tableName} 失敗\r\n{ex.Message}", ConsoleColor.DarkRed);
+                    Log.Error($"SELECT {tableName} 失敗");
+                    Log.Error(ex.ToString());
                     return new List<T>();
                 }
             }
