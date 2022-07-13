@@ -70,13 +70,13 @@ namespace Discord_Support_Bot.Command.Normal
                 for (int i = 0; i < items.Count; i++)
                 {
                     var item = items[i];
-                    temp += $"{row * 20 + i + 1}. {item.UserName}[<@{item.UserID}>] `{item.ActivityNum}` 則訊息\n";
+                    temp += $"{row * 25 + i + 1}. {item.UserName}[<@{item.UserID}>] `{item.ActivityNum}` 則訊息\n";
                 }
 
                 embedBuilder.WithDescription(temp);
-                embedBuilder.WithFooter($"{row + 1} / {userActivity.Count / 20 + 1}" + (user != null ? $" | {user.UserName}的排名為: {userActivity.IndexOf(user) + 1}" : ""));
+                embedBuilder.WithFooter($"{row + 1} / {userActivity.Count / 25 + 1}" + (user != null ? $" | {user.UserName}的排名為: {userActivity.IndexOf(user) + 1}" : ""));
                 return embedBuilder;
-            }, userActivity.Count, 20, false).ConfigureAwait(false);
+            }, userActivity.Count, 25, false).ConfigureAwait(false);
         }
 
         [Command("EmoteActivity")]
@@ -93,17 +93,27 @@ namespace Discord_Support_Bot.Command.Normal
             await Context.SendPaginatedConfirmAsync(page, (row) =>
             {
                 EmbedBuilder embedBuilder = new EmbedBuilder().WithOkColor().WithTitle($"{Context.Guild.Name} 表情使用排行榜");
-                var items = emoteActivity.Skip(row * 20).Take(20).ToList(); string temp = "";
+                var items = emoteActivity.Skip(row * 50).Take(50).ToList();
+                var resultList = new List<string>();
 
-                for (int i = 0; i < items.Count; i++)
+                for (int i = 0; i < Math.Min(items.Count, 25); i++)
                 {
                     var item = items[i];
-                    temp += $"{row * 20 + i + 1}. {item.EmoteName} {item.ActivityNum} 次\n";
+                    resultList.Add($"`{row * 50 + i + 1}.` {item.EmoteName} `{item.ActivityNum} 次`");
                 }
 
-                embedBuilder.WithDescription(temp);
+                if (items.Count >= 25)
+                {
+                    for (int i = 25; i < items.Count; i++)
+                    {
+                        var item = items[i];
+                        resultList[i - 25] += ($"  |  `{row * 50 + i + 1}.` {item.EmoteName} `{item.ActivityNum} 次`");
+                    }
+                }
+
+                embedBuilder.WithDescription(string.Join('\n', resultList));
                 return embedBuilder;
-            }, emoteActivity.Count, 20).ConfigureAwait(false);
+            }, emoteActivity.Count, 50).ConfigureAwait(false);
         }
 
         [Command("EmoteUseCount")]
@@ -130,7 +140,7 @@ namespace Discord_Support_Bot.Command.Normal
                 return;
             }
 
-            var emoteActivityNum = await RedisConnection.RedisDb.StringGetAsync($"SupportBot:Activity:Emote:{Context.Guild.Id}:{emoteId}").ConfigureAwait(false);
+            var emoteActivityNum = await RedisConnection.RedisDb.StringGetAsync($"SupportBot:Activity:Emote:{Context.Guild.Id}:{emoteId}").ConfigureAwait(false);  //Todo: Fix
             if (emoteActivityNum.IsNull)
             {
                 await Context.Channel.SendErrorAsync("該表情無使用紀錄").ConfigureAwait(false);
@@ -184,7 +194,7 @@ namespace Discord_Support_Bot.Command.Normal
                     }
                     else
                     {
-                        db.UpdateGuildInfo.Add(new SQLite.Table.UpdateGuildInfo() { GuildId = Context.Guild.Id, TwitterId = user.Id });
+                        db.UpdateGuildInfo.Add(new UpdateGuildInfo() { GuildId = Context.Guild.Id, TwitterId = user.Id });
                     }
 
                     await db.SaveChangesAsync().ConfigureAwait(false);

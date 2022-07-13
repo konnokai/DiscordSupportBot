@@ -112,6 +112,9 @@ namespace Discord_Support_Bot
                         continue;
                     }
 
+                    if (!guild.HasAllMembers)
+                        await guild.DownloadUsersAsync();
+
                     if (item.ChannelMemberId != 0)
                     {
                         try
@@ -165,6 +168,7 @@ namespace Discord_Support_Bot
             if (isDisconnect) return;
 
             await EmoteActivity.SaveDatebaseAsync();
+            await UserActivity.SaveDatebaseAsync();
         }
 
         private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
@@ -179,7 +183,8 @@ namespace Discord_Support_Bot
             {
                 LogLevel = LogSeverity.Warning,
                 ConnectionTimeout = int.MaxValue,
-                MessageCacheSize = 50
+                MessageCacheSize = 50,
+                GatewayIntents = GatewayIntents.All
             });
 
             Client.GuildMemberUpdated += async (before, after) => //僅限特定伺服器使用
@@ -233,12 +238,7 @@ namespace Discord_Support_Bot
                 ApplicatonOwner = (await Client.GetApplicationInfoAsync().ConfigureAwait(false)).Owner;
 
                 isConnect = true;
-#if RELEASE
-                Thread.Sleep(2000);
-
-                await EmoteActivity.InitActivityAsync();
-                await UserActivity.InitActivityAsync();
-#else
+#if DEBUG
                 Log.FormatColorWrite("準備完成", ConsoleColor.Green);
 #endif
             };
@@ -269,7 +269,7 @@ namespace Discord_Support_Bot
                 .AddSingleton(new CommandService(new CommandServiceConfig()
                 {
                     CaseSensitiveCommands = false,
-                    DefaultRunMode = Discord.Commands.RunMode.Async
+                    DefaultRunMode = Discord.Commands.RunMode.Async,                    
                 }));
 
             commandServices.LoadCommandFrom(Assembly.GetAssembly(typeof(CommandHandler)));

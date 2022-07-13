@@ -25,8 +25,12 @@ public class CommandHandler : ICommandService
     private async Task HandleCommandAsync(SocketMessage messageParam)
     {
         var message = messageParam as SocketUserMessage;
-        if (message == null || message.Author.IsBot) return;
+        if (message == null || message.Author.IsBot)
+            return;
+
         var guild = Client.Guilds.FirstOrDefault((x) => x.TextChannels.Any((x2) => x2.Id == message.Channel.Id));
+        if (guild == null) 
+            return;
 
         if (message.Channel.Id == 550724236159877121) //僅限特定伺服器使用
         {
@@ -56,13 +60,13 @@ public class CommandHandler : ICommandService
 
                 if (!result.IsSuccess)
                 {
-                    Log.FormatColorWrite($"[{context.Guild.Name}/{context.Message.Channel.Name}] {message.Author.Username} 執行 {context.Message} 發生錯誤", ConsoleColor.Red);
-                    Log.FormatColorWrite(result.ErrorReason, ConsoleColor.Red);
+                    Log.Error($"[{context.Guild.Name}/{context.Message.Channel.Name}] {message.Author.Username} 執行 {context.Message} 發生錯誤");
+                    Log.Error(result.ErrorReason);
                     await context.Channel.SendErrorAsync(result.ErrorReason).ConfigureAwait(false);
                 }
                 else
                 {
-                    Log.FormatColorWrite($"[{context.Guild.Name}/{context.Message.Channel.Name}] {message.Author.Username} 執行 {context.Message}", ConsoleColor.DarkYellow);
+                    Log.Info($"[{context.Guild.Name}/{context.Message.Channel.Name}] {message.Author.Username} 執行 {context.Message}");
                 }
 
                 try { if (context.Message.Author.Id == Program.ApplicatonOwner.Id || guild.Id == 429605944117297163) await message.DeleteAsync().ConfigureAwait(false); }

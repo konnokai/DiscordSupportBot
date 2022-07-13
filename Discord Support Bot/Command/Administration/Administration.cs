@@ -196,32 +196,6 @@ namespace Discord_Support_Bot.Command.Administration
             catch (Exception ex) { Log.Error(ex.Message); }
         }
 
-        [Command("AddTrustedGuild")]
-        [Summary("新增信任的Guild")]
-        [Alias("ATG")]
-        [RequireOwner]
-        public async Task AddTrustedGuild([Summary("伺服器ID")] ulong gid)
-        {
-            if (_client.Guilds.Any((x) => x.Id == gid))
-            {
-                SocketGuild guild = _client.Guilds.First((x) => x.Id == gid);
-
-                if (!Program.TrustedGuildList.Any((x) => x.GuildId == gid))
-                {
-                    using (var db = new SQLite.SupportContext())
-                    {
-                        db.TrustedGuild.Add(new SQLite.Table.TrustedGuild() { GuildId = gid });
-                        db.SaveChanges();
-
-                        Program.TrustedGuildList.Add(new SQLite.Table.TrustedGuild() { GuildId = gid });
-                        await Context.Channel.SendConfirmAsync($"已加入 {guild.Name}({guild.Id}) 到信任的清單").ConfigureAwait(false);
-                    }
-                }
-                else await Context.Channel.SendErrorAsync($"錯誤，{guild.Name}({guild.Id}) 已存在於信任的清單").ConfigureAwait(false);
-            }
-            else await Context.Channel.SendErrorAsync("找不到該伺服器").ConfigureAwait(false);
-        }
-
         [Command("NGE")]
         [Summary("給予新成員的身分組，僅限 <@&635185609027354645> 使用")]
         [RequireContext(ContextType.Guild)]
@@ -348,16 +322,6 @@ namespace Discord_Support_Bot.Command.Administration
             await _service.CheckRole(Context).ConfigureAwait(false);
         }
 
-        [Command("ReloadDB")]
-        [Summary("重整活動資料庫")]
-        [Alias("REDB")]
-        [RequireOwner]
-        public async Task ReloadDB()
-        {
-            await EmoteActivity.InitActivityAsync().ConfigureAwait(false);
-            await UserActivity.InitActivityAsync().ConfigureAwait(false);
-            await ReplyAsync(":white_check_mark:").ConfigureAwait(false);
-        }
 
         [Command("SetMemberNumberChannel")]
         [Summary("設定成員數量顯示的頻道\r\n" +
@@ -370,7 +334,7 @@ namespace Discord_Support_Bot.Command.Administration
         public async Task SetMemberNumberChannel([Summary("頻道Id")] ulong cId = 0)
         {
             string result = "";
-            using (var db = new SQLite.SupportContext())
+            using (var db = new SupportContext())
             {
                 var guild = db.UpdateGuildInfo.FirstOrDefault(x => x.GuildId == Context.Guild.Id);
 
@@ -639,7 +603,6 @@ namespace Discord_Support_Bot.Command.Administration
                 var guild = await _service._discordClient.GetGuildAsync(new Snowflake(Context.Guild.Id));
                 var channels = await _service._discordClient.GetGuildChannelsAsync(guild.Id);
                 var textChannel = channels.First((x) => x.Id == new Snowflake(item.Id));
-                //DateTime.UtcNow.AddHours(8).ToString("yyyy/MM/dd HH:mm:ss");
                 string exportFileName = ExportRequest.GetDefaultOutputFileName(guild, textChannel, ExportFormat.HtmlDark, null, null);
                 string exportFilePath = Path.GetDirectoryName(exportFileName);
                 var request = new ExportRequest(
@@ -669,25 +632,5 @@ namespace Discord_Support_Bot.Command.Administration
 
             await Context.Channel.SendConfirmAsync("Done");
         }
-
-        //[Command("EN")]
-        //[Summary("EN")]
-        //[RequireBotPermission(GuildPermission.ManageChannels)]
-        //[RequireOwner]
-        //public async Task EN()
-        //{
-        //    var guild = _client.GetGuild(877230478082600992);
-        //    foreach (var item in guild.CategoryChannels)
-        //    {
-        //        if (item.Id == 877230478820778074) continue;
-        //        await item.AddPermissionOverwriteAsync(guild.GetRole(877457819429924864), new OverwritePermissions(viewChannel: PermValue.Allow));
-        //        Console.WriteLine($"Done: {item.Name} ({item.Id})");
-        //        //foreach (var item2 in item.PermissionOverwrites.Where((x) => x.TargetType == PermissionTarget.Role))
-        //        //{
-
-        //        //}
-        //    }
-        //    Console.WriteLine("All Done");
-        //}
     }
 }

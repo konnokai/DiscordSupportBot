@@ -5,30 +5,30 @@ namespace Discord_Support_Bot.SQLite.Activity
 {
     class UserActivity
     {
-        public static bool IsInited { get; private set; } = false;
+        public static bool IsInited { get; private set; } = true;
         static string ConnectString { get; } = "Data Source=" + Program.GetDataFilePath("UserActivity.db");
 
-        public static async Task InitActivityAsync()
-        {
-            //IsInited = false;
+        //public static async Task InitActivityAsync()
+        //{
+        //    IsInited = false;
 
-            //if (File.Exists(Program.GetDataFilePath("UserActivity.db")))
-            //{
-            //    foreach (var item in Select<Table.Guild>("sqlite_master", "name", "WHERE type = 'table' AND name NOT LIKE 'sqlite_%';"))
-            //    {
-            //        try
-            //        {
-            //            foreach (var item2 in Select<UserTable>(item.name.ToString()))
-            //            {
-            //                await RedisConnection.RedisDb.StringSetAsync($"SupportBot:Activity:UserMessage:{item.name}:{item2.UserID}", item2.ActivityNum).ConfigureAwait(false);
-            //            }
-            //        }
-            //        catch { }
-            //    }
-            //}
+        //    if (File.Exists(Program.GetDataFilePath("UserActivity.db")))
+        //    {
+        //        foreach (var item in Select<Table.Guild>("sqlite_master", "name", "WHERE type = 'table' AND name NOT LIKE 'sqlite_%';"))
+        //        {
+        //            try
+        //            {
+        //                foreach (var item2 in Select<UserTable>(item.name.ToString()))
+        //                {
+        //                    await RedisConnection.RedisDb.StringSetAsync($"SupportBot:Activity:UserMessage:{item.name}:{item2.UserID}", item2.ActivityNum).ConfigureAwait(false);
+        //                }
+        //            }
+        //            catch { }
+        //        }
+        //    }
 
-            IsInited = true;
-        }
+        //    IsInited = true;
+        //}
 
         public static async Task AddActivity(ulong gid, ulong uid)
         {
@@ -48,6 +48,7 @@ namespace Discord_Support_Bot.SQLite.Activity
             {
                 var userTables = Select<UserTable>(gid.ToString());
                 var redisKeyList = RedisConnection.RedisServer.Keys(2, pattern: $"SupportBot:Activity:UserMessage:{gid}:*", cursor: 0, pageSize: 10000);
+                var resultList = new List<UserTable>();
 
                 foreach (var item in redisKeyList)
                 {
@@ -63,14 +64,28 @@ namespace Discord_Support_Bot.SQLite.Activity
 
                     var activityNum = int.Parse((await RedisConnection.RedisDb.StringGetAsync(item).ConfigureAwait(false)).ToString());
 
+                    var newUserTable = new UserTable() { UserID = uid, UserName = user.Username, ActivityNum = activityNum };
                     var userTable = userTables.FirstOrDefault((x) => x.UserID == uid);
-                    if (userTable == null)                    
-                        userTables.Add(new UserTable() { UserID = uid, UserName = user.Username, ActivityNum = activityNum });
-                    else                    
-                        userTable.ActivityNum += activityNum;
+                    if (userTable != null)
+                        newUserTable.ActivityNum += userTable.ActivityNum;
                 }
 
-                return userTables;
+                foreach (var item in userTables)
+                {
+                    IUser user = Program.Client.GetUser(item.UserID);
+                    if (user == null)
+                    {
+                        try { user = await Program.Client.Rest.GetUserAsync(item.UserID); }
+                        catch { }
+                        if (user == null)
+                            continue;
+                    }
+
+                    item.UserName = user.Username;
+                    resultList.Add(item);
+                }
+
+                return resultList;
             }
             catch (Exception ex)
             {
