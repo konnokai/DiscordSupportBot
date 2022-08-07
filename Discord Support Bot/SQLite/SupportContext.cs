@@ -6,6 +6,7 @@ namespace Discord_Support_Bot.SQLite
     {
         public DbSet<TrustedGuild> TrustedGuild { get; set; }
         public DbSet<UpdateGuildInfo> UpdateGuildInfo { get; set; }
+        public DbSet<NCchannelCOD> NCchannelCOD { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
             => options.UseSqlite($"Data Source={Program.GetDataFilePath("DataBase.db")}");

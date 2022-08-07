@@ -39,7 +39,12 @@ namespace Discord_Support_Bot.Interaction
                 foreach (var item2 in item)
                 {
                     if (!regex.IsMatch(item2.Key))
+                    {
+                        isError = true;
                         Log.Error(item2.Key);
+                        continue;
+                    }
+
                     foreach (var item3 in item2.Value)
                     {
                         if (!regex.IsMatch(item3))
@@ -50,7 +55,7 @@ namespace Discord_Support_Bot.Interaction
                     }
                 }
             }
-            if (isError) return;
+            if (isError) Environment.Exit(3);
 #endif
             #endregion
 

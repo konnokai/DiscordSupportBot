@@ -5,7 +5,7 @@
     public string TwitterClientKey { get; set; } = "";
     public string TwitterClientSecret { get; set; } = "";
     public string TwitterClientBearerToken { get; set; } = "";
-    
+    public ulong TestSlashCommandGuildId { get; set; } = 0;
     public string RedisOption { get; set; } = "localhost:6379,syncTimeout=3000";
 
     public void InitBotConfig()

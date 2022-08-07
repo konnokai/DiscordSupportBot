@@ -6,6 +6,7 @@ using StackExchange.Redis;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using Discord_Support_Bot.Interaction.Attribute;
 
 namespace Discord_Support_Bot
 {
@@ -187,6 +188,41 @@ namespace Discord_Support_Bot
                 GatewayIntents = GatewayIntents.All
             });
 
+            #region 初始化互動指令系統
+            var interactionServices = new ServiceCollection()
+                //.AddHttpClient()
+                .AddSingleton(Client)
+                .AddSingleton(botConfig)
+                .AddSingleton(new InteractionService(Client, new InteractionServiceConfig()
+                {
+                    AutoServiceScopes = true,
+                    UseCompiledLambda = true,
+                    EnableAutocompleteHandlers = false,
+                    DefaultRunMode = Discord.Interactions.RunMode.Async
+                }));
+
+            interactionServices.LoadInteractionFrom(Assembly.GetAssembly(typeof(InteractionHandler)));
+            IServiceProvider iService = interactionServices.BuildServiceProvider();
+            await iService.GetService<InteractionHandler>().InitializeAsync();
+            #endregion
+
+            #region 初始化一般指令系統
+            var commandServices = new ServiceCollection()
+                //.AddHttpClient()
+                .AddSingleton(Client)
+                .AddSingleton(botConfig)
+                .AddSingleton(new CommandService(new CommandServiceConfig()
+                {
+                    CaseSensitiveCommands = false,
+                    DefaultRunMode = Discord.Commands.RunMode.Async,
+                }));
+
+            commandServices.LoadCommandFrom(Assembly.GetAssembly(typeof(CommandHandler)));
+            IServiceProvider service = commandServices.BuildServiceProvider();
+            await service.GetService<CommandHandler>().InitializeAsync();
+            #endregion
+
+
             Client.GuildMemberUpdated += async (before, after) => //僅限特定伺服器使用
             {
                 var beforeUser = before.Value;
@@ -238,45 +274,92 @@ namespace Discord_Support_Bot
                 ApplicatonOwner = (await Client.GetApplicationInfoAsync().ConfigureAwait(false)).Owner;
 
                 isConnect = true;
+
+                try
+                {
+                    InteractionService interactionService = iService.GetService<InteractionService>();
+
+#if DEBUG
+                    if (botConfig.TestSlashCommandGuildId == 0 || Client.GetGuild(botConfig.TestSlashCommandGuildId) == null)
+                        Log.Warn("未設定測試Slash指令的伺服器或伺服器不存在，略過");
+                    else
+                    {
+                        try
+                        {
+                            var result = await interactionService.RegisterCommandsToGuildAsync(botConfig.TestSlashCommandGuildId);
+                            Log.Info($"已註冊指令 ({botConfig.TestSlashCommandGuildId}) : {string.Join(", ", result.Select((x) => x.Name))}");
+
+                            result = await interactionService.AddModulesToGuildAsync(botConfig.TestSlashCommandGuildId, false, interactionService.Modules.Where((x) => x.DontAutoRegister).ToArray());
+                            Log.Info($"已註冊指令 ({botConfig.TestSlashCommandGuildId}) : {string.Join(", ", result.Select((x) => x.Name))}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error("註冊伺服器專用Slash指令失敗");
+                            Log.Error(ex.ToString());
+                        }
+                    }
+#else
+                    try
+                    {
+                        int commandCount = 0;
+
+                        if (File.Exists(GetDataFilePath("CommandCount.bin")))
+                            commandCount = BitConverter.ToInt32(File.ReadAllBytes(GetDataFilePath("CommandCount.bin")));
+                        else
+                            File.WriteAllBytes(GetDataFilePath("CommandCount.bin"), BitConverter.GetBytes(iService.GetService<InteractionHandler>().CommandCount));
+
+                        if (commandCount == iService.GetService<InteractionHandler>().CommandCount) return;
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error("設定指令數量失敗，請確認檔案是否正常");
+                        Log.Error(ex.Message);
+                        if (File.Exists(GetDataFilePath("CommandCount.bin")))
+                            File.Delete(GetDataFilePath("CommandCount.bin"));
+
+                        isDisconnect = true;
+                        return;
+                    }
+
+                    try
+                    {
+                        foreach (var item in interactionService.Modules.Where((x) => x.Preconditions.Any((x) => x is Interaction.Attribute.RequireGuildAttribute)))
+                        {
+                            var guildId = ((Interaction.Attribute.RequireGuildAttribute)item.Preconditions.FirstOrDefault((x) => x is Interaction.Attribute.RequireGuildAttribute)).GuildId;
+                            var guild = Client.GetGuild(guildId.Value);
+
+                            if (guild == null)
+                            {
+                                Log.Warn($"{item.Name} 註冊失敗，伺服器 {guildId} 不存在");
+                                continue;
+                            }
+
+                            var result = await interactionService.AddModulesToGuildAsync(guild, false, item);
+                            Log.Info($"已在 {guild.Name}({guild.Id}) 註冊指令: {string.Join(", ", result.Select((x) => x.Name))}");
+
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error("註冊伺服器專用Slash指令失敗");
+                        Log.Error(ex.ToString());
+                    }
+
+                    await interactionService.RegisterCommandsGloballyAsync();
+                    Log.Info("已註冊全球指令");
+#endif
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("註冊Slash指令失敗，關閉中...");
+                    Log.Error(ex.ToString());
+                    isDisconnect = true;
+                }
+
 #if DEBUG
                 Log.FormatColorWrite("準備完成", ConsoleColor.Green);
 #endif
             };
-
-            #region 初始化互動指令系統
-            var interactionServices = new ServiceCollection()
-                //.AddHttpClient()
-                .AddSingleton(Client)
-                .AddSingleton(botConfig)
-                .AddSingleton(new InteractionService(Client, new InteractionServiceConfig()
-                {
-                    AutoServiceScopes = true,
-                    UseCompiledLambda = true,
-                    EnableAutocompleteHandlers = false,
-                    DefaultRunMode = Discord.Interactions.RunMode.Async
-                }));
-
-            interactionServices.LoadInteractionFrom(Assembly.GetAssembly(typeof(InteractionHandler)));
-            IServiceProvider iService = interactionServices.BuildServiceProvider();
-            await iService.GetService<InteractionHandler>().InitializeAsync();
-            #endregion
-
-            #region 初始化一般指令系統
-            var commandServices = new ServiceCollection()
-                //.AddHttpClient()
-                .AddSingleton(Client)
-                .AddSingleton(botConfig)
-                .AddSingleton(new CommandService(new CommandServiceConfig()
-                {
-                    CaseSensitiveCommands = false,
-                    DefaultRunMode = Discord.Commands.RunMode.Async,                    
-                }));
-
-            commandServices.LoadCommandFrom(Assembly.GetAssembly(typeof(CommandHandler)));
-            IServiceProvider service = commandServices.BuildServiceProvider();
-            await service.GetService<CommandHandler>().InitializeAsync();
-            #endregion
-
             #region Login
             await Client.LoginAsync(TokenType.Bot, botConfig.DiscordToken);
             #endregion
@@ -289,7 +372,7 @@ namespace Discord_Support_Bot
 #if RELEASE
             Log.Info("保存資料庫中...");
             await EmoteActivity.SaveDatebaseAsync();
-            await UserActivity.SaveDatebaseAsync();            
+            await UserActivity.SaveDatebaseAsync();
 #endif
             await Client.StopAsync();
 
