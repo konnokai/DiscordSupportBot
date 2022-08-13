@@ -3,14 +3,16 @@ using System;
 using Discord_Support_Bot.SQLite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Discord_Support_Bot.Migrations
 {
     [DbContext(typeof(SupportContext))]
-    partial class SupportContextModelSnapshot : ModelSnapshot
+    [Migration("20220813051631_RenameLottery")]
+    partial class RenameLottery
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

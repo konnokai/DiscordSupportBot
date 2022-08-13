@@ -3,20 +3,42 @@ using System;
 using Discord_Support_Bot.SQLite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Discord_Support_Bot.Migrations
 {
     [DbContext(typeof(SupportContext))]
-    partial class SupportContextModelSnapshot : ModelSnapshot
+    [Migration("20220809155244_NCChannel")]
+    partial class NCChannel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "5.0.7");
 
-            modelBuilder.Entity("Discord_Support_Bot.SQLite.Table.Lottery", b =>
+            modelBuilder.Entity("Discord_Support_Bot.SQLite.Table.NCChannelCOD", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CODId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<ulong>("DiscordUserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Platform")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("NCChannelCOD");
+                });
+
+            modelBuilder.Entity("Discord_Support_Bot.SQLite.Table.NCChannelLottery", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -45,27 +67,7 @@ namespace Discord_Support_Bot.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Lottery");
-                });
-
-            modelBuilder.Entity("Discord_Support_Bot.SQLite.Table.NCChannelCOD", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("CODId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<ulong>("DiscordUserId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Platform")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("NCChannelCOD");
+                    b.ToTable("NCChannelLottery");
                 });
 
             modelBuilder.Entity("Discord_Support_Bot.SQLite.Table.TrustedGuild", b =>

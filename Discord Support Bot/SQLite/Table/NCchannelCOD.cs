@@ -1,6 +1,6 @@
 ﻿namespace Discord_Support_Bot.SQLite.Table
 {
-    public class NCchannelCOD : DbEntity
+    public class NCChannelCOD : DbEntity
     {
         public enum PlayerPlatform { XBox, PS, PC };
 

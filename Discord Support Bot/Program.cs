@@ -197,7 +197,7 @@ namespace Discord_Support_Bot
                 {
                     AutoServiceScopes = true,
                     UseCompiledLambda = true,
-                    EnableAutocompleteHandlers = false,
+                    EnableAutocompleteHandlers = true,
                     DefaultRunMode = Discord.Interactions.RunMode.Async
                 }));
 
@@ -289,7 +289,7 @@ namespace Discord_Support_Bot
                             var result = await interactionService.RegisterCommandsToGuildAsync(botConfig.TestSlashCommandGuildId);
                             Log.Info($"已註冊指令 ({botConfig.TestSlashCommandGuildId}) : {string.Join(", ", result.Select((x) => x.Name))}");
 
-                            result = await interactionService.AddModulesToGuildAsync(botConfig.TestSlashCommandGuildId, false, interactionService.Modules.Where((x) => x.DontAutoRegister).ToArray());
+                            result = await interactionService.AddModulesToGuildAsync(botConfig.TestSlashCommandGuildId, true, interactionService.Modules.Where((x) => x.DontAutoRegister).ToArray());
                             Log.Info($"已註冊指令 ({botConfig.TestSlashCommandGuildId}) : {string.Join(", ", result.Select((x) => x.Name))}");
                         }
                         catch (Exception ex)
@@ -334,9 +334,8 @@ namespace Discord_Support_Bot
                                 continue;
                             }
 
-                            var result = await interactionService.AddModulesToGuildAsync(guild, false, item);
+                            var result = await interactionService.AddModulesToGuildAsync(guild, true, item);
                             Log.Info($"已在 {guild.Name}({guild.Id}) 註冊指令: {string.Join(", ", result.Select((x) => x.Name))}");
-
                         }
                     }
                     catch (Exception ex)

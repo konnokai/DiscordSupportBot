@@ -6,7 +6,11 @@ namespace Discord_Support_Bot.Interaction.NC_Guild_Only
 {
     [DontAutoRegister]
     [Group("id", "Id")]
+#if DEBUG
+    [RequireGuild(506083124015398932)]
+#else
     [RequireGuild(490086730029072394)]
+#endif
     public class Id : TopLevelModule
     {
         [SlashCommand("register", "註冊你的帳號Id")]
@@ -15,7 +19,7 @@ namespace Discord_Support_Bot.Interaction.NC_Guild_Only
             await DeferAsync(true);
 
             using var db = new SupportContext();
-            var user = db.NCchannelCOD.FirstOrDefault((x) => x.DiscordUserId == Context.User.Id);
+            var user = db.NCChannelCOD.FirstOrDefault((x) => x.DiscordUserId == Context.User.Id);
 
             if (string.IsNullOrEmpty(id))
             {
@@ -26,7 +30,7 @@ namespace Discord_Support_Bot.Interaction.NC_Guild_Only
                 }
                 else if (await PromptUserConfirmAsync("未輸入Id，是否要移除註冊資訊?"))
                 {
-                    db.NCchannelCOD.Remove(user);
+                    db.NCChannelCOD.Remove(user);
                     await Context.Interaction.SendConfirmAsync("已移除", true, true);
                 }
                 else return;
@@ -35,13 +39,13 @@ namespace Discord_Support_Bot.Interaction.NC_Guild_Only
             {
                 if (user == null)
                 {
-                    db.NCchannelCOD.Add(new NCchannelCOD() { DiscordUserId = Context.User.Id, CODId = id });
+                    db.NCChannelCOD.Add(new NCChannelCOD() { DiscordUserId = Context.User.Id, CODId = id });
                     await Context.Interaction.SendConfirmAsync("註冊成功，你可以使用 `/id set-platform` 來設定你的主要遊玩平台(預設為PC)", true, true);
                 }
                 else if (await PromptUserConfirmAsync("已註冊，是否要覆蓋註冊Id?"))
                 {
                     user.CODId = id;
-                    db.NCchannelCOD.Update(user);
+                    db.NCChannelCOD.Update(user);
                     await Context.Interaction.SendConfirmAsync("已更新你的註冊Id", true, true);
                 }
                 else return;
@@ -58,7 +62,7 @@ namespace Discord_Support_Bot.Interaction.NC_Guild_Only
                 dcUser = Context.User;
 
             using var db = new SupportContext();
-            var user = db.NCchannelCOD.FirstOrDefault((x) => x.DiscordUserId == dcUser.Id);
+            var user = db.NCChannelCOD.FirstOrDefault((x) => x.DiscordUserId == dcUser.Id);
 
             if (user == null)
             {
@@ -73,12 +77,12 @@ namespace Discord_Support_Bot.Interaction.NC_Guild_Only
         }
 
         [SlashCommand("set-platform", "設定你的主要遊玩平台")]
-        public async Task SetPlatformAsync(NCchannelCOD.PlayerPlatform playerPlatform)
+        public async Task SetPlatformAsync(NCChannelCOD.PlayerPlatform playerPlatform)
         {
             await DeferAsync(true);
 
             using var db = new SupportContext();
-            var user = db.NCchannelCOD.FirstOrDefault((x) => x.DiscordUserId == Context.User.Id);
+            var user = db.NCChannelCOD.FirstOrDefault((x) => x.DiscordUserId == Context.User.Id);
 
             if (user == null)
             {
@@ -87,7 +91,7 @@ namespace Discord_Support_Bot.Interaction.NC_Guild_Only
             else
             {
                 user.Platform = playerPlatform;
-                db.NCchannelCOD.Update(user);
+                db.NCChannelCOD.Update(user);
                 db.SaveChanges();
                 await Context.Interaction.SendConfirmAsync($"已設定你的主要遊玩平台為: {playerPlatform}", true, true);
             }

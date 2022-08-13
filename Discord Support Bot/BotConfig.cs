@@ -76,6 +76,7 @@
             TwitterClientKey = config.TwitterClientKey;
             TwitterClientSecret = config.TwitterClientSecret;
             TwitterClientBearerToken = config.TwitterClientBearerToken;
+            TestSlashCommandGuildId = config.TestSlashCommandGuildId;
             RedisOption = config.RedisOption;
         }
         catch (Exception ex)
