@@ -38,10 +38,10 @@ namespace Discord_Support_Bot.Interaction.AutoVoiceChannel
                 db.SaveChanges();
                 await Context.Interaction.SendConfirmAsync($"已設定 `{voiceChannel.Name}` 為自動語音建立頻道\n" +
                     $"當使用者加入此頻道時，小幫手會在此頻道的分類下建立以該使用者為名的語音頻道\n" +
-                    $"反之當該語音頻道已經無人時會自動刪除\n" +
-                    $"新頻道的以下設定將會繼承至 `{voiceChannel.Name}`\n\n" +
-                    $"位元率: {voiceChannel.Bitrate / 1000}Kbps\n" + 
-                    $"人數限制:" + (voiceChannel.UserLimit.HasValue ? voiceChannel.UserLimit.Value.ToString() : "無限制"), true, true);
+                    $"反之當該語音頻道已經無人時會自動刪除\n\n" +
+                    $"新頻道的以下設定將會繼承至 `{voiceChannel.Name}`\n" +
+                    $"位元率: `{voiceChannel.Bitrate / 1000}Kbps`\n" + 
+                    $"人數限制: `" + (voiceChannel.UserLimit.HasValue ? voiceChannel.UserLimit.Value.ToString() + "人" : "無限制") + "`", true, true);
             }
             catch (Exception ex)
             {

@@ -70,8 +70,11 @@ namespace Discord_Support_Bot.Interaction.AutoVoiceChannel.Services
 
                 if (beforeVch?.Guild == afterVch?.Guild) // User Move
                 {
+                    bool isCreate = false;
                     if (afterVch.Id == guildConfig.AutoVoiceChannel)
-                        await CreateVoiceChannelAndMoveUser(usr, afterVch);
+                        isCreate = await CreateVoiceChannelAndMoveUser(usr, afterVch);
+                    if (isCreate && beforeVch.Name.EndsWith("'s Room") && !beforeVch.ConnectedUsers.Any())
+                        await beforeVch.DeleteAsync();
                 }
                 else if (beforeVch is null) // User Join
                 {
@@ -89,24 +92,32 @@ namespace Discord_Support_Bot.Interaction.AutoVoiceChannel.Services
 
         private async Task<bool> CreateVoiceChannelAndMoveUser(IGuildUser user, SocketVoiceChannel voiceChannel)
         {
+            bool isCreate = false;
             try
             {
-                var newChannel = await voiceChannel.Guild.CreateVoiceChannelAsync($"{user.Username}'s Room", (act) =>
+                string roomName = $"{user.Username}'s Room";
+                IVoiceChannel newChannel = voiceChannel.Guild.VoiceChannels.FirstOrDefault((x) => x.Name == roomName);
+
+                if (newChannel == null)
                 {
-                    act.Bitrate = voiceChannel.Bitrate;
-                    act.CategoryId = voiceChannel.CategoryId;
-                    act.UserLimit = voiceChannel.UserLimit;
-                });
+                    newChannel = await voiceChannel.Guild.CreateVoiceChannelAsync(roomName, (act) =>
+                    {
+                        act.Bitrate = voiceChannel.Bitrate;
+                        act.CategoryId = voiceChannel.CategoryId;
+                        act.UserLimit = voiceChannel.UserLimit;
+                    });
+                    Log.Info($"建立語音頻道: {newChannel.Name}");
+                    isCreate = true;
+                }
 
                 await voiceChannel.Guild.MoveAsync(user, newChannel);
-
-                return true;
             }
             catch (Exception ex)
             {
                 Log.Error(ex.ToString());
-                return false;
             }
+
+            return isCreate;
         }
     }
 }
