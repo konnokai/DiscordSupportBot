@@ -6,6 +6,7 @@ namespace Discord_Support_Bot.Interaction.Lottery
     [DefaultMemberPermissions(GuildPermission.Administrator)]
     public class Lottery : TopLevelModule
     {
+        private readonly DiscordSocketClient _client;
         public class ShowEndedLotteryAutocompleteHandler : AutocompleteHandler
         {
             public override async Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
@@ -40,6 +41,7 @@ namespace Discord_Support_Bot.Interaction.Lottery
 
         public Lottery(DiscordSocketClient client)
         {
+            _client = client;
             client.ModalSubmitted += async (modal) =>
             {
                 if (modal.HasResponded || modal.Data.CustomId != "create-lottery")
@@ -78,7 +80,7 @@ namespace Discord_Support_Bot.Interaction.Lottery
                     lottery.MaxAward = maxAward;
                     lottery.GuildId = modal.GuildId.Value;
                     if (string.IsNullOrEmpty(lottery.AwardContext))
-                        lottery.AwardContext = $"未知的獎項，此抽獎新增時間: {lottery.CreateTime:yyyy/MM/dd HH:mm:ss}";
+                        lottery.AwardContext = $"未知的獎項";
 
                     using SupportContext supportContext = new SupportContext();
                     supportContext.Add(lottery);
@@ -87,10 +89,12 @@ namespace Discord_Support_Bot.Interaction.Lottery
                     var embed = new EmbedBuilder().WithOkColor().WithTitle("注意，抽獎訊息")
                         .WithDescription(context)
                         .AddField("本次參與抽獎結束時間", endDateTime.ConvertDateTimeToDiscordMarkdown())
-                        .AddField("本次抽出人數", maxAward.ToString()).Build();
+                        .AddField("本次抽出人數", maxAward.ToString(), true)
+                        .AddField("已參與人數", "無人參加").Build();
 
                     var component = new ComponentBuilder()
-                        .WithButton("點我參加", $"join-lottery:{lottery.Guid}", ButtonStyle.Success).Build();
+                        .WithButton("點我參加", $"join-lottery:{lottery.Guid}", ButtonStyle.Success)
+                        .WithButton("取消參加", $"leave-lottery:{lottery.Guid}", ButtonStyle.Danger).Build();
 
                     await modal.SendConfirmAsync("已建立", false, true);
                     await modal.Channel.SendMessageAsync(embed: embed, components: component);
@@ -104,52 +108,94 @@ namespace Discord_Support_Bot.Interaction.Lottery
 
             client.ButtonExecuted += async (button) =>
             {
-                if (button.HasResponded || !button.Data.CustomId.StartsWith("join-lottery:"))
+                if (button.HasResponded || !button.Data.CustomId.Contains("lottery:"))
                     return;
+
+                Log.Info($"\"{button.User}\" Click Button: {button.Data.CustomId}");
+                await button.DeferAsync(true);
+
+                string lotteryGuid = button.Data.CustomId.Replace("join-lottery:", "").Replace("leave-lottery:", "");
+
+                using var db = new SupportContext();
+                var lottery = db.Lottery.FirstOrDefault((x) => x.Guid == lotteryGuid);
+                if (lottery == null)
+                {
+                    await button.ModifyOriginalResponseAsync((x) => x.Components = new ComponentBuilder()
+                                    .WithButton("已結束", $"no-lottery", ButtonStyle.Success, disabled: true).Build());
+                    await button.SendErrorAsync("該抽獎不存在，可能已經結束", true);
+                    return;
+                }
+
+                if (lottery.EndTime <= DateTime.Now)
+                {
+                    await button.ModifyOriginalResponseAsync((x) => x.Components = new ComponentBuilder()
+                                    .WithButton("已結束", $"ended-lottery:{lottery.Guid}", ButtonStyle.Success, disabled: true).Build());
+                    await button.SendErrorAsync("該抽獎已結束，無法參加", true);
+                    return;
+                }
+
+                List<ulong> participantList = JsonConvert.DeserializeObject<List<ulong>>(lottery.ParticipantList);
+                if (button.Data.CustomId.StartsWith("join-lottery:"))
+                {
+                    try
+                    {
+                        if (participantList.Any((x) => x == button.User.Id))
+                        {
+                            await button.SendErrorAsync("你已參加本次抽獎", true);
+                            return;
+                        }
+                        else
+                        {
+                            participantList.Add(button.User.Id);
+                            lottery.ParticipantList = JsonConvert.SerializeObject(participantList);
+                            db.Lottery.Update(lottery);
+                            db.SaveChanges();
+                            await button.SendConfirmAsync("參加成功，請等待獎項抽出", true, true);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        await button.SendErrorAsync($"參與抽獎失敗");
+                        Log.Error($"{button.User.Id} ({button.Data.CustomId}) 參與抽獎失敗: {ex}");
+                    }
+                }
+                else if (button.Data.CustomId.StartsWith("leave-lottery:"))
+                {
+                    try
+                    {
+                        if (!participantList.Any((x) => x == button.User.Id))
+                        {
+                            await button.SendErrorAsync("你尚未參加本次抽獎", true);
+                            return;
+                        }
+                        else
+                        {
+                            participantList.Remove(button.User.Id);
+                            lottery.ParticipantList = JsonConvert.SerializeObject(participantList);
+                            db.Lottery.Update(lottery);
+                            db.SaveChanges();
+                            await button.SendConfirmAsync("已離開本次抽獎", true, true);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        await button.SendErrorAsync($"離開抽獎失敗");
+                        Log.Error($"{button.User.Id} ({button.Data.CustomId}) 離開抽獎失敗: {ex}");
+                    }
+                }
 
                 try
                 {
-                    await button.DeferAsync(true);
-
-                    string lotteryGuid = button.Data.CustomId.Replace("join-lottery:", "");
-
-                    using var db = new SupportContext();
-                    var lottery = db.Lottery.FirstOrDefault((x) => x.Guid == lotteryGuid);
-                    if (lottery == null)
-                    {
-                        await button.ModifyOriginalResponseAsync((x) => x.Components = new ComponentBuilder()
-                                        .WithButton("已結束", $"no-lottery", ButtonStyle.Success, disabled: true).Build());
-                        await button.SendErrorAsync("該抽獎不存在，可能已經結束", true);
-                        return;
-                    }
-
-                    if (lottery.EndTime <= DateTime.Now)
-                    {
-                        await button.ModifyOriginalResponseAsync((x) => x.Components = new ComponentBuilder()
-                                        .WithButton("已結束", $"ended-lottery:{lottery.Guid}", ButtonStyle.Success, disabled: true).Build());
-                        await button.SendErrorAsync("該抽獎已結束，無法參加", true);
-                        return;
-                    }
-
-                    List<ulong> participantList = JsonConvert.DeserializeObject<List<ulong>>(lottery.ParticipantList);
-                    if (participantList.Any((x) => x == button.User.Id))
-                    {
-                        await button.SendErrorAsync("你已參加本次抽獎", true);
-                        return;
-                    }
-                    else
-                    {
-                        participantList.Add(button.User.Id);
-                        lottery.ParticipantList = JsonConvert.SerializeObject(participantList);
-                        db.Lottery.Update(lottery);
-                        db.SaveChanges();
-                        await button.SendConfirmAsync("參加成功，請等待獎項抽出", true, true);
-                    }
+                    await button.ModifyOriginalResponseAsync((x) => x.Embed = new EmbedBuilder().WithOkColor().WithTitle("注意，抽獎訊息")
+                        .WithDescription(lottery.Context)
+                        .AddField("本次參與抽獎結束時間", lottery.EndTime.ConvertDateTimeToDiscordMarkdown())
+                        .AddField("本次抽出人數", lottery.MaxAward.ToString(), true)
+                        .AddField("已參與人數", participantList.Count == 0 ? "無人參加" : participantList.Count).Build());
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    await button.SendErrorAsync($"參與抽獎失敗");
-                    Log.Error($"{button.User.Id} ({button.Data.CustomId}) 參與抽獎失敗: {ex}");
+
+                    throw;
                 }
             };
         }
@@ -179,6 +225,8 @@ namespace Discord_Support_Bot.Interaction.Lottery
         {
             await DeferAsync(true);
 
+            await Context.Guild.DownloadUsersAsync();
+
             using var db = new SupportContext();
             var lottery = db.Lottery.FirstOrDefault((x) => x.Guid == guid);
             if (lottery == null)
@@ -187,42 +235,72 @@ namespace Discord_Support_Bot.Interaction.Lottery
                 return;
             }
 
-            List<ulong> participantList = JsonConvert.DeserializeObject<List<ulong>>(lottery.ParticipantList);
-            List<ulong> awardList = new();
-            if (!participantList.Any())
-            {
-                await Context.Interaction.SendErrorAsync("該抽獎尚無人參加，若要移除請使用 `/lottery delete-lottery`", true);
-                return;
-            }
-            else if (lottery.MaxAward >= participantList.Count)
-            {
-                await Context.Interaction.SendConfirmAsync("參與人數未超過抽出人數，將直接讓參與成員得獎", true);
-                awardList = participantList;
-            }
-            else
-            {
-                for (int i = 0; i < lottery.MaxAward; i++)
-                {
-                    var award = participantList[RandomNumber.Between(0, participantList.Count)];
-                    awardList.Add(award);
-                    participantList.Remove(award);
-                }
-                await Context.Interaction.SendConfirmAsync($"已抽出", true, true);
-            }
-
-            await Context.Channel.SendConfirmAsync($"抽獎內容: {lottery.Context}\n\n" +
-                $"建立時間: {lottery.CreateTime:yyyy/MM/dd HH:mm:ss}\n\n" +
-                $"得獎人員: {string.Join('\n', awardList.Select((x) => $"<@{x}>"))}");
-
             try
             {
-                db.Lottery.Remove(lottery);
-                db.SaveChanges();
+                List<ulong> participantList = JsonConvert.DeserializeObject<List<ulong>>(lottery.ParticipantList);
+                List<ulong> awardList = new();
+                if (!participantList.Any())
+                {
+                    await Context.Interaction.SendErrorAsync("該抽獎無人參加，將直接移除此抽獎", true);
+                    try
+                    {
+                        db.Lottery.Remove(lottery);
+                        db.SaveChanges();
+                    }
+                    catch (Exception ex)
+                    {
+                        await Context.Interaction.SendErrorAsync($"抽獎資料庫保存失敗: {ex.Message}", true);
+                        Log.Error($"StartLotteryAsync-SaveChanges ({guid}): {ex}");
+                    }
+                    return;
+                }
+                else if (lottery.MaxAward >= participantList.Count)
+                {
+                    await Context.Interaction.SendConfirmAsync("參與人數未超過抽出人數，將直接讓參與成員得獎", true);
+                    awardList = participantList;
+                }
+                else
+                {
+                    for (int i = 0; i < lottery.MaxAward; i++)
+                    {
+                        var award = participantList[RandomNumber.Between(0, participantList.Count - 1)];
+                        awardList.Add(award);
+                        participantList.Remove(award);
+                    }
+                    await Context.Interaction.SendConfirmAsync($"已抽出", true, true);
+                }
+
+                await Context.Channel.SendConfirmAsync($"抽獎內容: {lottery.Context}\n\n" +
+                    $"建立時間: {lottery.CreateTime:yyyy/MM/dd HH:mm:ss}\n\n" +
+                    $"得獎人員:\n" +
+                    string.Join('\n', awardList.Select((x) =>
+                    {
+                        try
+                        {
+                            var user = Context.Guild.GetUser(x);
+                            return $"{user} ({user.Mention})";
+                        }
+                        catch
+                        {
+                            return $"(<@{x}>)";
+                        }
+                    })));
+
+                try
+                {
+                    db.Lottery.Remove(lottery);
+                    db.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    await Context.Interaction.SendErrorAsync($"抽獎資料庫保存失敗: {ex.Message}", true);
+                    Log.Error($"StartLotteryAsync-SaveChanges ({guid}): {ex}");
+                }
             }
             catch (Exception ex)
             {
-                await Context.Interaction.SendErrorAsync($"抽獎資料庫保存失敗: {ex.Message}", true);
-                Log.Error($"StartLotteryAsync-SaveChanges: {ex}");
+                await Context.Interaction.SendErrorAsync($"抽獎錯誤: {ex.Message}", true);
+                Log.Error($"StartLotteryAsync ({guid}): {ex}");
             }
         }
 
@@ -256,6 +334,8 @@ namespace Discord_Support_Bot.Interaction.Lottery
         {
             await DeferAsync(true);
 
+            await Context.Guild.DownloadUsersAsync();
+
             using var db = new SupportContext();
             var lottery = db.Lottery.FirstOrDefault((x) => x.Guid == guid);
             if (lottery == null)
@@ -274,9 +354,24 @@ namespace Discord_Support_Bot.Interaction.Lottery
             {
                 await Context.SendPaginatedConfirmAsync(0, (page) =>
                 {
+                    var resultList = participantList.Skip(page * 25).Take(25).Select((x) =>
+                    {
+                        try
+                        {
+                            var user = Context.Guild.GetUser(x);
+                            return $"{user} ({user.Mention})";
+                        }
+                        catch
+                        {
+                            return $"(<@{x}>)";
+                        }
+                    });
                     return new EmbedBuilder().WithOkColor()
-                         .WithTitle($"`{lottery.AwardContext}` 已參與的成員")
-                         .WithDescription(string.Join('\n', participantList.Skip(page * 25).Take(25).Select((x) => $"<@{x}>")));
+                        .WithTitle($"`{lottery.AwardContext}` 已參與的成員")
+                        .WithDescription(string.Join('\n', resultList))
+                        .AddField("本次參與抽獎結束時間", lottery.EndTime.ConvertDateTimeToDiscordMarkdown())
+                        .AddField("本次抽出人數", lottery.MaxAward.ToString(), true)
+                        .AddField("已參與人數", participantList.Count); ;
                 }, participantList.Count, 25, true, true, true);
             }
         }

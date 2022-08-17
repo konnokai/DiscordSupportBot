@@ -336,7 +336,7 @@ namespace Discord_Support_Bot.Command.Administration
             string result = "";
             using (var db = new SupportContext())
             {
-                var guild = db.UpdateGuildInfo.FirstOrDefault(x => x.GuildId == Context.Guild.Id);
+                var guild = db.GuildConfig.FirstOrDefault(x => x.GuildId == Context.Guild.Id);
 
                 if (guild != null && guild.ChannelMemberId != 0)
                 {
@@ -344,7 +344,7 @@ namespace Discord_Support_Bot.Command.Administration
                         .WithDescription($"已設定 `{Context.Guild.GetChannel(guild.ChannelMemberId).Name}` 為伺服器人數顯示的頻道\r\n要移除嗎?")).ConfigureAwait(false))
                     {
                         guild.ChannelMemberId = 0;
-                        db.UpdateGuildInfo.Update(guild);
+                        db.GuildConfig.Update(guild);
                         await db.SaveChangesAsync().ConfigureAwait(false);
                         result = "已移除伺服器人數顯示功能";
                     }
@@ -368,11 +368,11 @@ namespace Discord_Support_Bot.Command.Administration
                     else
                     {
                         if (guild == null)
-                            await db.UpdateGuildInfo.AddAsync(new SQLite.Table.UpdateGuildInfo() { GuildId = Context.Guild.Id, ChannelMemberId = cId }).ConfigureAwait(false);
+                            await db.GuildConfig.AddAsync(new GuildConfig() { GuildId = Context.Guild.Id, ChannelMemberId = cId }).ConfigureAwait(false);
                         else
                         {
                             guild.ChannelMemberId = channel.Id;
-                            db.UpdateGuildInfo.Update(guild);
+                            db.GuildConfig.Update(guild);
                         }
 
                         try
@@ -407,7 +407,7 @@ namespace Discord_Support_Bot.Command.Administration
             string result = "";
             using (var db = new SQLite.SupportContext())
             {
-                var guild = db.UpdateGuildInfo.FirstOrDefault(x => x.GuildId == Context.Guild.Id);
+                var guild = db.GuildConfig.FirstOrDefault(x => x.GuildId == Context.Guild.Id);
 
                 if (guild != null && guild.ChannelNitroId != 0)
                 {
@@ -415,7 +415,7 @@ namespace Discord_Support_Bot.Command.Administration
                         .WithDescription($"已設定 `{Context.Guild.GetChannel(guild.ChannelNitroId).Name}` 為伺服器Nitro數量顯示的頻道\r\n要移除嗎?")).ConfigureAwait(false))
                     {
                         guild.ChannelNitroId = 0;
-                        db.UpdateGuildInfo.Update(guild);
+                        db.GuildConfig.Update(guild);
                         await db.SaveChangesAsync().ConfigureAwait(false);
                         result = "已移除伺服器Nitro數量顯示功能";
                     }
@@ -439,11 +439,11 @@ namespace Discord_Support_Bot.Command.Administration
                     else
                     {
                         if (guild == null)
-                            await db.UpdateGuildInfo.AddAsync(new SQLite.Table.UpdateGuildInfo() { GuildId = Context.Guild.Id, ChannelNitroId = cId }).ConfigureAwait(false);
+                            await db.GuildConfig.AddAsync(new GuildConfig() { GuildId = Context.Guild.Id, ChannelNitroId = cId }).ConfigureAwait(false);
                         else
                         {
                             guild.ChannelNitroId = channel.Id;
-                            db.UpdateGuildInfo.Update(guild);
+                            db.GuildConfig.Update(guild);
                         }
 
                         try

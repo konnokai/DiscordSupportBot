@@ -27,7 +27,7 @@ namespace Discord_Support_Bot.Command.Normal
             {
                 using (var db = new SupportContext())
                 {
-                    var list = Queryable.Where(db.UpdateGuildInfo, (x) => x.TwitterId != 0);
+                    var list = Queryable.Where(db.GuildConfig, (x) => x.TwitterId != 0);
                     foreach (var item in list)
                     {
                         try
@@ -63,7 +63,7 @@ namespace Discord_Support_Bot.Command.Normal
                                 }
 
                                 item.LastTwitterProfileURL = imgUrl;
-                                db.UpdateGuildInfo.Update(item);
+                                db.GuildConfig.Update(item);
                                 await db.SaveChangesAsync();
                             }
                         }

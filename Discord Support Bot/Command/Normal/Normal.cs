@@ -186,15 +186,15 @@ namespace Discord_Support_Bot.Command.Normal
             {
                 using (var db = new SupportContext())
                 {
-                    if (db.UpdateGuildInfo.Any(x => x.GuildId == Context.Guild.Id))
+                    if (db.GuildConfig.Any(x => x.GuildId == Context.Guild.Id))
                     {
-                        var guild = db.UpdateGuildInfo.First((x) => x.GuildId == Context.Guild.Id);
+                        var guild = db.GuildConfig.First((x) => x.GuildId == Context.Guild.Id);
                         guild.TwitterId = user.Id;
-                        db.UpdateGuildInfo.Update(guild);
+                        db.GuildConfig.Update(guild);
                     }
                     else
                     {
-                        db.UpdateGuildInfo.Add(new UpdateGuildInfo() { GuildId = Context.Guild.Id, TwitterId = user.Id });
+                        db.GuildConfig.Add(new GuildConfig() { GuildId = Context.Guild.Id, TwitterId = user.Id });
                     }
 
                     await db.SaveChangesAsync().ConfigureAwait(false);
@@ -215,16 +215,16 @@ namespace Discord_Support_Bot.Command.Normal
         {
             using (var db = new SupportContext())
             {
-                if (db.UpdateGuildInfo.Any(x => x.GuildId == Context.Guild.Id))
+                if (db.GuildConfig.Any(x => x.GuildId == Context.Guild.Id))
                 {
-                    var guild = db.UpdateGuildInfo.First((x) => x.GuildId == Context.Guild.Id);
+                    var guild = db.GuildConfig.First((x) => x.GuildId == Context.Guild.Id);
 
                     if (guild.TwitterId != 0)
                     {
                         var twitterId = guild.TwitterId;
                         guild.TwitterId = 0;
 
-                        db.UpdateGuildInfo.Update(guild);
+                        db.GuildConfig.Update(guild);
                         await db.SaveChangesAsync().ConfigureAwait(false);
 
                         await Context.Channel.SendConfirmAsync($"已解除連結 `{twitterId}`").ConfigureAwait(false);

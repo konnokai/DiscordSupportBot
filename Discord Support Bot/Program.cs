@@ -102,13 +102,13 @@ namespace Discord_Support_Bot
 
             using (var db = new SupportContext())
             {
-                foreach (var item in db.UpdateGuildInfo.ToList().Where((x) => x.ChannelMemberId != 0 || x.ChannelNitroId != 0))
+                foreach (var item in db.GuildConfig.ToList().Where((x) => x.ChannelMemberId != 0 || x.ChannelNitroId != 0))
                 {
                     SocketGuild guild = Client.GetGuild(item.GuildId);
                     if (guild == null) 
                     {
                         Log.Error("找不到 " + item.GuildId.ToString()); 
-                        db.UpdateGuildInfo.Remove(item);
+                        db.GuildConfig.Remove(item);
                         await db.SaveChangesAsync();
                         continue;
                     }
@@ -125,7 +125,7 @@ namespace Discord_Support_Bot
                             if (channel1 == null) { Log.Error("找不到 " + item.ChannelMemberId.ToString()); item.ChannelMemberId = 0; }
                             else await channel1.ModifyAsync((act) => { act.Name = "伺服器人數-" + guild.MemberCount.ToString(); });
 
-                            Log.Info($"UpdateGuildMemberInfo: {guild.Name}({guild.Id}) - {guild.MemberCount}");
+                            //Log.Info($"UpdateGuildMemberInfo: {guild.Name}({guild.Id}) - {guild.MemberCount}");
                         }
                         catch (Exception ex)
                         {
@@ -146,7 +146,7 @@ namespace Discord_Support_Bot
                             if (channel1 == null) { Log.Error("找不到 " + item.ChannelNitroId.ToString()); item.ChannelNitroId = 0; }
                             else await channel1.ModifyAsync((act) => { act.Name = "Nitro數-" + guild.PremiumSubscriptionCount.ToString(); });
 
-                            Log.Info($"UpdateGuildNitroInfo: {guild.Name}({guild.Id}) - {guild.PremiumSubscriptionCount}");
+                            //Log.Info($"UpdateGuildNitroInfo: {guild.Name}({guild.Id}) - {guild.PremiumSubscriptionCount}");
                         }
                         catch (Exception ex)
                         {
@@ -158,8 +158,8 @@ namespace Discord_Support_Bot
                         }
                     }
 
-                    db.UpdateGuildInfo.Update(item);
-                    await db.SaveChangesAsync();
+                    db.GuildConfig.Update(item);
+                    db.SaveChanges();
                 }
             }
         }
@@ -221,7 +221,6 @@ namespace Discord_Support_Bot
             IServiceProvider service = commandServices.BuildServiceProvider();
             await service.GetService<CommandHandler>().InitializeAsync();
             #endregion
-
 
             Client.GuildMemberUpdated += async (before, after) => //僅限特定伺服器使用
             {
@@ -286,10 +285,10 @@ namespace Discord_Support_Bot
                     {
                         try
                         {
-                            var result = await interactionService.RegisterCommandsToGuildAsync(botConfig.TestSlashCommandGuildId);
+                            var result = await interactionService.AddModulesToGuildAsync(botConfig.TestSlashCommandGuildId, true, interactionService.Modules.Where((x) => x.DontAutoRegister).ToArray());
                             Log.Info($"已註冊指令 ({botConfig.TestSlashCommandGuildId}) : {string.Join(", ", result.Select((x) => x.Name))}");
 
-                            result = await interactionService.AddModulesToGuildAsync(botConfig.TestSlashCommandGuildId, true, interactionService.Modules.Where((x) => x.DontAutoRegister).ToArray());
+                            result = await interactionService.RegisterCommandsToGuildAsync(botConfig.TestSlashCommandGuildId);
                             Log.Info($"已註冊指令 ({botConfig.TestSlashCommandGuildId}) : {string.Join(", ", result.Select((x) => x.Name))}");
                         }
                         catch (Exception ex)
@@ -298,17 +297,16 @@ namespace Discord_Support_Bot
                             Log.Error(ex.ToString());
                         }
                     }
+                }
 #else
+                    int commandCount = 0;
                     try
                     {
-                        int commandCount = 0;
 
                         if (File.Exists(GetDataFilePath("CommandCount.bin")))
                             commandCount = BitConverter.ToInt32(File.ReadAllBytes(GetDataFilePath("CommandCount.bin")));
-                        else
-                            File.WriteAllBytes(GetDataFilePath("CommandCount.bin"), BitConverter.GetBytes(iService.GetService<InteractionHandler>().CommandCount));
 
-                        if (commandCount == iService.GetService<InteractionHandler>().CommandCount) return;
+                        File.WriteAllBytes(GetDataFilePath("CommandCount.bin"), BitConverter.GetBytes(iService.GetService<InteractionHandler>().CommandCount));
                     }
                     catch (Exception ex)
                     {
@@ -321,33 +319,36 @@ namespace Discord_Support_Bot
                         return;
                     }
 
-                    try
+                    if (commandCount != iService.GetService<InteractionHandler>().CommandCount)
                     {
-                        foreach (var item in interactionService.Modules.Where((x) => x.Preconditions.Any((x) => x is Interaction.Attribute.RequireGuildAttribute)))
+                        try
                         {
-                            var guildId = ((Interaction.Attribute.RequireGuildAttribute)item.Preconditions.FirstOrDefault((x) => x is Interaction.Attribute.RequireGuildAttribute)).GuildId;
-                            var guild = Client.GetGuild(guildId.Value);
-
-                            if (guild == null)
+                            foreach (var item in interactionService.Modules.Where((x) => x.Preconditions.Any((x) => x is Interaction.Attribute.RequireGuildAttribute)))
                             {
-                                Log.Warn($"{item.Name} 註冊失敗，伺服器 {guildId} 不存在");
-                                continue;
+                                var guildId = ((Interaction.Attribute.RequireGuildAttribute)item.Preconditions.FirstOrDefault((x) => x is Interaction.Attribute.RequireGuildAttribute)).GuildId;
+                                var guild = Client.GetGuild(guildId.Value);
+
+                                if (guild == null)
+                                {
+                                    Log.Warn($"{item.Name} 註冊失敗，伺服器 {guildId} 不存在");
+                                    continue;
+                                }
+
+                                var result = await interactionService.AddModulesToGuildAsync(guild, true, item);
+                                Log.Info($"已在 {guild.Name}({guild.Id}) 註冊指令: {string.Join(", ", result.Select((x) => x.Name))}");
                             }
-
-                            var result = await interactionService.AddModulesToGuildAsync(guild, true, item);
-                            Log.Info($"已在 {guild.Name}({guild.Id}) 註冊指令: {string.Join(", ", result.Select((x) => x.Name))}");
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Error("註冊伺服器專用Slash指令失敗");
-                        Log.Error(ex.ToString());
-                    }
+                        catch (Exception ex)
+                        {
+                            Log.Error("註冊伺服器專用Slash指令失敗");
+                            Log.Error(ex.ToString());
+                        }
 
-                    await interactionService.RegisterCommandsGloballyAsync();
-                    Log.Info("已註冊全球指令");
-#endif
+                        await interactionService.RegisterCommandsGloballyAsync();
+                        Log.Info("已註冊全球指令");
+                    }
                 }
+#endif
                 catch (Exception ex)
                 {
                     Log.Error("註冊Slash指令失敗，關閉中...");
@@ -355,9 +356,7 @@ namespace Discord_Support_Bot
                     isDisconnect = true;
                 }
 
-#if DEBUG
                 Log.FormatColorWrite("準備完成", ConsoleColor.Green);
-#endif
             };
             #region Login
             await Client.LoginAsync(TokenType.Bot, botConfig.DiscordToken);
