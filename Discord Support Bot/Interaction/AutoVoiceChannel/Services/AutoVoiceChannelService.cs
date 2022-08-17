@@ -1,27 +1,21 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Discord_Support_Bot.Interaction.AutoVoiceChannel.Services
+﻿namespace Discord_Support_Bot.Interaction.AutoVoiceChannel.Services
 {
     public class AutoVoiceChannelService : IInteractionService
     {
         private readonly DiscordSocketClient _client;
+        private enum ChannelEvent { Create, MoveOnly, Error, None };
 
         public AutoVoiceChannelService(DiscordSocketClient client)
         {
             _client = client;
             _client.UserVoiceStateUpdated += _client_UserVoiceStateUpdated;
-            _ = new Timer((obj) => 
-            { 
+            _ = new Timer((obj) =>
+            {
                 _ = Task.Run(async () =>
                 {
                     await RemoveEmptyVoiceChannel(null);
-                    
-                }); 
+
+                });
             }, null, TimeSpan.FromMinutes(1), TimeSpan.FromHours(1));
         }
 
@@ -70,11 +64,11 @@ namespace Discord_Support_Bot.Interaction.AutoVoiceChannel.Services
 
                 if (beforeVch?.Guild == afterVch?.Guild) // User Move
                 {
-                    bool isCreate = false;
+                    ChannelEvent @event = ChannelEvent.Error;
                     if (afterVch.Id == guildConfig.AutoVoiceChannel)
-                        isCreate = await CreateVoiceChannelAndMoveUser(usr, afterVch);
-                    if (isCreate && beforeVch.Name.EndsWith("'s Room") && !beforeVch.ConnectedUsers.Any())
-                        await beforeVch.DeleteAsync();
+                        @event = await CreateVoiceChannelAndMoveUser(usr, afterVch);
+                    if (beforeVch.Name.EndsWith("'s Room") && !beforeVch.ConnectedUsers.Any())
+                        if (@event != ChannelEvent.MoveOnly) await beforeVch.DeleteAsync();
                 }
                 else if (beforeVch is null) // User Join
                 {
@@ -90,9 +84,9 @@ namespace Discord_Support_Bot.Interaction.AutoVoiceChannel.Services
             return Task.CompletedTask;
         }
 
-        private async Task<bool> CreateVoiceChannelAndMoveUser(IGuildUser user, SocketVoiceChannel voiceChannel)
+        private async Task<ChannelEvent> CreateVoiceChannelAndMoveUser(IGuildUser user, SocketVoiceChannel voiceChannel)
         {
-            bool isCreate = false;
+            var result = ChannelEvent.None;
             try
             {
                 string roomName = $"{user.Username}'s Room";
@@ -107,7 +101,7 @@ namespace Discord_Support_Bot.Interaction.AutoVoiceChannel.Services
                         act.UserLimit = voiceChannel.UserLimit;
                     });
                     Log.Info($"建立語音頻道: {newChannel.Name}");
-                    isCreate = true;
+                    result = ChannelEvent.Create;
                 }
 
                 await voiceChannel.Guild.MoveAsync(user, newChannel);
@@ -115,9 +109,10 @@ namespace Discord_Support_Bot.Interaction.AutoVoiceChannel.Services
             catch (Exception ex)
             {
                 Log.Error(ex.ToString());
+                result = ChannelEvent.Error;
             }
 
-            return isCreate;
+            return result;
         }
     }
 }
