@@ -179,14 +179,12 @@ namespace Discord_Support_Bot.Interaction
             if (addPaginatedFooter)
                 embed.AddPaginatedFooter(currentPage, lastPage);
 
-            IUserMessage msg;
-            if (isFollowup) msg = await ctx.Interaction.FollowupAsync(embed: embed.Build(), ephemeral: ephemeral).ConfigureAwait(false);
-            else
-            {
-                await ctx.Interaction.RespondAsync(embed: embed.Build(), ephemeral: ephemeral).ConfigureAwait(false);
-                msg = await ctx.Interaction.GetOriginalResponseAsync().ConfigureAwait(false);
-            }
+            await ctx.Interaction.RespondAsync(ephemeral ? "私人回應，無法換頁\n如需換頁請直接使用指令換頁" : null, embed: embed.Build(), ephemeral: ephemeral).ConfigureAwait(false);
 
+            if (ephemeral)
+                return;
+
+            var msg = await ctx.Interaction.GetOriginalResponseAsync().ConfigureAwait(false);
             if (lastPage == 0)
                 return;
 

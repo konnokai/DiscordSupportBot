@@ -48,7 +48,7 @@
         {
             _ = Task.Run(async () =>
             {
-                if (user is not IGuildUser usr || usr.IsBot)
+                if (user is not IGuildUser usr)
                     return;
 
                 var beforeVch = before.VoiceChannel;
@@ -65,12 +65,12 @@
                 if (beforeVch?.Guild == afterVch?.Guild) // User Move
                 {
                     ChannelEvent @event = ChannelEvent.Error;
-                    if (afterVch.Id == guildConfig.AutoVoiceChannel)
+                    if (afterVch.Id == guildConfig.AutoVoiceChannel && !usr.IsBot)
                         @event = await CreateVoiceChannelAndMoveUser(usr, afterVch);
                     if (beforeVch.Name.EndsWith("'s Room") && !beforeVch.ConnectedUsers.Any())
                         if (@event != ChannelEvent.MoveOnly) await beforeVch.DeleteAsync();
                 }
-                else if (beforeVch is null) // User Join
+                else if (beforeVch is null && !usr.IsBot) // User Join
                 {
                     if (afterVch.Id == guildConfig.AutoVoiceChannel)
                         await CreateVoiceChannelAndMoveUser(usr, afterVch);

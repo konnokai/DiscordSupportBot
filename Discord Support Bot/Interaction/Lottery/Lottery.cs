@@ -330,9 +330,16 @@ namespace Discord_Support_Bot.Interaction.Lottery
         [RequireUserPermission(GuildPermission.Administrator)]
         [EnabledInDm(false)]
         [RequireContext(ContextType.Guild)]
-        public async Task ShowParticipantListAsync([Summary("lottery", "要抽的獎項"), Autocomplete(typeof(ShowAllLotteryAutocompleteHandler))] string guid)
+        public async Task ShowParticipantListAsync([Summary("lottery", "要抽的獎項"), Autocomplete(typeof(ShowAllLotteryAutocompleteHandler))] string guid, [Summary("page", "頁數")] int page = 1)
         {
             await DeferAsync(true);
+
+            page -= 1;
+            if (page < 0)
+            {
+                await Context.Interaction.SendErrorAsync("頁數需大於1");
+                return;
+            }
 
             await Context.Guild.DownloadUsersAsync();
 
@@ -352,7 +359,7 @@ namespace Discord_Support_Bot.Interaction.Lottery
             }
             else
             {
-                await Context.SendPaginatedConfirmAsync(0, (page) =>
+                await Context.SendPaginatedConfirmAsync(page, (page) =>
                 {
                     var resultList = participantList.Skip(page * 25).Take(25).Select((x) =>
                     {

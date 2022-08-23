@@ -49,5 +49,40 @@ namespace Discord_Support_Bot.Interaction.AutoVoiceChannel
                 await Context.Interaction.SendErrorAsync($"設定失敗，請向 {Program.ApplicatonOwner} 確認原因\n{ex.Message}", true);
             }
         }
+
+        [SlashCommand("remove-auto-voice-channel", "移除自動建立專用語音頻道")]
+        [EnabledInDm(false)]
+        [DefaultMemberPermissions(GuildPermission.Administrator)]
+        [RequireContext(ContextType.Guild)]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireBotPermission(GuildPermission.ManageChannels | GuildPermission.MoveMembers)]
+        public async Task RemoveAutoVoiceChannelAsync()
+        {
+            await DeferAsync(true);
+
+            try
+            {
+                using var db = new SupportContext();
+                var guildConfig = db.GuildConfig.FirstOrDefault((x) => x.GuildId == Context.Interaction.GuildId);
+                if (guildConfig == null)
+                {
+                    await Context.Interaction.SendErrorAsync("無自動語音頻道可供移除");
+                    return;
+                }
+                else
+                {
+                    guildConfig.AutoVoiceChannel = 0;
+                    db.GuildConfig.Update(guildConfig);
+                }
+
+                db.SaveChanges();
+                await Context.Interaction.SendConfirmAsync($"已移除自動語音頻道", true, true);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"RemoveAutoVoiceChannelAsync: {ex}");
+                await Context.Interaction.SendErrorAsync($"設定失敗，請向 {Program.ApplicatonOwner} 確認原因\n{ex.Message}", true);
+            }
+        }
     }
 }
