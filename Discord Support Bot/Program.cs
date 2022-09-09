@@ -123,7 +123,13 @@ namespace Discord_Support_Bot
                             SocketGuildChannel channel1 = guild.GetChannel(item.ChannelMemberId);
 
                             if (channel1 == null) { Log.Error("找不到 " + item.ChannelMemberId.ToString()); item.ChannelMemberId = 0; }
-                            else await channel1.ModifyAsync((act) => { act.Name = "伺服器人數-" + guild.MemberCount.ToString(); });
+                            else
+                            {
+                                if (channel1 is SocketVoiceChannel)
+                                    await channel1.ModifyAsync((act) => { act.Name = "伺服器人數: " + guild.MemberCount.ToString(); });
+                                else
+                                    await channel1.ModifyAsync((act) => { act.Name = "伺服器人數-" + guild.MemberCount.ToString(); });
+                            }
 
                             //Log.Info($"UpdateGuildMemberInfo: {guild.Name}({guild.Id}) - {guild.MemberCount}");
                         }
@@ -144,7 +150,13 @@ namespace Discord_Support_Bot
                             SocketGuildChannel channel1 = guild.GetChannel(item.ChannelNitroId);
 
                             if (channel1 == null) { Log.Error("找不到 " + item.ChannelNitroId.ToString()); item.ChannelNitroId = 0; }
-                            else await channel1.ModifyAsync((act) => { act.Name = "Nitro數-" + guild.PremiumSubscriptionCount.ToString(); });
+                            else
+                            {
+                                if (channel1 is SocketVoiceChannel)
+                                    await channel1.ModifyAsync((act) => { act.Name = "Nitro數: " + guild.PremiumSubscriptionCount.ToString(); });
+                                else
+                                    await channel1.ModifyAsync((act) => { act.Name = "Nitro數-" + guild.PremiumSubscriptionCount.ToString(); });
+                            }
 
                             //Log.Info($"UpdateGuildNitroInfo: {guild.Name}({guild.Id}) - {guild.PremiumSubscriptionCount}");
                         }
