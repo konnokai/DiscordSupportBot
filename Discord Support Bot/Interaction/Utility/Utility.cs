@@ -3,7 +3,7 @@
 namespace Discord_Support_Bot.Interaction.Utility
 {
     [Group("utility", "工具")]
-    public class Utility : TopLevelModule
+    public class Utility : TopLevelModule<UtilityService>
     {
         private readonly DiscordSocketClient _client;
 
@@ -40,6 +40,12 @@ namespace Discord_Support_Bot.Interaction.Utility
             embedBuilder.AddField("上線時間", $"{Program.stopWatch.Elapsed:d\\天\\ hh\\:mm\\:ss}", false);
 
             await RespondAsync(embed: embedBuilder.Build());
+        }
+
+        [SlashCommand("sub", "訂閱按鈕")]
+        public async Task SubAsync()
+        {
+            await RespondAsync("點我訂閱", components: new ComponentBuilder().WithButton("訂閱", "sub", ButtonStyle.Danger).Build());
         }
     }
 }
