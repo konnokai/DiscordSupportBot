@@ -111,7 +111,6 @@ namespace Discord_Support_Bot.Interaction.Lottery
                 if (button.HasResponded || !button.Data.CustomId.Contains("lottery:"))
                     return;
 
-                Log.Info($"\"{button.User}\" Click Button: {button.Data.CustomId}");
                 await button.DeferAsync(true);
 
                 string lotteryGuid = button.Data.CustomId.Replace("join-lottery:", "").Replace("leave-lottery:", "");

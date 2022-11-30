@@ -61,7 +61,14 @@ namespace Discord_Support_Bot.Interaction
 
             _client.InteractionCreated += (slash) => { var _ = Task.Run(() => HandleInteraction(slash)); return Task.CompletedTask; };
             _client.MessageCommandExecuted += MessageCommandExecuted;
+            _client.ButtonExecuted += _client_ButtonExecuted;
             _interactions.SlashCommandExecuted += SlashCommandExecuted;
+        }
+
+        private Task _client_ButtonExecuted(SocketMessageComponent button)
+        {
+            Log.Info($"\"{button.User}\" Click Button: {button.Data.CustomId}");
+            return Task.CompletedTask;
         }
 
         private Task MessageCommandExecuted(SocketMessageCommand arg)
