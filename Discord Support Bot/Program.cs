@@ -133,6 +133,7 @@ namespace Discord_Support_Bot
 
                             //Log.Info($"UpdateGuildMemberInfo: {guild.Name}({guild.Id}) - {guild.MemberCount}");
                         }
+                        catch (TimeoutException) { }
                         catch (Exception ex)
                         {
                             Log.Error($"UpdateGuildMemberInfo: {guild.Name} ({guild.Id}): {item.ChannelMemberId}");
@@ -160,6 +161,7 @@ namespace Discord_Support_Bot
 
                             //Log.Info($"UpdateGuildNitroInfo: {guild.Name}({guild.Id}) - {guild.PremiumSubscriptionCount}");
                         }
+                        catch (TimeoutException) { }
                         catch (Exception ex)
                         {
                             Log.Error($"UpdateGuildNitroInfo: {guild.Name} ({guild.Id}): {item.ChannelNitroId}");
