@@ -7,6 +7,7 @@
     public string TwitterClientBearerToken { get; set; } = "";
     public ulong TestSlashCommandGuildId { get; set; } = 0;
     public string RedisOption { get; set; } = "localhost:6379,syncTimeout=3000";
+    public string UptimeKumaPushUrl { get; set; } = "";
 
     public void InitBotConfig()
     {
@@ -55,22 +56,6 @@
                 Environment.Exit(3);
             }
 
-            //if (string.IsNullOrWhiteSpace(config.GoogleClientId))
-            //{
-            //    Log.Error("GoogleClientId遺失，請輸入至credentials.json後重開Bot");
-            //    if (!Console.IsInputRedirected)
-            //        Console.ReadKey();
-            //    Environment.Exit(3);
-            //}
-
-            //if (string.IsNullOrWhiteSpace(config.GoogleClientSecret))
-            //{
-            //    Log.Error("GoogleClientSecret遺失，請輸入至credentials.json後重開Bot");
-            //    if (!Console.IsInputRedirected)
-            //        Console.ReadKey();
-            //    Environment.Exit(3);
-            //}
-
             DiscordToken = config.DiscordToken;
             WebHookUrl = config.WebHookUrl;
             TwitterClientKey = config.TwitterClientKey;
@@ -78,6 +63,7 @@
             TwitterClientBearerToken = config.TwitterClientBearerToken;
             TestSlashCommandGuildId = config.TestSlashCommandGuildId;
             RedisOption = config.RedisOption;
+            UptimeKumaPushUrl = config.UptimeKumaPushUrl;
         }
         catch (Exception ex)
         {

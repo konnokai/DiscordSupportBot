@@ -284,6 +284,8 @@ namespace Discord_Support_Bot
                 timerUpdateStatus.Change(0, 20 * 60 * 1000);
                 timerSaveDatebase.Change(20 * 60 * 1000, 20 * 60 * 1000);
 
+                UptimeKumaClient.Init(botConfig.UptimeKumaPushUrl, Client);
+
                 ApplicatonOwner = (await Client.GetApplicationInfoAsync().ConfigureAwait(false)).Owner;
 
                 isConnect = true;
