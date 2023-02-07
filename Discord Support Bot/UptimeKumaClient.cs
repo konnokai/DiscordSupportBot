@@ -55,6 +55,9 @@
         }
         catch (HttpRequestException requestEx)
         {
+            if (requestEx.Message.Contains("500"))
+                return;
+
             Log.Error($"UptimeKumaTimerHandler-RequestError: {requestEx.Message}");
         }
         catch (Exception ex)
