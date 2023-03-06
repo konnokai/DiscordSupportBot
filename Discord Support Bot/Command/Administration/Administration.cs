@@ -1,11 +1,11 @@
-﻿using DiscordChatExporter.Core.Discord;
+﻿using Discord.Commands;
+using DiscordChatExporter.Core.Discord;
 using DiscordChatExporter.Core.Exporting;
 using DiscordChatExporter.Core.Exporting.Filtering;
 using DiscordChatExporter.Core.Exporting.Partitioning;
 using DiscordChatExporter.Core.Utils.Extensions;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
-using Discord.Commands;
 using System.Text.RegularExpressions;
 
 namespace Discord_Support_Bot.Command.Administration
@@ -479,7 +479,7 @@ namespace Discord_Support_Bot.Command.Administration
             var list = await Context.Guild.GetEmotesAsync().ConfigureAwait(false);
             var exportNum = 0;
 
-            using FileStream fs = new FileStream(Program.GetDataFilePath($"{Context.Guild.Id}_Emoji.zip"), FileMode.OpenOrCreate);           
+            using FileStream fs = new FileStream(Program.GetDataFilePath($"{Context.Guild.Id}_Emoji.zip"), FileMode.OpenOrCreate);
             using (ZipArchive zipArchive = new ZipArchive(fs, ZipArchiveMode.Update))
             {
                 foreach (var item in list)
@@ -619,7 +619,7 @@ namespace Discord_Support_Bot.Command.Administration
                     ShouldReuseMedia: true,
                     DateFormat: "yyyy-MM-dd hh:mm tt"
                 );
-                
+
                 await _service._channelExporter.ExportChannelAsync(
                     request
                 );
@@ -648,7 +648,7 @@ namespace Discord_Support_Bot.Command.Administration
                 var reslut = regex.Match(item.Name);
                 if (reslut.Success)
                 {
-                    await item.ModifyAsync((act) =>{ act.Name = reslut.Value; act.UserLimit = 3; }) ;
+                    await item.ModifyAsync((act) => { act.Name = reslut.Value; act.UserLimit = 3; });
                     Log.Info(item.Name);
                 }
             }

@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Text;
-
-namespace DiscordChatExporter.Core.Utils;
+﻿namespace DiscordChatExporter.Core.Utils;
 
 public static class PathEx
 {

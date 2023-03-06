@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text;
-
-namespace DiscordChatExporter.Core.Utils.Extensions;
+﻿namespace DiscordChatExporter.Core.Utils.Extensions;
 
 public static class StringExtensions
 {

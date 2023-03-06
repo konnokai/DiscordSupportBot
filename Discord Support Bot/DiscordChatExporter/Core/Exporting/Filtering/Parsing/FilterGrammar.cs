@@ -30,24 +30,24 @@ internal static class FilterGrammar
         Parse.OneOf(QuotedString, UnquotedString).Named("text string");
 
     private static readonly TextParser<MessageFilter> ContainsFilter =
-        String.Select(v => (MessageFilter) new ContainsMessageFilter(v));
+        String.Select(v => (MessageFilter)new ContainsMessageFilter(v));
 
     private static readonly TextParser<MessageFilter> FromFilter = Span
         .EqualToIgnoreCase("from:")
         .IgnoreThen(String)
-        .Select(v => (MessageFilter) new FromMessageFilter(v))
+        .Select(v => (MessageFilter)new FromMessageFilter(v))
         .Named("from:<value>");
 
     private static readonly TextParser<MessageFilter> MentionsFilter = Span
         .EqualToIgnoreCase("mentions:")
         .IgnoreThen(String)
-        .Select(v => (MessageFilter) new MentionsMessageFilter(v))
+        .Select(v => (MessageFilter)new MentionsMessageFilter(v))
         .Named("mentions:<value>");
 
     private static readonly TextParser<MessageFilter> ReactionFilter = Span
         .EqualToIgnoreCase("reaction:")
         .IgnoreThen(String)
-        .Select(v => (MessageFilter) new ReactionMessageFilter(v))
+        .Select(v => (MessageFilter)new ReactionMessageFilter(v))
         .Named("reaction:<value>");
 
     private static readonly TextParser<MessageFilter> HasFilter = Span
@@ -60,13 +60,13 @@ internal static class FilterGrammar
             Span.EqualToIgnoreCase("image").IgnoreThen(Parse.Return(MessageContentMatchKind.Image)),
             Span.EqualToIgnoreCase("sound").IgnoreThen(Parse.Return(MessageContentMatchKind.Sound))
         ))
-        .Select(k => (MessageFilter) new HasMessageFilter(k))
+        .Select(k => (MessageFilter)new HasMessageFilter(k))
         .Named("has:<value>");
 
     private static readonly TextParser<MessageFilter> NegatedFilter = Character
         .EqualTo('-')
         .IgnoreThen(Parse.Ref(() => StandaloneFilter!))
-        .Select(f => (MessageFilter) new NegatedMessageFilter(f));
+        .Select(f => (MessageFilter)new NegatedMessageFilter(f));
 
     private static readonly TextParser<MessageFilter> GroupedFilter =
         from open in Character.EqualTo('(')

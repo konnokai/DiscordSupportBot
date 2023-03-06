@@ -54,7 +54,7 @@ namespace Discord_Support_Bot.Interaction.NC_Guild_Only
         }
 
         [SlashCommand("search", "查詢使用者的資訊")]
-        public async Task SearchAsync([Summary("使用者", "若無輸入則顯示自己的資訊")]IUser dcUser = null)
+        public async Task SearchAsync([Summary("使用者", "若無輸入則顯示自己的資訊")] IUser dcUser = null)
         {
             await DeferAsync(true);
 

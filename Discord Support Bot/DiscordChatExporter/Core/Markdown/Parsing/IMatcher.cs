@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace DiscordChatExporter.Core.Markdown.Parsing;
+﻿namespace DiscordChatExporter.Core.Markdown.Parsing;
 
 internal interface IMatcher<T>
 {

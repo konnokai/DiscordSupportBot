@@ -1,9 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using DiscordChatExporter.Core.Discord.Data;
+﻿using DiscordChatExporter.Core.Discord.Data;
 using DiscordChatExporter.Core.Exporting.Writers.MarkdownVisitors;
 using DiscordChatExporter.Core.Utils.Extensions;
 using Attachment = DiscordChatExporter.Core.Discord.Data.Attachment;

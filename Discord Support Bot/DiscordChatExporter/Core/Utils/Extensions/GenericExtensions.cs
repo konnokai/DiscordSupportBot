@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace DiscordChatExporter.Core.Utils.Extensions;
+﻿namespace DiscordChatExporter.Core.Utils.Extensions;
 
 public static class GenericExtensions
 {

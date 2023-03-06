@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using DiscordChatExporter.Core.Discord.Data;
+﻿using DiscordChatExporter.Core.Discord.Data;
 
 namespace DiscordChatExporter.Core.Exporting.Filtering;
 

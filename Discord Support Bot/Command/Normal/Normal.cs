@@ -62,7 +62,7 @@ namespace Discord_Support_Bot.Command.Normal
             if (userActivity == null) return;
             var user = userActivity.FirstOrDefault((x) => x.UserID == Context.User.Id);
 
-            await Context.SendPaginatedConfirmAsync(page,async (row) =>
+            await Context.SendPaginatedConfirmAsync(page, async (row) =>
             {
                 EmbedBuilder embedBuilder = new EmbedBuilder().WithOkColor().WithTitle($"{Context.Guild.Name} 發言排行榜");
                 var items = userActivity.Skip(row * 20).Take(20).ToList(); string temp = "";
@@ -142,7 +142,7 @@ namespace Discord_Support_Bot.Command.Normal
             GuildEmote emoteData;
             try
             {
-                emoteData = await Context.Guild.GetEmoteAsync(emoteId).ConfigureAwait(false);               
+                emoteData = await Context.Guild.GetEmoteAsync(emoteId).ConfigureAwait(false);
             }
             catch (Exception)
             {
@@ -245,5 +245,5 @@ namespace Discord_Support_Bot.Command.Normal
 
             await Context.Channel.SendErrorAsync("伺服器未連結推特帳號，請使用 `!!!h lt` 查看說明").ConfigureAwait(false);
         }
-    }    
+    }
 }

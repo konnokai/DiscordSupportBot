@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace DiscordChatExporter.Core.Markdown.Parsing;
+﻿namespace DiscordChatExporter.Core.Markdown.Parsing;
 
 internal class AggregateMatcher<T> : IMatcher<T>
 {
@@ -12,7 +10,7 @@ internal class AggregateMatcher<T> : IMatcher<T>
     }
 
     public AggregateMatcher(params IMatcher<T>[] matchers)
-        : this((IReadOnlyList<IMatcher<T>>) matchers)
+        : this((IReadOnlyList<IMatcher<T>>)matchers)
     {
     }
 

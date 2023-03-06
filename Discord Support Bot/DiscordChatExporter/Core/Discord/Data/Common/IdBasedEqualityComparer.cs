@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace DiscordChatExporter.Core.Discord.Data.Common;
+﻿namespace DiscordChatExporter.Core.Discord.Data.Common;
 
 public class IdBasedEqualityComparer : IEqualityComparer<IHasId>
 {

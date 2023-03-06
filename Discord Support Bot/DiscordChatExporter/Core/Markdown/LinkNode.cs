@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace DiscordChatExporter.Core.Markdown;
+﻿namespace DiscordChatExporter.Core.Markdown;
 
 internal record LinkNode(
     string Url,

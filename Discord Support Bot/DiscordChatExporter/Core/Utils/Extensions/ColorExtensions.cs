@@ -1,4 +1,4 @@
-﻿using Color =  System.Drawing.Color;
+﻿using Color = System.Drawing.Color;
 
 namespace DiscordChatExporter.Core.Utils.Extensions;
 

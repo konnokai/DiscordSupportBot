@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Discord.Commands;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
-using Discord.Commands;
 
 namespace Discord_Support_Bot.Command
 {
@@ -260,6 +260,6 @@ namespace Discord_Support_Bot.Command
         public static string FormatEmoteName(this GuildEmote emote)
         {
             return (emote.Animated ? "a:" : ":") + emote.Name + ":";
-        }        
+        }
     }
 }

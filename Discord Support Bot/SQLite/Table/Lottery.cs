@@ -10,7 +10,7 @@
         /// <summary>
         /// Guild Id
         /// </summary>
-       public ulong GuildId { get; set; }
+        public ulong GuildId { get; set; }
         /// <summary>
         /// 抽獎內容
         /// </summary>

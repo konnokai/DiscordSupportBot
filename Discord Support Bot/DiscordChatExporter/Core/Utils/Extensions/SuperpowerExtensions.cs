@@ -1,7 +1,6 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using Superpower;
+﻿using Superpower;
 using Superpower.Parsers;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DiscordChatExporter.Core.Utils.Extensions;
 

@@ -104,7 +104,7 @@ namespace Discord_Support_Bot.SQLite.Activity
 
                             activityNumInt = int.Parse(activityNum);
                         }
-                        catch (Exception ex) 
+                        catch (Exception ex)
                         {
                             Log.Error($"UserActivity-SaveDatebaseAsync: {ex}");
                             continue;

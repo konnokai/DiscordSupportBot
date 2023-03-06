@@ -1,7 +1,5 @@
-﻿using System.IO;
-using System.Linq;
+﻿using DiscordChatExporter.Core.Utils;
 using System.Text.RegularExpressions;
-using DiscordChatExporter.Core.Utils;
 
 namespace DiscordChatExporter.Core.Discord.Data.Embeds;
 

@@ -1,5 +1,4 @@
-﻿using System.Text;
-using DiscordChatExporter.Core.Markdown;
+﻿using DiscordChatExporter.Core.Markdown;
 using DiscordChatExporter.Core.Markdown.Parsing;
 using DiscordChatExporter.Core.Utils.Extensions;
 
@@ -52,7 +51,7 @@ internal partial class PlainTextMarkdownVisitor : MarkdownVisitor
         }
         else if (mention.Kind == MentionKind.Channel)
         {
-            var channel =mention.TargetId?.Pipe(_context.TryGetChannel);
+            var channel = mention.TargetId?.Pipe(_context.TryGetChannel);
             var name = channel?.Name ?? "deleted-channel";
 
             _buffer.Append($"#{name}");

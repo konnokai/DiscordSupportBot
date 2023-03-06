@@ -6,7 +6,6 @@ using StackExchange.Redis;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using Discord_Support_Bot.Interaction.Attribute;
 
 namespace Discord_Support_Bot
 {
@@ -95,7 +94,7 @@ namespace Discord_Support_Bot
 
             ChangeStatus();
         }
-		
+
         private static async void TimerHandler3(object state)
         {
             if (isDisconnect) return;
@@ -105,9 +104,9 @@ namespace Discord_Support_Bot
                 foreach (var item in db.GuildConfig.ToList().Where((x) => x.ChannelMemberId != 0 || x.ChannelNitroId != 0))
                 {
                     SocketGuild guild = Client.GetGuild(item.GuildId);
-                    if (guild == null) 
+                    if (guild == null)
                     {
-                        Log.Error("找不到 " + item.GuildId.ToString()); 
+                        Log.Error("找不到 " + item.GuildId.ToString());
                         db.GuildConfig.Remove(item);
                         await db.SaveChangesAsync();
                         continue;

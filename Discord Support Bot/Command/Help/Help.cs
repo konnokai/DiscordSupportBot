@@ -73,7 +73,7 @@ namespace Discord_Support_Bot.Command.Help
         [Command("Help")]
         [Summary("顯示指令的詳細說明")]
         [Alias("H")]
-        public async Task H([Summary("指令名稱")]string command = null)
+        public async Task H([Summary("指令名稱")] string command = null)
         {
             command = command?.Trim();
 
@@ -91,7 +91,7 @@ namespace Discord_Support_Bot.Command.Help
 
             CommandInfo commandInfo = _cmds.Commands.FirstOrDefault((x) => x.Aliases.Any((x2) => x2.ToLowerInvariant() == command.ToLowerInvariant()));
             if (commandInfo == null) { await ReplyAsync($"找不到 {command} 指令"); return; }
-             
+
             await ReplyAsync("", false, _service.GetCommandHelp(commandInfo).Build());
         }
     }

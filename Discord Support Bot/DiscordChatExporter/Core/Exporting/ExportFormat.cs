@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace DiscordChatExporter.Core.Exporting;
+﻿namespace DiscordChatExporter.Core.Exporting;
 
 public enum ExportFormat
 {

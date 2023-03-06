@@ -1,6 +1,6 @@
-﻿using System.Reflection;
+﻿using Discord.Commands;
+using System.Reflection;
 using System.Text.RegularExpressions;
-using Discord.Commands;
 
 namespace Discord_Support_Bot.Command;
 public class CommandHandler : ICommandService
@@ -29,7 +29,7 @@ public class CommandHandler : ICommandService
             return;
 
         var guild = Client.Guilds.FirstOrDefault((x) => x.TextChannels.Any((x2) => x2.Id == message.Channel.Id));
-        if (guild == null) 
+        if (guild == null)
             return;
 
         if (message.Channel.Id == 550724236159877121) //僅限特定伺服器使用

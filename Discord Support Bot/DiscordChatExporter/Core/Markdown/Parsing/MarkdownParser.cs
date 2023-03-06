@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text.RegularExpressions;
-using DiscordChatExporter.Core.Discord;
+﻿using DiscordChatExporter.Core.Discord;
 using DiscordChatExporter.Core.Utils;
+using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace DiscordChatExporter.Core.Markdown.Parsing;
 

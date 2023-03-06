@@ -1,6 +1,6 @@
-using System.Text.Json;
 using DiscordChatExporter.Core.Utils.Extensions;
 using JsonExtensions.Reading;
+using System.Text.Json;
 
 namespace DiscordChatExporter.Core.Discord.Data;
 

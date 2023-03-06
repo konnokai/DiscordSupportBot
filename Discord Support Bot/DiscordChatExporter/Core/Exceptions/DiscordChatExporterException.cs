@@ -1,7 +1,4 @@
-﻿using System;
-using System.Net.Http;
-
-namespace DiscordChatExporter.Core.Exceptions;
+﻿namespace DiscordChatExporter.Core.Exceptions;
 
 public partial class DiscordChatExporterException : Exception
 {

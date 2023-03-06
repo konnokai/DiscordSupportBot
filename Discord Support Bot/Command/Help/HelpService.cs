@@ -27,7 +27,7 @@ namespace Discord_Support_Bot.Command.Help
             var reqs = GetCommandRequirements(com);
             if (reqs.Any()) em.AddField("要求", string.Join("\n", reqs));
 
-            em.WithFooter(efb => efb.WithText("模組: " +  com.Module.Name))
+            em.WithFooter(efb => efb.WithText("模組: " + com.Module.Name))
               .WithOkColor();
 
             return em;

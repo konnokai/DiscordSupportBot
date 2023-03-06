@@ -82,7 +82,7 @@ namespace Discord_Support_Bot.SQLite.Activity
                 foreach (var item in emoteTables)
                 {
                     var emote = guildEmotes.FirstOrDefault((x) => x.Id == item.EmoteID);
-                    if (emote == null)                    
+                    if (emote == null)
                         continue;
 
                     item.EmoteName = emote.ToString();

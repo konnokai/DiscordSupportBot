@@ -1,11 +1,6 @@
-﻿using System;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Sockets;
-using System.Threading.Tasks;
-using DiscordChatExporter.Core.Utils.Extensions;
+﻿using DiscordChatExporter.Core.Utils.Extensions;
 using Polly;
+using System.Net.Sockets;
 
 namespace DiscordChatExporter.Core.Utils;
 

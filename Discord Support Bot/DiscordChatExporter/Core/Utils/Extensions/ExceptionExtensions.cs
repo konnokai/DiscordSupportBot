@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Net;
-using System.Net.Http;
+﻿using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace DiscordChatExporter.Core.Utils.Extensions;
@@ -28,7 +24,7 @@ public static class ExceptionExtensions
 
     public static IReadOnlyList<Exception> GetSelfAndChildren(this Exception exception)
     {
-        var children = new List<Exception> {exception};
+        var children = new List<Exception> { exception };
         PopulateChildren(exception, children);
         return children;
     }
@@ -40,5 +36,5 @@ public static class ExceptionExtensions
             .Groups[1]
             .Value
             .NullIfWhiteSpace()?
-            .Pipe(s => (HttpStatusCode) int.Parse(s, CultureInfo.InvariantCulture));
+            .Pipe(s => (HttpStatusCode)int.Parse(s, CultureInfo.InvariantCulture));
 }

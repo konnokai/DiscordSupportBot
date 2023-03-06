@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
-using DiscordChatExporter.Core.Utils;
+﻿using DiscordChatExporter.Core.Utils;
 using DiscordChatExporter.Core.Utils.Extensions;
+using System.Globalization;
+using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 
 namespace DiscordChatExporter.Core.Exporting;
 
@@ -52,7 +46,7 @@ internal partial class MediaDownloader
                     var lastModified = response.Content.Headers.TryGetValue("Last-Modified")?.Pipe(s =>
                         DateTimeOffset.TryParse(s, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date)
                             ? date
-                            : (DateTimeOffset?) null
+                            : (DateTimeOffset?)null
                     );
 
                     if (lastModified is not null)

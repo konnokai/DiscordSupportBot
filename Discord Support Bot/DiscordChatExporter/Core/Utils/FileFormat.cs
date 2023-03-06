@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace DiscordChatExporter.Core.Utils;
+﻿namespace DiscordChatExporter.Core.Utils;
 
 public static class FileFormat
 {

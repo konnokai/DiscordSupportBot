@@ -1,7 +1,5 @@
-﻿using System;
-using System.Linq;
+﻿using DiscordChatExporter.Core.Discord.Data;
 using System.Text.RegularExpressions;
-using DiscordChatExporter.Core.Discord.Data;
 
 namespace DiscordChatExporter.Core.Exporting.Filtering;
 

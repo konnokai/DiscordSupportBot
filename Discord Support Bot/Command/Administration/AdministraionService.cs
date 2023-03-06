@@ -1,6 +1,6 @@
-﻿using DiscordChatExporter.Core.Discord;
+﻿using Discord.Commands;
+using DiscordChatExporter.Core.Discord;
 using DiscordChatExporter.Core.Exporting;
-using Discord.Commands;
 
 namespace Discord_Support_Bot.Command.Administration
 {
@@ -19,7 +19,7 @@ namespace Discord_Support_Bot.Command.Administration
             _botConfig = botConfig;
             _channelExporter = new ChannelExporter(new DiscordClient(botConfig.DiscordToken));
         }
- 
+
         public async Task ClearUser(ITextChannel textChannel)
         {
             IEnumerable<IMessage> msgs = (await textChannel.GetMessagesAsync(100).FlattenAsync().ConfigureAwait(false))
@@ -91,7 +91,7 @@ namespace Discord_Support_Bot.Command.Administration
 
             var embed = new EmbedBuilder()
                 .WithDescription("即將剔除 `" + (kickSwitch ? "包含" : "不包含") + $"` `{role.Name}` 用戶組的成員" +
-                (text != "" ? $"\n剔除訊息為\n```js\n{text}\n```": "\n不發送剔除訊息") +
+                (text != "" ? $"\n剔除訊息為\n```js\n{text}\n```" : "\n不發送剔除訊息") +
                 $"\n請確認是否正確");
 
             if (await context.PromptUserConfirmAsync(embed))
@@ -102,7 +102,7 @@ namespace Discord_Support_Bot.Command.Administration
 
                 try
                 {
-                    List<SocketGuildUser> socketGuildUsers = 
+                    List<SocketGuildUser> socketGuildUsers =
                         new List<SocketGuildUser>(context.Guild.Users.Where((x) => kickSwitch ? x.Roles.Any((x2) => x2.Id == rid) : !x.Roles.Any((x2) => x2.Id == rid)));
 
                     foreach (var item in socketGuildUsers)
