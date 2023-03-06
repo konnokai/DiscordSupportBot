@@ -62,7 +62,7 @@ namespace Discord_Support_Bot.Command.Normal
             if (userActivity == null) return;
             var user = userActivity.FirstOrDefault((x) => x.UserID == Context.User.Id);
 
-            await Context.SendPaginatedConfirmAsync(page, (row) =>
+            await Context.SendPaginatedConfirmAsync(page,async (row) =>
             {
                 EmbedBuilder embedBuilder = new EmbedBuilder().WithOkColor().WithTitle($"{Context.Guild.Name} 發言排行榜");
                 var items = userActivity.Skip(row * 20).Take(20).ToList(); string temp = "";
@@ -70,11 +70,21 @@ namespace Discord_Support_Bot.Command.Normal
                 for (int i = 0; i < items.Count; i++)
                 {
                     var item = items[i];
-                    temp += $"{row * 25 + i + 1}. {item.UserName}[<@{item.UserID}>] `{item.ActivityNum}` 則訊息\n";
+
+                    IUser user = Program.Client.GetUser(item.UserID);
+                    if (user == null)
+                    {
+                        try { user = await Program.Client.Rest.GetUserAsync(item.UserID); }
+                        catch { }
+                        if (user == null)
+                            continue;
+                    }
+
+                    temp += $"{row * 25 + i + 1}. {user.Username}[<@{item.UserID}>] `{item.ActivityNum}` 則訊息\n";
                 }
 
                 embedBuilder.WithDescription(temp);
-                embedBuilder.WithFooter($"{row + 1} / {userActivity.Count / 25 + 1}" + (user != null ? $" | {user.UserName}的排名為: {userActivity.IndexOf(user) + 1}" : ""));
+                embedBuilder.WithFooter($"{row + 1} / {userActivity.Count / 25 + 1}" + (user != null ? $" | {Context.User.Username}的排名為: {userActivity.IndexOf(user) + 1}" : ""));
                 return embedBuilder;
             }, userActivity.Count, 25, false).ConfigureAwait(false);
         }
