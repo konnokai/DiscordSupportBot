@@ -198,7 +198,11 @@ namespace Discord_Support_Bot
                 LogLevel = LogSeverity.Warning,
                 ConnectionTimeout = int.MaxValue,
                 MessageCacheSize = 50,
-                GatewayIntents = GatewayIntents.All
+                GatewayIntents = GatewayIntents.All & ~GatewayIntents.GuildInvites & ~GatewayIntents.GuildScheduledEvents,
+                AlwaysDownloadDefaultStickers = false,
+                AlwaysResolveStickers = false,
+                FormatUsersInBidirectionalUnicode = false,
+                LogGatewayIntentWarnings = false,                
             });
 
             #region 初始化互動指令系統
