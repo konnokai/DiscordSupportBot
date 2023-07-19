@@ -40,21 +40,21 @@
                 Environment.Exit(3);
             }
 
-            if (string.IsNullOrWhiteSpace(config.TwitterClientKey))
-            {
-                Log.Error("TwitterClientKey遺失，請輸入至bot_config.json後重開Bot");
-                if (!Console.IsInputRedirected)
-                    Console.ReadKey();
-                Environment.Exit(3);
-            }
+            //if (string.IsNullOrWhiteSpace(config.TwitterClientKey))
+            //{
+            //    Log.Error("TwitterClientKey遺失，請輸入至bot_config.json後重開Bot");
+            //    if (!Console.IsInputRedirected)
+            //        Console.ReadKey();
+            //    Environment.Exit(3);
+            //}
 
-            if (string.IsNullOrWhiteSpace(config.TwitterClientSecret))
-            {
-                Log.Error("TwitterClientSecret遺失，請輸入至bot_config.json後重開Bot");
-                if (!Console.IsInputRedirected)
-                    Console.ReadKey();
-                Environment.Exit(3);
-            }
+            //if (string.IsNullOrWhiteSpace(config.TwitterClientSecret))
+            //{
+            //    Log.Error("TwitterClientSecret遺失，請輸入至bot_config.json後重開Bot");
+            //    if (!Console.IsInputRedirected)
+            //        Console.ReadKey();
+            //    Environment.Exit(3);
+            //}
 
             DiscordToken = config.DiscordToken;
             WebHookUrl = config.WebHookUrl;

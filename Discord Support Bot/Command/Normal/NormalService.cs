@@ -5,7 +5,7 @@ namespace Discord_Support_Bot.Command.Normal
 {
     public class NormalService : ICommandService
     {
-        public TwitterClient TwitterAppClient { get; set; }
+        //public TwitterClient TwitterAppClient { get; set; }
 
         private ConsumerOnlyCredentials appCredentials;
         private DiscordSocketClient _client;
@@ -20,60 +20,60 @@ namespace Discord_Support_Bot.Command.Normal
             {
                 BearerToken = botConfig.TwitterClientBearerToken
             };
-            TwitterAppClient = new TwitterClient(appCredentials);
+            //TwitterAppClient = new TwitterClient(appCredentials);
 
 #if RELEASE
-            timerChangeGuildAvatar = new Timer(async (obj) =>
-            {
-                using (var db = new SupportContext())
-                {
-                    var list = Queryable.Where(db.GuildConfig, (x) => x.TwitterId != 0);
-                    foreach (var item in list)
-                    {
-                        try
-                        {
-                            var user = await TwitterAppClient.Users.GetUserAsync(item.TwitterId);
-                            var imgUrl = user.ProfileImageUrlFullSize;
+            //timerChangeGuildAvatar = new Timer(async (obj) =>
+            //{
+            //    using (var db = new SupportContext())
+            //    {
+            //        var list = Queryable.Where(db.GuildConfig, (x) => x.TwitterId != 0);
+            //        foreach (var item in list)
+            //        {
+            //            try
+            //            {
+            //                var user = await TwitterAppClient.Users.GetUserAsync(item.TwitterId);
+            //                var imgUrl = user.ProfileImageUrlFullSize;
 
-                            if (imgUrl != "" && item.LastTwitterProfileURL != imgUrl)
-                            {
-                                Log.Info($"ChangeGuildAvatar: {user.ScreenName}({user.Id}) - {imgUrl}");
+            //                if (imgUrl != "" && item.LastTwitterProfileURL != imgUrl)
+            //                {
+            //                    Log.Info($"ChangeGuildAvatar: {user.ScreenName}({user.Id}) - {imgUrl}");
 
-                                MemoryStream memoryStream;
-                                using (WebClient webClient = new WebClient())
-                                {
-                                    memoryStream = new MemoryStream(webClient.DownloadData(imgUrl));
-                                }
+            //                    MemoryStream memoryStream;
+            //                    using (WebClient webClient = new WebClient())
+            //                    {
+            //                        memoryStream = new MemoryStream(webClient.DownloadData(imgUrl));
+            //                    }
 
-                                var guild = _client.GetGuild(item.GuildId);
-                                await guild.ModifyAsync((func) => func.Icon = new Image(memoryStream));
+            //                    var guild = _client.GetGuild(item.GuildId);
+            //                    await guild.ModifyAsync((func) => func.Icon = new Image(memoryStream));
 
-                                if (item.NoticeChangeAvatarChannelId != 0)
-                                {
-                                    try
-                                    {
-                                        memoryStream.Position = 0;
-                                        var channel = guild.GetTextChannel(item.NoticeChangeAvatarChannelId);
-                                        await channel.SendFileAsync(memoryStream, Path.GetFileName(imgUrl), "頭像已變更");
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Log.Error($"NoticeChangeGuildAvatar - {item.GuildId}\r\n{ex.Message}\r\n{ex.StackTrace}");
-                                    }
-                                }
+            //                    if (item.NoticeChangeAvatarChannelId != 0)
+            //                    {
+            //                        try
+            //                        {
+            //                            memoryStream.Position = 0;
+            //                            var channel = guild.GetTextChannel(item.NoticeChangeAvatarChannelId);
+            //                            await channel.SendFileAsync(memoryStream, Path.GetFileName(imgUrl), "頭像已變更");
+            //                        }
+            //                        catch (Exception ex)
+            //                        {
+            //                            Log.Error($"NoticeChangeGuildAvatar - {item.GuildId}\r\n{ex.Message}\r\n{ex.StackTrace}");
+            //                        }
+            //                    }
 
-                                item.LastTwitterProfileURL = imgUrl;
-                                db.GuildConfig.Update(item);
-                                await db.SaveChangesAsync();
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Error($"ChangeGuildAvatar - {item.GuildId}\r\n{ex.Message}\r\n{ex.StackTrace}");
-                        }
-                    }
-                }
-            }, null, TimeSpan.FromSeconds(10), TimeSpan.FromHours(1));
+            //                    item.LastTwitterProfileURL = imgUrl;
+            //                    db.GuildConfig.Update(item);
+            //                    await db.SaveChangesAsync();
+            //                }
+            //            }
+            //            catch (Exception ex)
+            //            {
+            //                Log.Error($"ChangeGuildAvatar - {item.GuildId}\r\n{ex.Message}\r\n{ex.StackTrace}");
+            //            }
+            //        }
+            //    }
+            //}, null, TimeSpan.FromSeconds(10), TimeSpan.FromHours(1));
 #endif
 
             timerAutoWheel = new Timer(async (obj) =>
