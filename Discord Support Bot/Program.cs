@@ -422,27 +422,28 @@ namespace Discord_Support_Bot
 
         public static void ChangeStatus()
         {
-            Action<string> setGame = new Action<string>((string text) => { Client.SetGameAsync($"!!!h | {text}"); });
-
-            switch (UpdateStatus)
+            Task.Run(async () =>
             {
-                case UpdateStatusFlags.Guild:
-                    setGame($"在 {Client.Guilds.Count} 個伺服器");
-                    UpdateStatus = UpdateStatusFlags.Member;
-                    break;
-                case UpdateStatusFlags.Member:
-                    try
-                    {
-                        setGame($"服務 {Client.Guilds.Sum((x) => x.MemberCount)} 個成員");
-                        UpdateStatus = UpdateStatusFlags.Info;
-                    }
-                    catch (Exception) { UpdateStatus = UpdateStatusFlags.Info; ChangeStatus(); }
-                    break;
-                case UpdateStatusFlags.Info:
-                    setGame("去打你的程式啦");
-                    UpdateStatus = UpdateStatusFlags.Guild;
-                    break;
-            }
+                switch (UpdateStatus)
+                {
+                    case UpdateStatusFlags.Guild:
+                        await Client.SetCustomStatusAsync($"在 {Client.Guilds.Count} 個伺服器");
+                        UpdateStatus = UpdateStatusFlags.Member;
+                        break;
+                    case UpdateStatusFlags.Member:
+                        try
+                        {
+                            await Client.SetCustomStatusAsync($"服務 {Client.Guilds.Sum((x) => x.MemberCount)} 個成員");
+                            UpdateStatus = UpdateStatusFlags.Info;
+                        }
+                        catch (Exception) { UpdateStatus = UpdateStatusFlags.Info; ChangeStatus(); }
+                        break;
+                    case UpdateStatusFlags.Info:
+                        await Client.SetCustomStatusAsync("去打你的程式啦");
+                        UpdateStatus = UpdateStatusFlags.Guild;
+                        break;
+                }
+            });
         }
 
         public static string GetDataFilePath(string fileName)
