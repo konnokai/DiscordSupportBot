@@ -18,6 +18,19 @@ namespace DiscordSupportBot.Interaction.AutoVoiceChannel
         [RequireBotPermission(GuildPermission.ManageChannels | GuildPermission.MoveMembers)]
         public async Task SetAutoVoiceChannelAsync(IVoiceChannel voiceChannel)
         {
+            var currentUser = Context.Guild.GetUser(Context.Client.CurrentUser.Id);
+            if (!currentUser.GuildPermissions.ManageChannels)
+            {
+                await Context.Interaction.SendErrorAsync($"我在此伺服器無`管理頻道`權限，請給予權限後重新設定");
+                return;
+            }
+
+            if (!currentUser.GuildPermissions.MoveMembers)
+            {
+                await Context.Interaction.SendErrorAsync($"我在此伺服器無`移動成員`權限，請給予權限後重新設定");
+                return;
+            }
+
             await DeferAsync(true);
 
             try

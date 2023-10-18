@@ -19,6 +19,7 @@ namespace DiscordSupportBot
         public static UpdateStatusFlags UpdateStatus { get; set; } = UpdateStatusFlags.Guild;
         public static List<TrustedGuild> TrustedGuildList { get; set; } = new List<TrustedGuild>();
         public static ConnectionMultiplexer Redis { get; set; }
+        public static IDatabase RedisDb { get; private set; }
 
         public static bool isDisconnect = false, isConnect = false;
         static Timer timerAddBookMark, timerUpdateStatus, timerUpdateGuildInfo, timerSaveDatebase;
@@ -61,6 +62,7 @@ namespace DiscordSupportBot
             {
                 RedisConnection.Init(botConfig.RedisOption);
                 Redis = RedisConnection.Instance.ConnectionMultiplexer;
+                RedisDb = Redis.GetDatabase(0);
                 Log.Info("Redis已連線");
             }
             catch (Exception ex)
