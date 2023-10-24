@@ -66,7 +66,22 @@ namespace DiscordSupportBot.Command.Administration
         [RequireOwner]
         public async Task ListServerAsync([Summary("頁數")] int page = 0)
         {
-            await Context.SendPaginatedConfirmAsync(page, (cur) => { EmbedBuilder embedBuilder = new EmbedBuilder().WithOkColor().WithTitle("目前所在的伺服器有"); foreach (var item in _client.Guilds.Skip(cur * 7).Take(7)) { int totalMember = item.Users.Count((x) => !x.IsBot); bool isBotOwnerInGuild = item.GetUser(Program.ApplicatonOwner.Id) != null; embedBuilder.AddField(item.Name, "ID: " + item.Id + "\nOwner ID: " + item.OwnerId + "\n人數: " + totalMember.ToString() + "\nBot擁有者是否在該伺服器: " + (isBotOwnerInGuild ? "是" : "否") + "\n是否已信任該伺服器: " + (isBotOwnerInGuild || Program.TrustedGuildList.Any((x) => x.GuildId == item.Id) ? "是" : "否")); } return embedBuilder; }, _client.Guilds.Count, 7).ConfigureAwait(false);
+            await Context.SendPaginatedConfirmAsync(page, (cur) =>
+            {
+                EmbedBuilder embedBuilder = new EmbedBuilder()
+                    .WithOkColor()
+                    .WithTitle("目前所在的伺服器有");
+
+                foreach (var item in _client.Guilds.Skip(cur * 7).Take(7))
+                {
+                    int totalMember = item.Users.Count((x) => !x.IsBot);
+                    embedBuilder.AddField(item.Name, $"伺服器 Id: {item.Id}\n" +
+                        $"擁有者 Id: {item.OwnerId}\n" +
+                        $"人數: {item.MemberCount}");
+                }
+
+                return embedBuilder;
+            }, _client.Guilds.Count, 7).ConfigureAwait(false);
         }
 
         [Command("ListBot")]
@@ -323,7 +338,6 @@ namespace DiscordSupportBot.Command.Administration
             await _service.CheckRole(Context).ConfigureAwait(false);
         }
 
-
         [Command("SetMemberNumberChannel")]
         [Summary("設定成員數量顯示的頻道\r\n" +
             "可以設定在文字或是語音頻道\r\n" +
@@ -465,7 +479,6 @@ namespace DiscordSupportBot.Command.Administration
 
             await Context.Channel.SendConfirmAsync(result).ConfigureAwait(false);
         }
-
 
         [Command("ExportEmoji")]
         [Summary("匯出伺服器表情")]

@@ -17,7 +17,6 @@ namespace DiscordSupportBot
         public static Stopwatch StopWatch { get; private set; } = new Stopwatch();
         public static DiscordSocketClient Client { get; set; }
         public static UpdateStatusFlags UpdateStatus { get; set; } = UpdateStatusFlags.Guild;
-        public static List<TrustedGuild> TrustedGuildList { get; set; } = new List<TrustedGuild>();
         public static ConnectionMultiplexer RedisConnection { get; private set; }
         public static IDatabase RedisDb { get; private set; }
         public static bool IsDisconnect { get; internal set; } = false;
@@ -56,8 +55,6 @@ namespace DiscordSupportBot
                 {
                     db.Database.EnsureCreated();
                 }
-
-                TrustedGuildList = db.TrustedGuild.ToList();
             }
 
             try
