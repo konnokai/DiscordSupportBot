@@ -1,4 +1,4 @@
-﻿namespace DiscordSupportBot.SQLite.Activity
+﻿namespace DiscordSupportBot.DataBase.Activity
 {
     class EmoteTable
     {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace DiscordSupportBot.SQLite
+namespace DiscordSupportBot.DataBase
 {
     class SupportContext : DbContext
     {

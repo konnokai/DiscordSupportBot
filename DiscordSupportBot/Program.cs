@@ -299,17 +299,17 @@ namespace DiscordSupportBot
                     InteractionService interactionService = iService.GetService<InteractionService>();
 
 #if DEBUG
-                    if (botConfig.TestSlashCommandGuildId == 0 || Client.GetGuild(botConfig.TestSlashCommandGuildId) == null)
+                    if (_botConfig.TestSlashCommandGuildId == 0 || Client.GetGuild(_botConfig.TestSlashCommandGuildId) == null)
                         Log.Warn("未設定測試Slash指令的伺服器或伺服器不存在，略過");
                     else
                     {
                         try
                         {
-                            var result = await interactionService.AddModulesToGuildAsync(botConfig.TestSlashCommandGuildId, true, interactionService.Modules.Where((x) => x.DontAutoRegister).ToArray());
-                            Log.Info($"已註冊指令 ({botConfig.TestSlashCommandGuildId}) : {string.Join(", ", result.Select((x) => x.Name))}");
+                            var result = await interactionService.AddModulesToGuildAsync(_botConfig.TestSlashCommandGuildId, true, interactionService.Modules.Where((x) => x.DontAutoRegister).ToArray());
+                            Log.Info($"已註冊指令 ({_botConfig.TestSlashCommandGuildId}) : {string.Join(", ", result.Select((x) => x.Name))}");
 
-                            result = await interactionService.RegisterCommandsToGuildAsync(botConfig.TestSlashCommandGuildId);
-                            Log.Info($"已註冊指令 ({botConfig.TestSlashCommandGuildId}) : {string.Join(", ", result.Select((x) => x.Name))}");
+                            result = await interactionService.RegisterCommandsToGuildAsync(_botConfig.TestSlashCommandGuildId);
+                            Log.Info($"已註冊指令 ({_botConfig.TestSlashCommandGuildId}) : {string.Join(", ", result.Select((x) => x.Name))}");
                         }
                         catch (Exception ex)
                         {

@@ -59,7 +59,7 @@ namespace DiscordSupportBot.Command.Normal
             await Context.Channel.TriggerTypingAsync().ConfigureAwait(false);
 
             var userActivity = (await UserActivity.GetActivityAsync(Context.Guild.Id).ConfigureAwait(false)).OrderByDescending((x) => x.ActivityNum).ToList();
-            if (userActivity == null) return;
+            if (!userActivity.Any()) return;
             var user = userActivity.FirstOrDefault((x) => x.UserID == Context.User.Id);
 
             await Context.SendPaginatedConfirmAsync(page, async (row) =>
@@ -97,8 +97,8 @@ namespace DiscordSupportBot.Command.Normal
         {
             await Context.Channel.TriggerTypingAsync().ConfigureAwait(false);
 
-            var emoteActivity = (await SQLite.Activity.EmoteActivity.GetActivityAsync(Context.Guild.Id).ConfigureAwait(false)).OrderByDescending((x) => x.ActivityNum).ToList();
-            if (emoteActivity == null) return;
+            var emoteActivity = (await DataBase.Activity.EmoteActivity.GetActivityAsync(Context.Guild.Id).ConfigureAwait(false)).OrderByDescending((x) => x.ActivityNum).ToList();
+            if (!emoteActivity.Any()) return;
 
             await Context.SendPaginatedConfirmAsync(page, (row) =>
             {

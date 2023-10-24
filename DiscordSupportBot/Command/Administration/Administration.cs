@@ -420,7 +420,7 @@ namespace DiscordSupportBot.Command.Administration
         public async Task SetNitroNumberChannel([Summary("頻道Id")] ulong cId = 0)
         {
             string result = "";
-            using (var db = new SQLite.SupportContext())
+            using (var db = new SupportContext())
             {
                 var guild = db.GuildConfig.FirstOrDefault(x => x.GuildId == Context.Guild.Id);
 

@@ -1,5 +1,4 @@
-﻿using Tweetinvi;
-using Tweetinvi.Models;
+﻿using Tweetinvi.Models;
 
 namespace DiscordSupportBot.Command.Normal
 {

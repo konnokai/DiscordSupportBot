@@ -4,9 +4,9 @@ global using Discord.WebSocket;
 
 // Discord Support Bot
 global using DiscordSupportBot.Command;
-global using DiscordSupportBot.SQLite;
-global using DiscordSupportBot.SQLite.Activity;
-global using DiscordSupportBot.SQLite.Table;
+global using DiscordSupportBot.DataBase;
+global using DiscordSupportBot.DataBase.Activity;
+global using DiscordSupportBot.DataBase.Table;
 
 // Package
 global using Newtonsoft.Json;

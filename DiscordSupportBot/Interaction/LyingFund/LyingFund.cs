@@ -17,7 +17,7 @@ namespace DiscordSupportBot.Interaction.LyingFund
         public async Task LyingFundLeaderBoardAsync()
         {
             var hashEntries = await Program.RedisConnection.GetDatabase(0).HashGetAllAsync("support:LyinhFund");
-            
+
             await Context.Interaction.SendConfirmAsync($"說謊基金排行榜\n\n" +
                 $"{string.Join('\n', hashEntries.OrderByDescending((x) => x.Value).Select((x) => $"<@{x.Name}>: {x.Value}"))}");
         }

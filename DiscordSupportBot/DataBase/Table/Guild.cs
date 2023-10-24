@@ -1,4 +1,4 @@
-﻿namespace DiscordSupportBot.SQLite.Table
+﻿namespace DiscordSupportBot.DataBase.Table
 {
     class Guild
     {

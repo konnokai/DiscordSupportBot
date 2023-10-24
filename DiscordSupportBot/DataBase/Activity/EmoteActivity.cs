@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Data.Sqlite;
 
-namespace DiscordSupportBot.SQLite.Activity
+namespace DiscordSupportBot.DataBase.Activity
 {
     class EmoteActivity
     {
@@ -94,7 +94,7 @@ namespace DiscordSupportBot.SQLite.Activity
             catch (Exception ex)
             {
                 Log.Error(ex.ToString());
-                return null;
+                return new List<EmoteTable>();
             }
         }
 

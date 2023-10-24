@@ -1,4 +1,4 @@
-﻿namespace DiscordSupportBot.SQLite.Table
+﻿namespace DiscordSupportBot.DataBase.Table
 {
     public class NCChannelCOD : DbEntity
     {

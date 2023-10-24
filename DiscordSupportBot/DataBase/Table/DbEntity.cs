@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DiscordSupportBot.SQLite.Table
+namespace DiscordSupportBot.DataBase.Table
 {
     public class DbEntity
     {

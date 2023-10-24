@@ -73,7 +73,7 @@ namespace DiscordSupportBot.Interaction.Lottery
                         return;
                     }
 
-                    var lottery = new SQLite.Table.Lottery();
+                    var lottery = new DataBase.Table.Lottery();
                     lottery.Context = context;
                     lottery.AwardContext = awardContext;
                     lottery.EndTime = endDateTime;
