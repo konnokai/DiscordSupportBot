@@ -1,81 +1,16 @@
-﻿using Tweetinvi.Models;
-
-namespace DiscordSupportBot.Command.Normal
+﻿namespace DiscordSupportBot.Command.Normal
 {
     public class NormalService : ICommandService
     {
-        //public TwitterClient TwitterAppClient { get; set; }
-
-        private ConsumerOnlyCredentials appCredentials;
         private DiscordSocketClient _client;
-        private Timer timerChangeGuildAvatar, timerAutoWheel;
+        private Timer _timerAutoWheel;
         private SocketTextChannel socketText = null;
 
-        public NormalService(DiscordSocketClient client, BotConfig botConfig)
+        public NormalService(DiscordSocketClient client)
         {
             _client = client;
 
-            appCredentials = new ConsumerOnlyCredentials(botConfig.TwitterClientKey, botConfig.TwitterClientSecret)
-            {
-                BearerToken = botConfig.TwitterClientBearerToken
-            };
-            //TwitterAppClient = new TwitterClient(appCredentials);
-
-#if RELEASE
-            //timerChangeGuildAvatar = new Timer(async (obj) =>
-            //{
-            //    using (var db = new SupportContext())
-            //    {
-            //        var list = Queryable.Where(db.GuildConfig, (x) => x.TwitterId != 0);
-            //        foreach (var item in list)
-            //        {
-            //            try
-            //            {
-            //                var user = await TwitterAppClient.Users.GetUserAsync(item.TwitterId);
-            //                var imgUrl = user.ProfileImageUrlFullSize;
-
-            //                if (imgUrl != "" && item.LastTwitterProfileURL != imgUrl)
-            //                {
-            //                    Log.Info($"ChangeGuildAvatar: {user.ScreenName}({user.Id}) - {imgUrl}");
-
-            //                    MemoryStream memoryStream;
-            //                    using (WebClient webClient = new WebClient())
-            //                    {
-            //                        memoryStream = new MemoryStream(webClient.DownloadData(imgUrl));
-            //                    }
-
-            //                    var guild = _client.GetGuild(item.GuildId);
-            //                    await guild.ModifyAsync((func) => func.Icon = new Image(memoryStream));
-
-            //                    if (item.NoticeChangeAvatarChannelId != 0)
-            //                    {
-            //                        try
-            //                        {
-            //                            memoryStream.Position = 0;
-            //                            var channel = guild.GetTextChannel(item.NoticeChangeAvatarChannelId);
-            //                            await channel.SendFileAsync(memoryStream, Path.GetFileName(imgUrl), "頭像已變更");
-            //                        }
-            //                        catch (Exception ex)
-            //                        {
-            //                            Log.Error($"NoticeChangeGuildAvatar - {item.GuildId}\r\n{ex.Message}\r\n{ex.StackTrace}");
-            //                        }
-            //                    }
-
-            //                    item.LastTwitterProfileURL = imgUrl;
-            //                    db.GuildConfig.Update(item);
-            //                    await db.SaveChangesAsync();
-            //                }
-            //            }
-            //            catch (Exception ex)
-            //            {
-            //                Log.Error($"ChangeGuildAvatar - {item.GuildId}\r\n{ex.Message}\r\n{ex.StackTrace}");
-            //            }
-            //        }
-            //    }
-            //}, null, TimeSpan.FromSeconds(10), TimeSpan.FromHours(1));
-#endif
-
-            timerAutoWheel = new Timer(async (obj) =>
+            _timerAutoWheel = new Timer(async (obj) =>
             {
                 if (DateTime.Now.DayOfWeek != DayOfWeek.Saturday) return;
                 if (DateTime.Now.Minute != 0) return;
@@ -110,7 +45,7 @@ namespace DiscordSupportBot.Command.Normal
                 }
             });
 
-            timerAutoWheel.Change((long)Math.Round(Convert.ToDateTime($"{DateTime.Now.AddMinutes(1):yyyy/MM/dd HH:mm:00}").Subtract(DateTime.Now).TotalSeconds) * 1000, 60 * 1000);
+            _timerAutoWheel.Change((long)Math.Round(Convert.ToDateTime($"{DateTime.Now.AddMinutes(1):yyyy/MM/dd HH:mm:00}").Subtract(DateTime.Now).TotalSeconds) * 1000, 60 * 1000);
         }
     }
 }

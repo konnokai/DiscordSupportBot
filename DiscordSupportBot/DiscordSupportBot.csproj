@@ -42,7 +42,6 @@
     <PackageReference Include="StackExchange.Redis" Version="2.6.122" />
     <PackageReference Include="Superpower" Version="3.0.0" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
-    <PackageReference Include="TweetinviAPI" Version="5.0.4" />
   </ItemGroup>
 
   <ItemGroup>
