@@ -14,29 +14,31 @@ namespace DiscordSupportBot
         public static string VERSION => GetLinkerTime(Assembly.GetEntryAssembly());
 
         public static IUser ApplicatonOwner { get; private set; } = null;
-        public static Stopwatch stopWatch { get; private set; } = new Stopwatch();
+        public static Stopwatch StopWatch { get; private set; } = new Stopwatch();
         public static DiscordSocketClient Client { get; set; }
         public static UpdateStatusFlags UpdateStatus { get; set; } = UpdateStatusFlags.Guild;
         public static List<TrustedGuild> TrustedGuildList { get; set; } = new List<TrustedGuild>();
-        public static ConnectionMultiplexer Redis { get; set; }
+        public static ConnectionMultiplexer RedisConnection { get; private set; }
         public static IDatabase RedisDb { get; private set; }
+        public static bool IsDisconnect { get; internal set; } = false;
+        public static bool IsConnect { get; private set; } = false;
 
-        public static bool isDisconnect = false, isConnect = false;
+
         static Timer timerAddBookMark, timerUpdateStatus, timerUpdateGuildInfo, timerSaveDatebase;
-        static List<ulong> pinChannelList = new List<ulong>();
-        static readonly BotConfig botConfig = new BotConfig();
+        static readonly List<ulong> _pinChannelList = new List<ulong>();
+        static readonly BotConfig _botConfig = new BotConfig();
 
         public enum UpdateStatusFlags { Guild, Member, Info }
 
         static void Main(string[] args)
         {
-            stopWatch.Start();
+            StopWatch.Start();
 
             Log.Info(VERSION + " 初始化中");
             Console.OutputEncoding = Encoding.UTF8;
             Console.CancelKeyPress += Console_CancelKeyPress;
 
-            botConfig.InitBotConfig();
+            _botConfig.InitBotConfig();
 
             timerAddBookMark = new Timer(TimerHandler);
             timerUpdateStatus = new Timer(TimerHandler2);
@@ -60,9 +62,9 @@ namespace DiscordSupportBot
 
             try
             {
-                RedisConnection.Init(botConfig.RedisOption);
-                Redis = RedisConnection.Instance.ConnectionMultiplexer;
-                RedisDb = Redis.GetDatabase(0);
+                global::RedisConnection.Init(_botConfig.RedisOption);
+                RedisConnection = global::RedisConnection.Instance.ConnectionMultiplexer;
+                RedisDb = RedisConnection.GetDatabase(0);
                 Log.Info("Redis已連線");
             }
             catch (Exception ex)
@@ -77,12 +79,12 @@ namespace DiscordSupportBot
 
         private static void TimerHandler(object state) //僅限指定伺服器使用
         {
-            if (isDisconnect) return;
+            if (IsDisconnect) return;
 
             string text = DateTime.Now.ToString("yyyy/MM/dd") + " 書籤";
             foreach (ITextChannel item in Client.GetGuild(463657254105645056).TextChannels.Where((x) => x.IsNsfw))
             {
-                if (pinChannelList.Contains(item.Id))
+                if (_pinChannelList.Contains(item.Id))
                 {
                     item.SendMessageAsync(text);
                     Log.FormatColorWrite("已發送文字 \"" + text + "\" 到 " + item.Guild.Name + "/" + item.Name, ConsoleColor.DarkCyan);
@@ -92,14 +94,14 @@ namespace DiscordSupportBot
 
         private static void TimerHandler2(object state)
         {
-            if (isDisconnect) return;
+            if (IsDisconnect) return;
 
             ChangeStatus();
         }
 
         private static async void TimerHandler3(object state)
         {
-            if (isDisconnect) return;
+            if (IsDisconnect) return;
 
             using (var db = new SupportContext())
             {
@@ -181,7 +183,7 @@ namespace DiscordSupportBot
 
         private static async void TimerHandler4(object state)
         {
-            if (isDisconnect) return;
+            if (IsDisconnect) return;
 
             await EmoteActivity.SaveDatebaseAsync();
             await UserActivity.SaveDatebaseAsync();
@@ -189,7 +191,7 @@ namespace DiscordSupportBot
 
         private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
         {
-            isDisconnect = true;
+            IsDisconnect = true;
             e.Cancel = true;
         }
 
@@ -204,14 +206,14 @@ namespace DiscordSupportBot
                 AlwaysDownloadDefaultStickers = false,
                 AlwaysResolveStickers = false,
                 FormatUsersInBidirectionalUnicode = false,
-                LogGatewayIntentWarnings = false,                
+                LogGatewayIntentWarnings = false,
             });
 
             #region 初始化互動指令系統
             var interactionServices = new ServiceCollection()
                 //.AddHttpClient()
                 .AddSingleton(Client)
-                .AddSingleton(botConfig)
+                .AddSingleton(_botConfig)
                 .AddSingleton(new InteractionService(Client, new InteractionServiceConfig()
                 {
                     AutoServiceScopes = true,
@@ -229,7 +231,7 @@ namespace DiscordSupportBot
             var commandServices = new ServiceCollection()
                 //.AddHttpClient()
                 .AddSingleton(Client)
-                .AddSingleton(botConfig)
+                .AddSingleton(_botConfig)
                 .AddSingleton(new CommandService(new CommandServiceConfig()
                 {
                     CaseSensitiveCommands = false,
@@ -289,11 +291,11 @@ namespace DiscordSupportBot
                 timerUpdateStatus.Change(0, 20 * 60 * 1000);
                 timerSaveDatebase.Change(20 * 60 * 1000, 20 * 60 * 1000);
 
-                UptimeKumaClient.Init(botConfig.UptimeKumaPushUrl, Client);
+                UptimeKumaClient.Init(_botConfig.UptimeKumaPushUrl, Client);
 
                 ApplicatonOwner = (await Client.GetApplicationInfoAsync().ConfigureAwait(false)).Owner;
 
-                isConnect = true;
+                IsConnect = true;
 
                 try
                 {
@@ -336,7 +338,7 @@ namespace DiscordSupportBot
                         if (File.Exists(GetDataFilePath("CommandCount.bin")))
                             File.Delete(GetDataFilePath("CommandCount.bin"));
 
-                        isDisconnect = true;
+                        IsDisconnect = true;
                         return;
                     }
 
@@ -374,19 +376,19 @@ namespace DiscordSupportBot
                 {
                     Log.Error("註冊Slash指令失敗，關閉中...");
                     Log.Error(ex.ToString());
-                    isDisconnect = true;
+                    IsDisconnect = true;
                 }
 
                 Log.FormatColorWrite("準備完成", ConsoleColor.Green);
             };
             #region Login
-            await Client.LoginAsync(TokenType.Bot, botConfig.DiscordToken);
+            await Client.LoginAsync(TokenType.Bot, _botConfig.DiscordToken);
             #endregion
 
             await Client.StartAsync();
 
             do { await Task.Delay(1000); }
-            while (!isDisconnect);
+            while (!IsDisconnect);
 
 #if RELEASE
             Log.Info("保存資料庫中...");
@@ -401,25 +403,25 @@ namespace DiscordSupportBot
         private static void MakePinChannelList()
         {
             //大眾口味飆車區
-            pinChannelList.Add(706441543724171385); //貼圖
-            pinChannelList.Add(706441613093634098); //本一
-            pinChannelList.Add(706441648015409199); //本二
+            _pinChannelList.Add(706441543724171385); //貼圖
+            _pinChannelList.Add(706441613093634098); //本一
+            _pinChannelList.Add(706441648015409199); //本二
 
             //幼跟沒幼
-            pinChannelList.Add(706439997825220698); //幼跟沒幼貼圖
-            pinChannelList.Add(706440023754408007); //幼跟沒幼本子
-            pinChannelList.Add(706440083527565333); //FBI貼圖
-            pinChannelList.Add(706440051378094140); //FBI本子
+            _pinChannelList.Add(706439997825220698); //幼跟沒幼貼圖
+            _pinChannelList.Add(706440023754408007); //幼跟沒幼本子
+            _pinChannelList.Add(706440083527565333); //FBI貼圖
+            _pinChannelList.Add(706440051378094140); //FBI本子
 
             //隔離專區
-            pinChannelList.Add(706439567577841695);
-            pinChannelList.Add(706439609965608970);
-            pinChannelList.Add(706542107837333554);
-            pinChannelList.Add(706531891645513739);
-            pinChannelList.Add(706541902618427453);
-            pinChannelList.Add(706439433653846025);
-            pinChannelList.Add(706532048168288286);
-            pinChannelList.Add(706532155064582246);
+            _pinChannelList.Add(706439567577841695);
+            _pinChannelList.Add(706439609965608970);
+            _pinChannelList.Add(706542107837333554);
+            _pinChannelList.Add(706531891645513739);
+            _pinChannelList.Add(706541902618427453);
+            _pinChannelList.Add(706439433653846025);
+            _pinChannelList.Add(706532048168288286);
+            _pinChannelList.Add(706532155064582246);
         }
 
         public static void ChangeStatus()
@@ -458,10 +460,10 @@ namespace DiscordSupportBot
         {
             Message message = new Message();
 
-            if (isConnect) message.username = Client.CurrentUser.Username;
+            if (IsConnect) message.username = Client.CurrentUser.Username;
             else message.username = "Bot";
 
-            if (isConnect) message.avatar_url = Client.CurrentUser.GetAvatarUrl();
+            if (IsConnect) message.avatar_url = Client.CurrentUser.GetAvatarUrl();
             else message.avatar_url = "";
 
             message.content = content;
@@ -470,7 +472,7 @@ namespace DiscordSupportBot
             {
                 webClient.Encoding = Encoding.UTF8;
                 webClient.Headers["Content-Type"] = "application/json";
-                webClient.UploadString(botConfig.WebHookUrl, JsonConvert.SerializeObject(message));
+                webClient.UploadString(_botConfig.WebHookUrl, JsonConvert.SerializeObject(message));
             }
         }
         public static string GetLinkerTime(Assembly assembly)

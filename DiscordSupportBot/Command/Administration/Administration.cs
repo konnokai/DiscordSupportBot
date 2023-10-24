@@ -94,7 +94,7 @@ namespace DiscordSupportBot.Command.Administration
         [RequireOwner]
         public async Task DieAsync()
         {
-            Program.isDisconnect = true;
+            Program.IsDisconnect = true;
             await Context.Channel.SendErrorAsync("關閉中").ConfigureAwait(false);
         }
 
