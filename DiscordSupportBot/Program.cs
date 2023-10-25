@@ -18,7 +18,6 @@ namespace DiscordSupportBot
         public static DiscordSocketClient Client { get; set; }
         public static UpdateStatusFlags UpdateStatus { get; set; } = UpdateStatusFlags.Guild;
         public static ConnectionMultiplexer RedisConnection { get; private set; }
-        public static IDatabase RedisDb { get; private set; }
         public static bool IsDisconnect { get; internal set; } = false;
         public static bool IsConnect { get; private set; } = false;
 
@@ -61,7 +60,6 @@ namespace DiscordSupportBot
             {
                 global::RedisConnection.Init(_botConfig.RedisOption);
                 RedisConnection = global::RedisConnection.Instance.ConnectionMultiplexer;
-                RedisDb = RedisConnection.GetDatabase(0);
                 Log.Info("Redis已連線");
             }
             catch (Exception ex)

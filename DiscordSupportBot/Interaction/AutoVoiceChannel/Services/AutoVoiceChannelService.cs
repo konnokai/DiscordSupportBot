@@ -42,14 +42,14 @@ namespace DiscordSupportBot.Interaction.AutoVoiceChannel.Services
                     if (guild == null)
                         continue;
 
-                    await foreach (var redisValue in Program.RedisDb.SetScanAsync($"discordVoiceChannelCache:{item.GuildId}"))
+                    await foreach (var redisValue in RedisConnection.RedisDb.SetScanAsync($"discordVoiceChannelCache:{item.GuildId}"))
                     {
                         ulong voiceChannelId = ulong.Parse(redisValue);
                         var voiceChannel = guild.GetVoiceChannel(voiceChannelId);
 
                         if (voiceChannel == null)
                         {
-                            await Program.RedisDb.SetRemoveAsync($"discordVoiceChannelCache:{item.GuildId}", redisValue);
+                            await RedisConnection.RedisDb.SetRemoveAsync($"discordVoiceChannelCache:{item.GuildId}", redisValue);
                             continue;
                         }
 
@@ -75,7 +75,7 @@ namespace DiscordSupportBot.Interaction.AutoVoiceChannel.Services
 
                 try
                 {
-                    await foreach (var redisValue in Program.RedisDb.SetScanAsync($"discordVoiceChannelCache:{item.GuildId}"))
+                    await foreach (var redisValue in RedisConnection.RedisDb.SetScanAsync($"discordVoiceChannelCache:{item.GuildId}"))
                     {
                         ulong channelId = ulong.Parse(redisValue);
                         cache.Add(channelId);
@@ -154,7 +154,7 @@ namespace DiscordSupportBot.Interaction.AutoVoiceChannel.Services
 
                     try
                     {
-                        await Program.RedisDb.SetAddAsync($"discordVoiceChannelCache:{voiceChannel.Guild.Id}", newChannel.Id);
+                        await RedisConnection.RedisDb.SetAddAsync($"discordVoiceChannelCache:{voiceChannel.Guild.Id}", newChannel.Id);
                     }
                     catch (Exception) { }
 
@@ -197,7 +197,7 @@ namespace DiscordSupportBot.Interaction.AutoVoiceChannel.Services
 
             try
             {
-                await Program.RedisDb.SetRemoveAsync($"discordVoiceChannelCache:{voiceChannel.GuildId}", voiceChannel.Id);
+                await RedisConnection.RedisDb.SetRemoveAsync($"discordVoiceChannelCache:{voiceChannel.GuildId}", voiceChannel.Id);
             }
             catch (Exception) { }
 
