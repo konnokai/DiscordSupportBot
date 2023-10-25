@@ -8,40 +8,6 @@ namespace DiscordSupportBot.DataBase.Activity
         public static bool IsInited { get; private set; } = true;
         static string ConnectString { get; } = "Data Source=" + Program.GetDataFilePath("EmoteActivity.db");
 
-        //public static async Task InitActivityAsync()
-        //{
-        //    IsInited = false;
-
-        //    if (File.Exists(Program.GetDataFilePath("EmoteActivity.db")))
-        //    {
-        //        foreach (var item in Select<Guild>("sqlite_master", "name", "WHERE type = 'table' AND name NOT LIKE 'sqlite_%';"))
-        //        {
-        //            try
-        //            {
-        //                var guild = Program.Client.Guilds.FirstOrDefault((x) => x.Id == item.name);
-        //                if (guild == null) continue;
-
-        //                var temp = Select<EmoteTable>(item.name.ToString());
-
-        //                foreach (var item2 in temp)
-        //                {
-        //                    try
-        //                    {
-        //                        var tempEmote = guild.Emotes.FirstOrDefault((x) => x.Id == item2.EmoteID);
-        //                        if (tempEmote == null) continue;
-
-        //                        await RedisConnection.RedisDb.StringSetAsync($"SupportBot:Activity:Emote:{item.name}:{item2.EmoteID}", item2.ActivityNum).ConfigureAwait(false);
-        //                    }
-        //                    catch { }
-        //                }
-        //            }
-        //            catch { }
-        //        }
-        //    }
-
-        //    IsInited = true;
-        //}
-
         public static async Task AddActivityAsync(ulong gid, ulong eid)
         {
             try
@@ -59,34 +25,29 @@ namespace DiscordSupportBot.DataBase.Activity
             try
             {
                 var emoteTables = Select<EmoteTable>(gid.ToString());
-                var redisKeyList = RedisConnection.RedisServer.Keys(2, pattern: $"SupportBot:Activity:Emote:{gid}:*", cursor: 0, pageSize: 2500);
+                var redisEmoteList = RedisConnection.RedisServer.Keys(2, pattern: $"SupportBot:Activity:Emote:{gid}:*", cursor: 0, pageSize: 2500)
+                    .Select((x) => ulong.Parse(x.ToString().Split(':')[4])).ToList();
                 var guildEmotes = await Program.Client.GetGuild(gid).GetEmotesAsync().ConfigureAwait(false);
                 var resultList = new List<EmoteTable>();
 
-                foreach (var item in redisKeyList)
+                foreach (var guildEmote in guildEmotes)
                 {
-                    var eid = ulong.Parse(item.ToString().Split(new char[] { ':' })[4]);
-                    var emote = guildEmotes.FirstOrDefault((x) => x.Id == eid);
-                    if (emote == null) continue;
+                    int redisActivityNum = 0;
+                    if (await RedisConnection.RedisDb.KeyExistsAsync($"SupportBot:Activity:Emote:{gid}:{guildEmote.Id}"))
+                        redisActivityNum = int.Parse((await RedisConnection.RedisDb.StringGetAsync($"SupportBot:Activity:Emote:{gid}:{guildEmote.Id}")).ToString());
 
-                    var activityNum = int.Parse((await RedisConnection.RedisDb.StringGetAsync(item).ConfigureAwait(false)).ToString());
+                    var emoteTable = emoteTables.SingleOrDefault((x) => x.EmoteID == guildEmote.Id);
+                    if (emoteTable == null)
+                    {
+                        if (redisActivityNum > 0)
+                            resultList.Add(new EmoteTable() { EmoteID = guildEmote.Id, EmoteName = guildEmote.ToString(), ActivityNum = redisActivityNum });
 
-                    var newEmoteTable = new EmoteTable() { EmoteID = eid, EmoteName = emote.ToString(), ActivityNum = activityNum };
-                    var emoteTable = emoteTables.FirstOrDefault((x) => x.EmoteID == eid);
-                    if (emoteTable != null)
-                        newEmoteTable.ActivityNum += emoteTable.ActivityNum;
-
-                    resultList.Add(newEmoteTable);
-                }
-
-                foreach (var item in emoteTables)
-                {
-                    var emote = guildEmotes.FirstOrDefault((x) => x.Id == item.EmoteID);
-                    if (emote == null)
                         continue;
+                    }
 
-                    item.EmoteName = emote.ToString();
-                    resultList.Add(item);
+                    emoteTable.EmoteName = guildEmote.ToString();
+                    emoteTable.ActivityNum += redisActivityNum;
+                    resultList.Add(emoteTable);
                 }
 
                 return resultList;
