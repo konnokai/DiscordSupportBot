@@ -646,25 +646,5 @@ namespace DiscordSupportBot.Command.Administration
 
             await Context.Channel.SendConfirmAsync("Done");
         }
-
-        [Command("RenameChannel")]
-        [Alias("rc")]
-        [RequireContext(ContextType.Guild)]
-        [RequireGuild(1029365173938556958)]
-        [RequireBotPermission(GuildPermission.ManageChannels)]
-        [RequireUserPermission(GuildPermission.ManageChannels)]
-        public async Task RenameChannelAsync()
-        {
-            Regex regex = new Regex(@"[\d]{1,2}_");
-            foreach (var item in Context.Guild.VoiceChannels)
-            {
-                var reslut = regex.Match(item.Name);
-                if (reslut.Success)
-                {
-                    await item.ModifyAsync((act) => { act.Name = reslut.Value; act.UserLimit = 3; });
-                    Log.Info(item.Name);
-                }
-            }
-        }
     }
 }
