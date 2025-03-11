@@ -1,4 +1,3 @@
-version: "3.9"
 services:
   discord-support-bot:
     container_name: discord-support-bot
