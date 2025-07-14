@@ -11,7 +11,7 @@ namespace DiscordSupportBot.Interaction.Activity
             await DeferAsync();
 
             var userActivity = (await UserActivity.GetActivityAsync(Context.Guild.Id).ConfigureAwait(false)).OrderByDescending((x) => x.ActivityNum).ToList();
-            if (!userActivity.Any())
+            if (userActivity.Count == 0)
             {
                 await Context.Interaction.SendErrorAsync("此伺服器無訊息紀錄", true).ConfigureAwait(false);
                 return;
@@ -53,7 +53,7 @@ namespace DiscordSupportBot.Interaction.Activity
             await DeferAsync();
 
             var emoteActivity = (await EmoteActivity.GetActivityAsync(Context.Guild.Id).ConfigureAwait(false)).OrderByDescending((x) => x.ActivityNum).ToList();
-            if (!emoteActivity.Any())
+            if (emoteActivity.Count == 0)
             {
                 await Context.Interaction.SendErrorAsync("此伺服器無表情紀錄", true).ConfigureAwait(false);
                 return;
@@ -92,9 +92,13 @@ namespace DiscordSupportBot.Interaction.Activity
             ulong emoteId;
             try
             {
-                emoteId = ulong.Parse(emote.Split(new char[] { ':' })[2].TrimEnd('>'));
+                emoteId = ulong.Parse(emote.Split([':'])[2].TrimEnd('>'));
             }
-            catch (Exception) { await Context.Interaction.SendErrorAsync("輸入的參數非表情").ConfigureAwait(false); return; }
+            catch (Exception)
+            {
+                await Context.Interaction.SendErrorAsync("輸入的參數非表情").ConfigureAwait(false);
+                return;
+            }
 
             GuildEmote emoteData;
             try
@@ -107,8 +111,8 @@ namespace DiscordSupportBot.Interaction.Activity
                 return;
             }
 
-            var emoteActivityList = (await EmoteActivity.GetActivityAsync(Context.Guild.Id).ConfigureAwait(false)).OrderByDescending((x) => x.ActivityNum).ToList();
-            if (!emoteActivityList.Any())
+            var emoteActivityList = (await EmoteActivity.GetActivityAsync(Context.Guild.Id).ConfigureAwait(false)).ToList();
+            if (emoteActivityList.Count == 0)
             {
                 await Context.Interaction.SendErrorAsync("此伺服器無表情紀錄").ConfigureAwait(false);
                 return;

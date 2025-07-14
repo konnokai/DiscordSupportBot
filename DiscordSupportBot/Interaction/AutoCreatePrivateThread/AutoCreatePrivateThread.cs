@@ -12,7 +12,6 @@ namespace DiscordSupportBot.Interaction.AutoCreatePrivateThread
             _client = client;
         }
 
-
         [SlashCommand("auto-create-private-thread", "自動創建私密討論串")]
         [RequireContext(ContextType.Guild)]
         [DefaultMemberPermissions(GuildPermission.ManageThreads | GuildPermission.CreatePrivateThreads)]
@@ -52,7 +51,7 @@ namespace DiscordSupportBot.Interaction.AutoCreatePrivateThread
             componentBuilder.WithButton(buttonTitle, "create-private-thread", ButtonStyle.Primary);
             await userMessage.ModifyAsync((act) => act.Components = componentBuilder.Build());
 
-            await Context.Interaction.SendConfirmAsync("已成功添加按鈕", true);
+            await Context.Interaction.SendConfirmAsync("已成功添加按鈕，如需移除此功能只需直接刪除帶有按鈕的訊息即可", true);
         }
     }
 }

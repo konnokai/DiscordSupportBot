@@ -14,7 +14,7 @@ namespace DiscordSupportBot.Interaction.Admin
         {
             if (role == Context.Guild.EveryoneRole)
             {
-                await Context.Interaction.SendErrorAsync("不可給予Everyone用戶組");
+                await Context.Interaction.SendErrorAsync("不可給予 Everyone 用戶組");
                 return;
             }
 
@@ -26,78 +26,76 @@ namespace DiscordSupportBot.Interaction.Admin
 
             await DeferAsync(true);
 
-            using (HttpClient httpClient = new HttpClient())
+            using HttpClient httpClient = new();
+            string userIdContext;
+            try
             {
-                string userIdContext;
+                userIdContext = await httpClient.GetStringAsync(attachment.Url);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"AutoGrantRoleAsync-DownloadAttachment: {ex}");
+                await Context.Interaction.SendErrorAsync($"下載使用者清單失敗: {ex.Message}", true);
+                return;
+            }
+
+            string[] userList;
+            try
+            {
+                userList = userIdContext.Split(["\r", "\n", "\r\n", ",", "|"], StringSplitOptions.RemoveEmptyEntries);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"AutoGrantRoleAsync-SplitUserList: {ex}");
+                await Context.Interaction.SendErrorAsync($"分離使用者清單失敗: {ex.Message}", true);
+                return;
+            }
+
+            int ignoreNum = 0, addNum = 0, notInListNum = 0, errorNum = 0;
+            foreach (var user in Context.Guild.Users)
+            {
                 try
                 {
-                    userIdContext = await httpClient.GetStringAsync(attachment.Url);
-                }
-                catch (Exception ex)
-                {
-                    Log.Error($"AutoGrantRoleAsync-DownloadAttachment: {ex}");
-                    await Context.Interaction.SendErrorAsync($"下載使用者清單失敗: {ex.Message}", true);
-                    return;
-                }
-
-                string[] userList;
-                try
-                {
-                    userList = userIdContext.Split(new string[] { "\r", "\n", "\r\n", ",", "|" }, StringSplitOptions.RemoveEmptyEntries);
-                }
-                catch (Exception ex)
-                {
-                    Log.Error($"AutoGrantRoleAsync-SplitUserList: {ex}");
-                    await Context.Interaction.SendErrorAsync($"分離使用者清單失敗: {ex.Message}", true);
-                    return;
-                }
-
-                int ignoreNum = 0, addNum = 0, notInListNum = 0, errorNum = 0;
-                foreach (var user in Context.Guild.Users)
-                {
-                    try
+                    if (userList.Any((x) => x.Trim() == user.Id.ToString() || x.Trim() == $"{user.Username}#{user.Discriminator}"))
                     {
-                        if (userList.Any((x) => x.Trim() == user.Id.ToString() || x.Trim() == $"{user.Username}#{user.Discriminator}"))
+                        if (!user.Roles.Contains(role))
                         {
-                            if (!user.Roles.Contains(role))
-                            {
-                                await user.AddRoleAsync(role);
-                                addNum++;
-                            }
-                            else
-                            {
-                                ignoreNum++;
-                            }
+                            await user.AddRoleAsync(role);
+                            addNum++;
                         }
                         else
                         {
-                            notInListNum++;
+                            ignoreNum++;
                         }
                     }
-                    catch (HttpException discordEx) when (discordEx.DiscordCode == DiscordErrorCode.MissingPermissions || discordEx.DiscordCode == DiscordErrorCode.InsufficientPermissions)
+                    else
                     {
-                        Log.Error($"AutoGrantRoleAsync-AddRole-MissingPermissions");
-                        await Context.Interaction.SendErrorAsync($"我沒有權限可增加用戶組，請確認我的用戶組比 {role} 還高", true);
-                        return;
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Error($"AutoGrantRoleAsync-AddRole: {ex}");
-                        await Context.Interaction.SendErrorAsync($"無法新增 {user} 的用戶組: {ex.Message}", true);
-                        errorNum++;
+                        notInListNum++;
                     }
                 }
-
-                await Context.Interaction.FollowupAsync(embed: new EmbedBuilder()
-                    .WithOkColor()
-                    .WithTitle("新增完成")
-                    .WithDescription($"清單人數: {userList.Count()}\n" +
-                                     $"新增人數: {addNum}\n" +
-                                     $"已持有用戶組而忽略人數: {ignoreNum}\n" +
-                                     $"未在清單內而忽略人數: {notInListNum}\n" +
-                                     $"遇到錯誤人數: {errorNum}")
-                    .Build());
+                catch (HttpException discordEx) when (discordEx.DiscordCode == DiscordErrorCode.MissingPermissions || discordEx.DiscordCode == DiscordErrorCode.InsufficientPermissions)
+                {
+                    Log.Error($"AutoGrantRoleAsync-AddRole-MissingPermissions");
+                    await Context.Interaction.SendErrorAsync($"我沒有權限可增加用戶組，請確認我的用戶組比 {role} 還高", true);
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"AutoGrantRoleAsync-AddRole: {ex}");
+                    await Context.Interaction.SendErrorAsync($"無法新增 {user} 的用戶組: {ex.Message}", true);
+                    errorNum++;
+                }
             }
+
+            await Context.Interaction.FollowupAsync(embed: new EmbedBuilder()
+                .WithOkColor()
+                .WithTitle("新增完成")
+                .WithDescription($"清單人數: {userList.Length}\n" +
+                                 $"新增人數: {addNum}\n" +
+                                 $"已持有用戶組而忽略人數: {ignoreNum}\n" +
+                                 $"未在清單內而忽略人數: {notInListNum}\n" +
+                                 $"遇到錯誤人數: {errorNum}")
+                .Build());
         }
     }
 }
