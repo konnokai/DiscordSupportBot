@@ -18,10 +18,10 @@ namespace DiscordSupportBot.Interaction.AutoCreatePrivateThread.Service
 
             try
             {
-                var channel = component.Channel as ITextChannel;
+                var channel = component.Channel as SocketTextChannel;
                 var guild = _client.GetGuild(component.GuildId.Value);
 
-                var oldThread = guild.ThreadChannels.FirstOrDefault((x) => x.Name.EndsWith(component.User.Id.ToString()));
+                var oldThread = channel.Threads.FirstOrDefault((x) => x.Name.EndsWith(component.User.Id.ToString()));
                 if (oldThread != null)
                 {
                     await component.SendErrorAsync($"已經存在同名的私密討論串 [點我跳轉](https://discord.com/channels/{guild.Id}/{oldThread.Id})");
