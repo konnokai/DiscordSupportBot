@@ -1,11 +1,5 @@
 ﻿using Discord.Commands;
-using DiscordChatExporter.Core.Discord;
-using DiscordChatExporter.Core.Exporting;
-using DiscordChatExporter.Core.Exporting.Filtering;
-using DiscordChatExporter.Core.Exporting.Partitioning;
-using DiscordChatExporter.Core.Utils.Extensions;
 using System.IO.Compression;
-using System.Runtime.InteropServices;
 
 namespace DiscordSupportBot.Command.Administration
 {
@@ -130,7 +124,7 @@ namespace DiscordSupportBot.Command.Administration
         [RequireOwner]
         public async Task BigLeave()
         {
-            List<SocketGuild> guilds = new List<SocketGuild>(_client.Guilds.Where((x) => x.MemberCount <= 10));
+            List<SocketGuild> guilds = [.. _client.Guilds.Where((x) => x.MemberCount <= 10)];
 
             foreach (var item in guilds)
             {
@@ -491,18 +485,17 @@ namespace DiscordSupportBot.Command.Administration
             var list = await Context.Guild.GetEmotesAsync().ConfigureAwait(false);
             var exportNum = 0;
 
-            using FileStream fs = new FileStream(Program.GetDataFilePath($"{Context.Guild.Id}_Emoji.zip"), FileMode.OpenOrCreate);
-            using (ZipArchive zipArchive = new ZipArchive(fs, ZipArchiveMode.Update))
+            using var httpClient = new HttpClient();
+            using FileStream fs = new(Program.GetDataFilePath($"{Context.Guild.Id}_Emoji.zip"), FileMode.OpenOrCreate);
+            using (ZipArchive zipArchive = new(fs, ZipArchiveMode.Update))
             {
                 foreach (var item in list)
                 {
-                    byte[] bytes = await _service.httpClient.GetByteArrayAsync(item.Url).ConfigureAwait(false);
+                    byte[] bytes = await httpClient.GetByteArrayAsync(item.Url).ConfigureAwait(false);
                     var zipArchiveEntry = zipArchive.CreateEntry(item.Name + Path.GetExtension(item.Url), CompressionLevel.Optimal);
 
-                    using (var zipStream = zipArchiveEntry.Open())
-                    {
-                        await zipStream.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
-                    }
+                    using var zipStream = zipArchiveEntry.Open();
+                    await zipStream.WriteAsync(bytes).ConfigureAwait(false);
                 }
 
                 exportNum = zipArchive.Entries.Count;
@@ -543,12 +536,13 @@ namespace DiscordSupportBot.Command.Administration
             await Context.Channel.SendConfirmAsync("Working...");
 
             var inportNum = 0;
-            byte[] bytes = await _service.httpClient.GetByteArrayAsync(url).ConfigureAwait(false);
+            using var httpClient = new HttpClient();
+            byte[] bytes = await httpClient.GetByteArrayAsync(url).ConfigureAwait(false);
 
             try
             {
-                using MemoryStream ms = new MemoryStream(bytes);
-                using (ZipArchive zipArchive = new ZipArchive(ms, ZipArchiveMode.Read))
+                using MemoryStream ms = new(bytes);
+                using (ZipArchive zipArchive = new(ms, ZipArchiveMode.Read))
                 {
                     foreach (var item in zipArchive.Entries)
                     {
@@ -580,70 +574,6 @@ namespace DiscordSupportBot.Command.Administration
 
             try { await Context.Message.DeleteAsync().ConfigureAwait(false); }
             catch { }
-        }
-
-        // https://github.com/Tyrrrz/DiscordChatExporter
-        [Command("ExportChannelMessage")]
-        [Summary("匯出類別下的所有頻道聊天紀錄")]
-        [Alias("ExpChannelMsg")]
-        [RequireContext(ContextType.Guild)]
-        [RequireBotPermission(GuildPermission.ReadMessageHistory)]
-        [RequireUserPermission(GuildPermission.ManageMessages)]
-        [RequireOwner]
-        public async Task ExportChannel(ulong categoryId = 0)
-        {
-            var category = Context.Guild.GetCategoryChannel(categoryId);
-            if (category == null)
-            {
-                await Context.Channel.SendErrorAsync("分類不存在!");
-                return;
-            }
-
-            var needExportChannel = category.Channels.Where((x) => x is SocketTextChannel);
-            int i = 0;
-            foreach (var item in needExportChannel)
-            {
-                i++;
-                if (_service._exportedChannelId.Contains(item.Id))
-                {
-                    await Context.Channel.SendErrorAsync($"{item.Name} 已經匯出過了，無法重複使用");
-                    continue;
-                }
-
-                _service._exportedChannelId.Add(Context.Channel.Id);
-                await Context.Channel.SendConfirmAsync($"({i}/{needExportChannel.Count()}) {item.Name} Working...");
-
-                var guild = await _service._discordClient.GetGuildAsync(new Snowflake(Context.Guild.Id));
-                var channels = await _service._discordClient.GetGuildChannelsAsync(guild.Id);
-                var textChannel = channels.First((x) => x.Id == new Snowflake(item.Id));
-                string exportFileName = ExportRequest.GetDefaultOutputFileName(guild, textChannel, ExportFormat.HtmlDark, null, null);
-                string exportFilePath = Path.GetDirectoryName(exportFileName);
-                var request = new ExportRequest(
-                    guild,
-                    textChannel,
-                    Program.GetDataFilePath($"Export_temp"),
-                    ExportFormat.HtmlDark,
-                    null,
-                    null,
-                    PartitionLimit.Null,
-                    MessageFilter.Null,
-                    ShouldDownloadMedia: true,
-                    ShouldReuseMedia: true,
-                    DateFormat: "yyyy-MM-dd hh:mm tt"
-                );
-
-                await _service._channelExporter.ExportChannelAsync(
-                    request
-                );
-
-                if (!Directory.Exists(Program.GetDataFilePath("Export"))) Directory.CreateDirectory(Program.GetDataFilePath("Export"));
-                ZipFile.CreateFromDirectory(
-                    Program.GetDataFilePath($"Export_temp"),
-                    Program.GetDataFilePath($"Export" + (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "\\" : "/") + $"{Path.GetFileNameWithoutExtension(exportFileName)}.zip"));
-                Directory.Delete(Program.GetDataFilePath($"Export_temp"), true);
-            }
-
-            await Context.Channel.SendConfirmAsync("Done");
         }
     }
 }

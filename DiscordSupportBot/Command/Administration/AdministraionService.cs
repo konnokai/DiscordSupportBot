@@ -1,23 +1,14 @@
 ﻿using Discord.Commands;
-using DiscordChatExporter.Core.Discord;
-using DiscordChatExporter.Core.Exporting;
 
 namespace DiscordSupportBot.Command.Administration
 {
     public class AdministraionService : ICommandService
     {
-        private DiscordSocketClient _client;
-        private BotConfig _botConfig;
-        internal readonly DiscordClient _discordClient;
-        internal readonly HttpClient httpClient = new HttpClient();
-        internal readonly ChannelExporter _channelExporter;
-        internal readonly HashSet<ulong> _exportedChannelId = new HashSet<ulong>();
+        private readonly DiscordSocketClient _client;
 
-        public AdministraionService(DiscordSocketClient client, BotConfig botConfig)
+        public AdministraionService(DiscordSocketClient client)
         {
             _client = client;
-            _botConfig = botConfig;
-            _channelExporter = new ChannelExporter(new DiscordClient(botConfig.DiscordToken));
         }
 
         public async Task ClearUser(ITextChannel textChannel)
@@ -42,7 +33,7 @@ namespace DiscordSupportBot.Command.Administration
                 {
                     await context.Channel.SendMessageAsync("Working...");
 
-                    List<SocketGuildUser> socketGuildUsers = new List<SocketGuildUser>(context.Guild.Users.Where((x) => x.Roles.Count == 1));
+                    List<SocketGuildUser> socketGuildUsers = [.. context.Guild.Users.Where((x) => x.Roles.Count == 1)];
                     int i = 0;
 
                     foreach (var item in socketGuildUsers)
@@ -68,7 +59,7 @@ namespace DiscordSupportBot.Command.Administration
 
                 await context.Channel.SendMessageAsync("Working...");
 
-                List<SocketGuildUser> socketGuildUsers = new List<SocketGuildUser>(context.Guild.Users.Where((x) => x.Roles.Any(x2 => x2 == role) && x.Roles.Any((x2) => x2 == role2)));
+                List<SocketGuildUser> socketGuildUsers = [.. context.Guild.Users.Where((x) => x.Roles.Any(x2 => x2 == role) && x.Roles.Any((x2) => x2 == role2))];
                 int i = 0;
 
                 foreach (var item in socketGuildUsers)
@@ -103,7 +94,7 @@ namespace DiscordSupportBot.Command.Administration
                 try
                 {
                     List<SocketGuildUser> socketGuildUsers =
-                        new List<SocketGuildUser>(context.Guild.Users.Where((x) => kickSwitch ? x.Roles.Any((x2) => x2.Id == rid) : !x.Roles.Any((x2) => x2.Id == rid)));
+                        [.. context.Guild.Users.Where((x) => kickSwitch ? x.Roles.Any((x2) => x2.Id == rid) : !x.Roles.Any((x2) => x2.Id == rid))];
 
                     foreach (var item in socketGuildUsers)
                     {
