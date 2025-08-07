@@ -13,10 +13,7 @@ namespace DiscordSupportBot.Interaction.AutoVoiceChannel.Services
             _client = client;
             _client.UserVoiceStateUpdated += _client_UserVoiceStateUpdated;
 
-            Task.Run(async () =>
-            {
-                await RefreshVoiceChannelCacheAsync();
-            });
+            Task.Run(RefreshVoiceChannelCacheAsync);
 
             _ = new Timer((obj) =>
             {
@@ -111,17 +108,17 @@ namespace DiscordSupportBot.Interaction.AutoVoiceChannel.Services
                 if (beforeVch?.Guild == afterVch?.Guild) // User Move
                 {
                     ChannelEvent @event = ChannelEvent.Error;
-                    if (afterVch.Id == guildConfig.AutoVoiceChannel && !usr.IsBot)
+                    if (afterVch.Id == guildConfig.AutoVoiceChannel && !usr.IsBot) // 確保使用者進入的是指定的語音頻道才可自動建立新的語音頻道並移動
                         @event = await CreateVoiceChannelAndMoveUser(usr, afterVch);
-                    if (@event != ChannelEvent.MoveOnly &&
-                        _voiceChannelCache.TryGetValue(beforeVch.Guild.Id, out var result) &&
-                        result.Contains(beforeVch.Id) &&
-                        !beforeVch.ConnectedUsers.Any())
-                        await beforeVch.DeleteAndClearFromCacheAsync(_voiceChannelCache);
+                    if (@event != ChannelEvent.MoveOnly && // 如果只移動使用者
+                        _voiceChannelCache.TryGetValue(beforeVch.Guild.Id, out var result) && // 並且快取中有該伺服器資料
+                        result.Contains(beforeVch.Id) && // 並且快取中有該語音頻道
+                        !beforeVch.ConnectedUsers.Any()) // 並且該語音頻道無人連線
+                        await beforeVch.DeleteAndClearFromCacheAsync(_voiceChannelCache); // 刪除該語音頻道並從快取中清除
                 }
                 else if (beforeVch is null && !usr.IsBot) // User Join
                 {
-                    if (afterVch.Id == guildConfig.AutoVoiceChannel)
+                    if (afterVch.Id == guildConfig.AutoVoiceChannel) // 確保使用者進入的是指定的語音頻道才可自動建立新的語音頻道並移動
                         await CreateVoiceChannelAndMoveUser(usr, afterVch);
                 }
                 else if (afterVch is null) // User Leave

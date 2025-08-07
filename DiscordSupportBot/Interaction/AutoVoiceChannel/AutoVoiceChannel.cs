@@ -4,18 +4,11 @@ namespace DiscordSupportBot.Interaction.AutoVoiceChannel
 {
     public class AutoVoiceChannel : TopLevelModule<Services.AutoVoiceChannelService>
     {
-        private readonly DiscordSocketClient _client;
-        public AutoVoiceChannel(DiscordSocketClient client)
-        {
-            _client = client;
-        }
-
-        [SlashCommand("set-auto-voice-channel", "設定某個頻道加入後可自動建立專用語音頻道")]
-        [EnabledInDm(false)]
-        [DefaultMemberPermissions(GuildPermission.Administrator)]
         [RequireContext(ContextType.Guild)]
+        [DefaultMemberPermissions(GuildPermission.Administrator)]
         [RequireUserPermission(GuildPermission.Administrator)]
         [RequireBotPermission(GuildPermission.ManageChannels | GuildPermission.MoveMembers)]
+        [SlashCommand("set-auto-voice-channel", "設定某個頻道加入後可自動建立專用語音頻道")]
         public async Task SetAutoVoiceChannelAsync(IVoiceChannel voiceChannel)
         {
             var currentUser = Context.Guild.GetUser(Context.Client.CurrentUser.Id);
@@ -63,12 +56,10 @@ namespace DiscordSupportBot.Interaction.AutoVoiceChannel
             }
         }
 
-        [SlashCommand("remove-auto-voice-channel", "移除自動建立專用語音頻道")]
-        [EnabledInDm(false)]
-        [DefaultMemberPermissions(GuildPermission.Administrator)]
         [RequireContext(ContextType.Guild)]
+        [DefaultMemberPermissions(GuildPermission.Administrator)]
         [RequireUserPermission(GuildPermission.Administrator)]
-        [RequireBotPermission(GuildPermission.ManageChannels | GuildPermission.MoveMembers)]
+        [SlashCommand("remove-auto-voice-channel", "移除自動建立專用語音頻道")]
         public async Task RemoveAutoVoiceChannelAsync()
         {
             await DeferAsync(true);

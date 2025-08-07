@@ -12,10 +12,10 @@ namespace DiscordSupportBot.Interaction.AutoCreatePrivateThread
             _client = client;
         }
 
-        [SlashCommand("auto-create-private-thread", "自動創建私密討論串")]
         [RequireContext(ContextType.Guild)]
         [DefaultMemberPermissions(GuildPermission.ManageThreads | GuildPermission.CreatePrivateThreads)]
         [RequireBotPermission(GuildPermission.ManageThreads | GuildPermission.CreatePrivateThreads)]
+        [SlashCommand("auto-create-private-thread", "自動創建私密討論串")]
         public async Task AutoCreatePrivateThreadAsync([Summary("messageId", "要顯示按鈕的訊息")] string messageIdStr,
             [Summary("buttonTitle", "按鈕標題")] string buttonTitle)
         {
