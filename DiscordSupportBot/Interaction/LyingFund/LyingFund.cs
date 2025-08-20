@@ -7,6 +7,12 @@ namespace DiscordSupportBot.Interaction.LyingFund
         [SlashCommand("lying-fund", "說謊基金")]
         public async Task LyingFundAsync(IUser user)
         {
+            if (Context.Guild.GetUser(user.Id) == null)
+            {
+                await Context.Interaction.SendErrorAsync("指定的使用者不在此伺服器中");
+                return;
+            }
+
             var fund = await RedisConnection.RedisDb.HashIncrementAsync($"support:LyinhFund:{Context.Guild.Id}", user.Id, 500);
             await Context.Interaction.SendConfirmAsync($"已對 `{user}` 增加 500 說謊基金，現在金額: {fund}");
         }
