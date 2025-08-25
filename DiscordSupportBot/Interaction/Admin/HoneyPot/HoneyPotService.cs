@@ -64,19 +64,28 @@ namespace DiscordSupportBot.Interaction.Admin.HoneyPot
                     return;
 
                 // 添加蜜罐反應表情
+                //try
+                //{
+                //    await arg.AddReactionAsync(Emoji.Parse(":honey_pot:"));
+                //}
+                //catch (Exception ex)
+                //{
+                //    Log.Warn($"無法添加蜜罐表情反應: {ex.Demystify()}");
+                //}
+
+                // 封鎖用戶 + 刪除全部訊息
+                await guildUser.BanAsync(1, "在蜜罐頻道發言");
+
+                Log.Info($"用戶 {guildUser.Username} ({guildUser.Id}) 在蜜罐頻道 {guildChannel.Name} ({guildChannel.Id}) 發言，已被踢出");
+
                 try
                 {
-                    await arg.AddReactionAsync(Emoji.Parse(":honey_pot:"));
+                    await arg.Channel.SendErrorAsync($"{arg.Author} ({arg.Author.Id}) 在蜜罐頻道發言，已被踢出伺服器");
                 }
                 catch (Exception ex)
                 {
-                    Log.Warn($"無法添加蜜罐表情反應: {ex.Demystify()}");
+                    Log.Warn($"無法發送用戶被踢出訊息: {ex.Demystify()}");
                 }
-
-                // 踢出用戶
-                await guildUser.KickAsync("在蜜罐頻道發言");
-
-                Log.Info($"用戶 {guildUser.Username} ({guildUser.Id}) 在蜜罐頻道 {guildChannel.Name} ({guildChannel.Id}) 發言，已被踢出");
             }
             catch (Exception ex)
             {
