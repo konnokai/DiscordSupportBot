@@ -44,6 +44,30 @@ namespace DiscordSupportBot.Interaction.Fund
                 $"{string.Join('\n', hashEntries.OrderByDescending((x) => x.Value).Select((x) => $"<@{x.Name}>: {x.Value}"))}");
         }
 
+        [MessageCommand("對該訊息的作者添加說謊基金")]
+        public async Task AddLyingFundMessageCommandAsync(IMessage message)
+        {
+            await AddFundAsync(FundType.Lying, message.Author);
+        }
+
+        [MessageCommand("對該訊息的作者添加暈船基金")]
+        public async Task AddDizzyFundMessageCommandAsync(IMessage message)
+        {
+            await AddFundAsync(FundType.Dizzy, message.Author);
+        }
+
+        [MessageCommand("對該訊息的作者添加色狗基金")]
+        public async Task AddHentaiDogFundMessageCommandAsync(IMessage message)
+        {
+            await AddFundAsync(FundType.HentaiDog, message.Author);
+        }
+
+        [MessageCommand("對該訊息的作者添加渣男基金")]
+        public async Task AddFuckBoyFundMessageCommandAsync(IMessage message)
+        {
+            await AddFundAsync(FundType.FuckBoy, message.Author);
+        }
+
         private string GetFundTypeName(FundType fundType)
         {
             return fundType switch
