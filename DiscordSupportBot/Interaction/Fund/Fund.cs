@@ -1,8 +1,8 @@
 ﻿using Discord.Interactions;
 
-namespace DiscordSupportBot.Interaction.LyingFund
+namespace DiscordSupportBot.Interaction.Fund
 {
-    public class LyingFund : TopLevelModule
+    public class Fund : TopLevelModule
     {
         public enum FundType
         {
@@ -11,7 +11,9 @@ namespace DiscordSupportBot.Interaction.LyingFund
             [ChoiceDisplay("暈船")]
             Dizzy,
             [ChoiceDisplay("色狗")]
-            HentaiDog
+            HentaiDog,
+            [ChoiceDisplay("渣男")]
+            FuckBoy
         }
 
         [SlashCommand("add-fund", "對某人添加基金")]
@@ -49,6 +51,7 @@ namespace DiscordSupportBot.Interaction.LyingFund
                 FundType.Lying => "說謊",
                 FundType.Dizzy => "暈船",
                 FundType.HentaiDog => "色狗",
+                FundType.FuckBoy => "渣男",
                 _ => throw new NotImplementedException(),
             };
         }
