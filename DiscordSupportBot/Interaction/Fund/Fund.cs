@@ -13,7 +13,9 @@ namespace DiscordSupportBot.Interaction.Fund
             [ChoiceDisplay("色狗")]
             HentaiDog,
             [ChoiceDisplay("渣男")]
-            FuckBoy
+            FuckBoy,
+            [ChoiceDisplay("抖M")]
+            Masochism
         }
 
         [SlashCommand("add-fund", "對某人添加基金")]
@@ -44,6 +46,37 @@ namespace DiscordSupportBot.Interaction.Fund
                 $"{string.Join('\n', hashEntries.OrderByDescending((x) => x.Value).Select((x) => $"<@{x.Name}>: {x.Value}"))}");
         }
 
+        [SlashCommand("all-fund-leaderboard", "所有基金的前三名排行榜")]
+        public async Task AllFundLeaderBoardAsync()
+        {
+            await Context.Interaction.DeferAsync(false);
+
+            var fundTypes = Enum.GetValues(typeof(FundType)).Cast<FundType>();
+            var embed = new EmbedBuilder()
+                .WithTitle($"`{Context.Guild.Name}` 所有基金前三名排行榜")
+                .WithOkColor();
+
+            bool hasAny = false;
+            foreach (var fundType in fundTypes)
+            {
+                var hashEntries = await RedisConnection.RedisDb.HashGetAllAsync($"support:{fundType}Fund:{Context.Guild.Id}");
+                if (hashEntries.Length > 0)
+                {
+                    hasAny = true;
+                    embed.AddField(GetFundTypeName(fundType), string.Join('\n', hashEntries.OrderByDescending((x) => x.Value).Take(3).Select((x) => $"<@{x.Name}>: {x.Value}")), true);
+                }
+            }
+
+            if (!hasAny)
+            {
+                await Context.Interaction.SendErrorAsync("目前沒有任何人有基金");
+            }
+            else
+            {
+                await Context.Interaction.FollowupAsync(embed: embed.Build());
+            }
+        }
+
         [MessageCommand("對該訊息的作者添加說謊基金")]
         public async Task AddLyingFundMessageCommandAsync(IMessage message)
         {
@@ -68,6 +101,12 @@ namespace DiscordSupportBot.Interaction.Fund
             await AddFundAsync(FundType.FuckBoy, message.Author);
         }
 
+        [MessageCommand("對該訊息的作者添加抖M基金")]
+        public async Task AddMasochismFundMessageCommandAsync(IMessage message)
+        {
+            await AddFundAsync(FundType.Masochism, message.Author);
+        }
+
         private string GetFundTypeName(FundType fundType)
         {
             return fundType switch
@@ -76,7 +115,8 @@ namespace DiscordSupportBot.Interaction.Fund
                 FundType.Dizzy => "暈船",
                 FundType.HentaiDog => "色狗",
                 FundType.FuckBoy => "渣男",
-                _ => throw new NotImplementedException(),
+                FundType.Masochism => "抖M",
+                _ => fundType.ToString(),
             };
         }
     }
