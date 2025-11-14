@@ -1,4 +1,5 @@
 ﻿using Discord.Commands;
+using System.Diagnostics;
 using System.IO.Compression;
 
 namespace DiscordSupportBot.Command.Administration
@@ -77,23 +78,50 @@ namespace DiscordSupportBot.Command.Administration
             }, _client.Guilds.Count, 7).ConfigureAwait(false);
         }
 
+        private const int MaxMemberCount = 500;
+
         [Command("ListBot")]
-        [Summary("顯示目前伺服器的Bot")]
+        [Summary("顯示目前伺服器的 Bot")]
         [Alias("LB")]
         [RequireOwner]
         public async Task ListBotAsync([Summary("頁數")] int page = 0)
         {
-            await Context.Guild.DownloadUsersAsync().ConfigureAwait(false);
-            var users = await Context.Guild.GetUsersAsync().FirstOrDefaultAsync();
-            var roleUsers = users.Where(x => x.IsBot).OrderBy((x) => x.Username);
-
-            await Context.SendPaginatedConfirmAsync(page, (cur) =>
+            if (Context.Guild.MemberCount >= MaxMemberCount)
             {
-                return new EmbedBuilder()
-                .WithOkColor()
-                .WithTitle(string.Format("伺服器內共有 {0} 個Bot", roleUsers.Count()))
-                .WithDescription(string.Join('\n', roleUsers.Skip(cur * 20).Take(20)));
-            }, roleUsers.Count(), 20).ConfigureAwait(false);
+                await Context.Channel.SendErrorAsync($"為避免造成統計負擔，當伺服器成員超過 {MaxMemberCount} 人時禁止使用本指令").ConfigureAwait(false);
+                return;
+            }
+
+            var message = await Context.Channel.SendConfirmAsync("獲取伺服器使用者清單中...").ConfigureAwait(false);
+
+            try
+            {
+                var botUsers = new List<IGuildUser>();
+                await foreach (var users in Context.Guild.GetUsersAsync())
+                {
+                    botUsers.AddRange(users.Where(x => x.IsBot));
+                }
+
+                await message.DeleteAsync().ConfigureAwait(false);
+
+                await Context.SendPaginatedConfirmAsync(page, (cur) =>
+                {
+                    return new EmbedBuilder()
+                    .WithOkColor()
+                    .WithTitle(string.Format("伺服器內共有 {0} 個 Bot", botUsers.Count))
+                    .WithDescription(string.Join('\n', botUsers.Skip(cur * 20).Take(20)));
+                }, botUsers.Count, 20).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"ListBot-GetUserListError: {Context.Guild.Id}");
+                Log.Error(ex.Demystify().ToString());
+
+                await message.ModifyAsync(m =>
+                {
+                    m.Embed = new EmbedBuilder().WithErrorColor().WithDescription($"獲取使用者清單失敗: {ex.Message}").Build();
+                }).ConfigureAwait(false);
+            }
         }
 
         [Command("Die")]
@@ -139,8 +167,7 @@ namespace DiscordSupportBot.Command.Administration
 
         [Command("ResetACT")]
         [Summary("重製排行榜\n" +
-            "可指定要重製發言(user)，表情(emote)或是全部(all)\n" +
-            "(指令縮寫絕對不是故意的)")]
+            "可指定要重製發言 (user)，表情 (emote) 或是全部 (all)")]
         [Alias("ReACT")]
         [RequireUserPermission(GuildPermission.Administrator)]
         public async Task ResetACT(ResetType resetType)

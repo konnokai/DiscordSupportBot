@@ -201,7 +201,7 @@ namespace DiscordSupportBot.Interaction.Lottery
 
         [SlashCommand("create-lottery", "建立一個抽獎訊息")]
         [RequireUserPermission(GuildPermission.Administrator)]
-        [EnabledInDm(false)]
+        [CommandContextType(InteractionContextType.Guild)]
         [RequireContext(ContextType.Guild)]
         public async Task CreateLotteryAsync()
         {
@@ -218,7 +218,7 @@ namespace DiscordSupportBot.Interaction.Lottery
 
         [SlashCommand("start-lottery", "開始抽獎")]
         [RequireUserPermission(GuildPermission.Administrator)]
-        [EnabledInDm(false)]
+        [CommandContextType(InteractionContextType.Guild)]
         [RequireContext(ContextType.Guild)]
         public async Task StartLotteryAsync([Summary("ended-lottery", "要抽哪個獎項? 僅會顯示已無法參與的抽獎"), Autocomplete(typeof(ShowEndedLotteryAutocompleteHandler))] string guid)
         {
@@ -305,7 +305,7 @@ namespace DiscordSupportBot.Interaction.Lottery
 
         [SlashCommand("delete-lottery", "刪除抽獎")]
         [RequireUserPermission(GuildPermission.Administrator)]
-        [EnabledInDm(false)]
+        [CommandContextType(InteractionContextType.Guild)]
         [RequireContext(ContextType.Guild)]
         public async Task DeleteLotteryAsync([Summary("lottery", "要抽的獎項"), Autocomplete(typeof(ShowAllLotteryAutocompleteHandler))] string guid)
         {
@@ -327,7 +327,7 @@ namespace DiscordSupportBot.Interaction.Lottery
 
         [SlashCommand("show-participant-list", "顯示抽獎參與成員清單")]
         [RequireUserPermission(GuildPermission.Administrator)]
-        [EnabledInDm(false)]
+        [CommandContextType(InteractionContextType.Guild)]
         [RequireContext(ContextType.Guild)]
         public async Task ShowParticipantListAsync([Summary("lottery", "要抽的獎項"), Autocomplete(typeof(ShowAllLotteryAutocompleteHandler))] string guid, [Summary("page", "頁數")] int page = 1)
         {

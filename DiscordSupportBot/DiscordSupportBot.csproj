@@ -7,14 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Migrations\20200307171521_InitialCreate.cs" />
-    <Compile Remove="Migrations\20200307171521_InitialCreate.Designer.cs" />
-    <Compile Remove="Migrations\20200922135928_Delete-TimeChannel.cs" />
-    <Compile Remove="Migrations\20200922135928_Delete-TimeChannel.Designer.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\.editorconfig" Link=".editorconfig" />
     <None Include="..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
@@ -24,7 +16,7 @@
   <ItemGroup>
     <PackageReference Include="Ben.Demystifier" Version="0.4.1" />
     <PackageReference Include="Dapper" Version="2.1.66" />
-    <PackageReference Include="Discord.Net" Version="3.18.0" />
+    <PackageReference Include="Discord.Net" Version="3.18.0-nightly.20251113.688" />
     <PackageReference Include="JsonExtensions" Version="1.2.0" />
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="9.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8">
@@ -40,21 +32,6 @@
     <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.11" />
     <PackageReference Include="StackExchange.Redis" Version="2.9.11" />
     <PackageReference Include="System.Linq.Async" Version="6.0.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Discord.Net.Commands">
-      <HintPath>Lib\Discord.Net.Commands.dll</HintPath>
-    </Reference>
-    <Reference Include="Discord.Net.Core">
-      <HintPath>Lib\Discord.Net.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Discord.Net.Rest">
-      <HintPath>Lib\Discord.Net.Rest.dll</HintPath>
-    </Reference>
-    <Reference Include="Discord.Net.WebSocket">
-      <HintPath>Lib\Discord.Net.WebSocket.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
   <ItemGroup>
@@ -74,6 +51,6 @@
 		<Authors>Konnokai</Authors>
 		<PackageProjectUrl>https://konnokai.me</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<RepositoryType>https://github.com/jun112561/Discord-Support-Bot.git</RepositoryType>
+		<RepositoryType>https://github.com/konnokai/DiscordSupportBot.git</RepositoryType>
 	</PropertyGroup>
 </Project>

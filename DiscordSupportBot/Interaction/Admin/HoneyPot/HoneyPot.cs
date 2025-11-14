@@ -41,7 +41,7 @@ namespace DiscordSupportBot.Interaction.Admin.HoneyPot
                 // 更新服務中的快取
                 _service.AddHoneyPotChannel(channel.Id);
 
-                await Context.Interaction.SendConfirmAsync($"已設定 `{channel.Name}` 為蜜罐頻道", 
+                await Context.Interaction.SendConfirmAsync($"已設定 `{channel.Name}` 為蜜罐頻道",
                     $"當非機器人用戶在此頻道發送訊息時，該用戶將會被踢出伺服器", true, true);
             }
             catch (Exception ex)
