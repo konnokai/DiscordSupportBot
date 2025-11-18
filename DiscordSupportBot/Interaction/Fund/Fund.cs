@@ -1,23 +1,11 @@
 ﻿using Discord.Interactions;
+using FundType = DiscordSupportBot.Interaction.Fund.Service.FundService.FundType;
 
 namespace DiscordSupportBot.Interaction.Fund
 {
-    public class Fund : TopLevelModule
+    public class Fund : TopLevelModule<Service.FundService>
     {
-        public enum FundType
-        {
-            [ChoiceDisplay("說謊")]
-            Lying,
-            [ChoiceDisplay("暈船")]
-            Dizzy,
-            [ChoiceDisplay("色狗")]
-            HentaiDog,
-            [ChoiceDisplay("渣男")]
-            FuckBoy,
-            [ChoiceDisplay("抖M")]
-            Masochism
-        }
-
+        [RequireContext(ContextType.Guild)]
         [SlashCommand("add-fund", "對某人添加基金")]
         public async Task AddFundAsync([Summary("基金類型")] FundType fundType, [Summary("目標使用者")] IUser user)
         {
@@ -27,10 +15,11 @@ namespace DiscordSupportBot.Interaction.Fund
                 return;
             }
 
-            var fund = await RedisConnection.RedisDb.HashIncrementAsync($"support:{fundType}Fund:{Context.Guild.Id}", user.Id, 500);
-            await Context.Interaction.SendConfirmAsync($"已對 `{user}` 增加 500 {GetFundTypeName(fundType)}基金，現在金額: {fund}");
+            var newAmount = _service.AddFundAsync(fundType, Context.Guild.Id, user.Id);
+            await Context.Interaction.SendConfirmAsync($"已對 <@{user.Id}> 增加 500 {_service.GetFundTypeName(fundType)}基金，現在金額: {newAmount}");
         }
 
+        [RequireContext(ContextType.Guild)]
         [SlashCommand("fund-leaderboard", "基金排行榜")]
         public async Task FundLeaderBoardAsync([Summary("基金類型")] FundType fundType)
         {
@@ -38,14 +27,15 @@ namespace DiscordSupportBot.Interaction.Fund
 
             if (hashEntries.Length == 0)
             {
-                await Context.Interaction.SendErrorAsync($"目前沒有任何人有{GetFundTypeName(fundType)}基金");
+                await Context.Interaction.SendErrorAsync($"目前沒有任何人有{_service.GetFundTypeName(fundType)}基金");
                 return;
             }
 
-            await Context.Interaction.SendConfirmAsync($"`{Context.Guild.Name}` {GetFundTypeName(fundType)}基金排行榜\n\n" +
+            await Context.Interaction.SendConfirmAsync($"`{Context.Guild.Name}` {_service.GetFundTypeName(fundType)}基金排行榜\n\n" +
                 $"{string.Join('\n', hashEntries.OrderByDescending((x) => x.Value).Select((x) => $"<@{x.Name}>: {x.Value}"))}");
         }
 
+        [RequireContext(ContextType.Guild)]
         [SlashCommand("all-fund-leaderboard", "所有基金的前三名排行榜")]
         public async Task AllFundLeaderBoardAsync()
         {
@@ -63,7 +53,7 @@ namespace DiscordSupportBot.Interaction.Fund
                 if (hashEntries.Length > 0)
                 {
                     hasAny = true;
-                    embed.AddField(GetFundTypeName(fundType), string.Join('\n', hashEntries.OrderByDescending((x) => x.Value).Take(3).Select((x) => $"<@{x.Name}>: {x.Value}")), true);
+                    embed.AddField(_service.GetFundTypeName(fundType), string.Join('\n', hashEntries.OrderByDescending((x) => x.Value).Take(3).Select((x) => $"<@{x.Name}>: {x.Value}")), true);
                 }
             }
 
@@ -77,47 +67,54 @@ namespace DiscordSupportBot.Interaction.Fund
             }
         }
 
-        [MessageCommand("對該訊息的作者添加說謊基金")]
-        public async Task AddLyingFundMessageCommandAsync(IMessage message)
+        [RequireContext(ContextType.Guild)]
+        [MessageCommand("對該訊息的作者添加基金")]
+        public async Task AddFundMessageCommandAsync(IMessage message)
         {
-            await AddFundAsync(FundType.Lying, message.Author);
-        }
+            var selectMenuBuilder = new SelectMenuBuilder()
+                .WithCustomId("select_fund_type")
+                .WithMinValues(1)
+                .WithMaxValues(1)
+                .WithRequired(true)
+                .WithPlaceholder("選擇基金類型");
 
-        [MessageCommand("對該訊息的作者添加暈船基金")]
-        public async Task AddDizzyFundMessageCommandAsync(IMessage message)
-        {
-            await AddFundAsync(FundType.Dizzy, message.Author);
-        }
-
-        [MessageCommand("對該訊息的作者添加色狗基金")]
-        public async Task AddHentaiDogFundMessageCommandAsync(IMessage message)
-        {
-            await AddFundAsync(FundType.HentaiDog, message.Author);
-        }
-
-        [MessageCommand("對該訊息的作者添加渣男基金")]
-        public async Task AddFuckBoyFundMessageCommandAsync(IMessage message)
-        {
-            await AddFundAsync(FundType.FuckBoy, message.Author);
-        }
-
-        [MessageCommand("對該訊息的作者添加抖M基金")]
-        public async Task AddMasochismFundMessageCommandAsync(IMessage message)
-        {
-            await AddFundAsync(FundType.Masochism, message.Author);
-        }
-
-        private string GetFundTypeName(FundType fundType)
-        {
-            return fundType switch
+            foreach (var item in Enum.GetNames(typeof(FundType)))
             {
-                FundType.Lying => "說謊",
-                FundType.Dizzy => "暈船",
-                FundType.HentaiDog => "色狗",
-                FundType.FuckBoy => "渣男",
-                FundType.Masochism => "抖M",
-                _ => fundType.ToString(),
-            };
+                selectMenuBuilder.AddOption(_service.GetFundTypeName(Enum.Parse<FundType>(item, true)), item);
+            }
+
+            var modalBuilder = new ModalBuilder();
+            modalBuilder.WithTitle("添加說謊基金");
+            modalBuilder.WithCustomId($"add_lying_fund:{Context.Guild.Id}:{message.Author.Id}");
+
+            if (!string.IsNullOrEmpty(message.Content))
+            {
+                var realContext = message.CleanContent;
+                var isLongLengthContext = message.CleanContent.Length >= 150;
+                if (isLongLengthContext)
+                {
+                    realContext = $"{message.CleanContent[..Math.Min(150, message.Content.Length)]}" +
+                        $"... (已忽略後續大於 150 字元的訊息)";
+                }
+
+                modalBuilder.AddTextDisplay($"訊息內容: \r\n" +
+                    $"```" +
+                    $"{realContext}" +
+                    $"```");
+            }
+            else if (message.Attachments.FirstOrDefault() != null)
+            {
+                modalBuilder.AddTextDisplay($"附件網址: \r\n" +
+                    $"{message.Attachments.First().Url}");
+            }
+            else
+            {
+                modalBuilder.AddTextDisplay("無法顯示訊息內容，但不影響添加基金");
+            }
+
+            modalBuilder.AddSelectMenu("添加類型", selectMenuBuilder);
+
+            await Context.Interaction.RespondWithModalAsync(modalBuilder.Build());
         }
     }
 }
