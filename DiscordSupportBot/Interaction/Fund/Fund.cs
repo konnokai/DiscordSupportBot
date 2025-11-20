@@ -15,7 +15,7 @@ namespace DiscordSupportBot.Interaction.Fund
                 return;
             }
 
-            var newAmount = _service.AddFundAsync(fundType, Context.Guild.Id, user.Id);
+            var newAmount = await _service.AddFundAsync(fundType, Context.Guild.Id, user.Id);
             await Context.Interaction.SendConfirmAsync($"已對 <@{user.Id}> 增加 500 {_service.GetFundTypeName(fundType)}基金，現在金額: {newAmount}");
         }
 
