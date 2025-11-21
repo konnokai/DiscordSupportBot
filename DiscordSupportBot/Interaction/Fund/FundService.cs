@@ -15,7 +15,13 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             [ChoiceDisplay("渣男")]
             FuckBoy,
             [ChoiceDisplay("抖M")]
-            Masochism
+            Masochism,
+            [ChoiceDisplay("小丑")]
+            Clown,
+            [ChoiceDisplay("爛笑話")]
+            BadJoke,
+            [ChoiceDisplay("炸寢")]
+            SleepBomb,
         }
 
         private readonly DiscordSocketClient _client;
@@ -59,6 +65,9 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                 FundType.HentaiDog => "色狗",
                 FundType.FuckBoy => "渣男",
                 FundType.Masochism => "抖M",
+                FundType.Clown => "小丑",
+                FundType.BadJoke => "爛笑話",
+                FundType.SleepBomb => "炸寢",
                 _ => fundType.ToString(),
             };
         }
