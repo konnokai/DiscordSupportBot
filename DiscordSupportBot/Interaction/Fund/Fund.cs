@@ -1,4 +1,5 @@
 ﻿using Discord.Interactions;
+using System.Diagnostics;
 using FundType = DiscordSupportBot.Interaction.Fund.Service.FundService.FundType;
 
 namespace DiscordSupportBot.Interaction.Fund
@@ -41,29 +42,37 @@ namespace DiscordSupportBot.Interaction.Fund
         {
             await Context.Interaction.DeferAsync(false);
 
-            var fundTypes = Enum.GetValues(typeof(FundType)).Cast<FundType>();
-            var embed = new EmbedBuilder()
-                .WithTitle($"`{Context.Guild.Name}` 所有基金前三名排行榜")
-                .WithOkColor();
-
-            bool hasAny = false;
-            foreach (var fundType in fundTypes)
+            try
             {
-                var hashEntries = await RedisConnection.RedisDb.HashGetAllAsync($"support:{fundType}Fund:{Context.Guild.Id}");
-                if (hashEntries.Length > 0)
+                var fundTypes = Enum.GetValues(typeof(FundType)).Cast<FundType>();
+                var embed = new EmbedBuilder()
+                    .WithTitle($"`{Context.Guild.Name}` 所有基金前三名排行榜")
+                    .WithOkColor();
+
+                bool hasAny = false;
+                foreach (var fundType in fundTypes)
                 {
-                    hasAny = true;
-                    embed.AddField(_service.GetFundTypeName(fundType), string.Join('\n', hashEntries.OrderByDescending((x) => x.Value).Take(3).Select((x) => $"<@{x.Name}>: {x.Value}")), true);
+                    var hashEntries = await RedisConnection.RedisDb.HashGetAllAsync($"support:{fundType}Fund:{Context.Guild.Id}");
+                    if (hashEntries.Length > 0)
+                    {
+                        hasAny = true;
+                        embed.AddField(_service.GetFundTypeName(fundType), string.Join('\n', hashEntries.OrderByDescending((x) => x.Value).Take(3).Select((x) => $"<@{x.Name}>: {x.Value}")), true);
+                    }
+                }
+
+                if (!hasAny)
+                {
+                    await Context.Interaction.SendErrorAsync("目前沒有任何人有基金", true);
+                }
+                else
+                {
+                    await Context.Interaction.FollowupAsync(embed: embed.Build());
                 }
             }
-
-            if (!hasAny)
+            catch (Exception ex)
             {
-                await Context.Interaction.SendErrorAsync("目前沒有任何人有基金");
-            }
-            else
-            {
-                await Context.Interaction.FollowupAsync(embed: embed.Build());
+                Log.Error(ex.Demystify(), $"all-fund-leaderboard: {Context.Guild.Id}");
+                await Context.Interaction.SendErrorAsync("取得排行榜時發生錯誤，請稍後再試", true);
             }
         }
 
