@@ -60,7 +60,7 @@ namespace DiscordSupportBot.Interaction.Fund.Service
 
         internal async Task<string> AddFundAsync(FundType fundType, ulong guildId, ulong userId)
         {
-            var newAmount = await RedisConnection.RedisDb.HashIncrementAsync($"SupportBot:{fundType}Fund:{guildId}", userId, 500);
+            var newAmount = await RedisConnection.RedisDb.HashIncrementAsync(GetFundRedisKey(fundType, guildId), userId, 500);
             return $"已對 <@{userId}> 增加 500 {GetFundTypeName(fundType)}基金，現在金額: {newAmount}";
         }
 
@@ -78,6 +78,11 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                 FundType.SleepBomb => "炸寢",
                 _ => fundType.ToString(),
             };
+        }
+
+        internal string GetFundRedisKey(FundType fundType, ulong guildId)
+        {
+            return $"SupportBot:Fund:{fundType}:{guildId}";
         }
     }
 }

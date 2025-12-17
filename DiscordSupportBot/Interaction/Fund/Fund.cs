@@ -1,4 +1,5 @@
 ﻿using Discord.Interactions;
+using DiscordSupportBot.DataBase.Table;
 using System.Diagnostics;
 using FundType = DiscordSupportBot.Interaction.Fund.Service.FundService.FundType;
 
@@ -32,7 +33,7 @@ namespace DiscordSupportBot.Interaction.Fund
         [SlashCommand("fund-leaderboard", "基金排行榜")]
         public async Task FundLeaderBoardAsync([Summary("基金類型")] FundType fundType)
         {
-            var hashEntries = await RedisConnection.RedisDb.HashGetAllAsync($"SupportBot:{fundType}Fund:{Context.Guild.Id}");
+            var hashEntries = await RedisConnection.RedisDb.HashGetAllAsync(_service.GetFundRedisKey(fundType, Context.Guild.Id));
 
             if (hashEntries.Length == 0)
             {
@@ -60,7 +61,7 @@ namespace DiscordSupportBot.Interaction.Fund
                 bool hasAny = false;
                 foreach (var fundType in fundTypes)
                 {
-                    var hashEntries = await RedisConnection.RedisDb.HashGetAllAsync($"SupportBot:{fundType}Fund:{Context.Guild.Id}");
+                    var hashEntries = await RedisConnection.RedisDb.HashGetAllAsync(_service.GetFundRedisKey(fundType, Context.Guild.Id));
                     if (hashEntries.Length > 0)
                     {
                         hasAny = true;
