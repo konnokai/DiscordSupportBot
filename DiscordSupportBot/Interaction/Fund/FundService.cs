@@ -47,13 +47,21 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                 .First(x => x.CustomId == "select_fund_type")
                 .Values.First().ToString());
 
-            var newAmount = await AddFundAsync(fundType, guildId, userId);
-            await arg.RespondAsync(embed: new EmbedBuilder().WithDescription($"已對 <@{userId}> 增加 500 {GetFundTypeName(fundType)}基金，現在金額: {newAmount}").WithOkColor().Build());
+            var message = string.Empty;
+            if (userId == Program.ApplicatonOwner.Id)
+            {
+                message = "無法對 Owner 添加基金，反擊!\n";
+                userId = arg.User.Id;
+            }
+
+            message += await AddFundAsync(fundType, guildId, userId);
+            await arg.SendConfirmAsync(message);
         }
 
-        internal async Task<long> AddFundAsync(FundType fundType, ulong guildId, ulong userId)
+        internal async Task<string> AddFundAsync(FundType fundType, ulong guildId, ulong userId)
         {
-            return await RedisConnection.RedisDb.HashIncrementAsync($"support:{fundType}Fund:{guildId}", userId, 500);
+            var newAmount = await RedisConnection.RedisDb.HashIncrementAsync($"SupportBot:{fundType}Fund:{guildId}", userId, 500);
+            return $"已對 <@{userId}> 增加 500 {GetFundTypeName(fundType)}基金，現在金額: {newAmount}";
         }
 
         internal string GetFundTypeName(FundType fundType)

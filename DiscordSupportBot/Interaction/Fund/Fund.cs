@@ -16,15 +16,23 @@ namespace DiscordSupportBot.Interaction.Fund
                 return;
             }
 
-            var newAmount = await _service.AddFundAsync(fundType, Context.Guild.Id, user.Id);
-            await Context.Interaction.SendConfirmAsync($"已對 <@{user.Id}> 增加 500 {_service.GetFundTypeName(fundType)}基金，現在金額: {newAmount}");
+            var userId = user.Id;
+            var message = string.Empty;
+            if (userId == Program.ApplicatonOwner.Id)
+            {
+                message = "無法對 Owner 添加基金，反擊!\n";
+                userId = Context.User.Id;
+            }
+
+            message += await _service.AddFundAsync(fundType, Context.Guild.Id, userId);
+            await Context.Interaction.SendConfirmAsync(message);
         }
 
         [RequireContext(ContextType.Guild)]
         [SlashCommand("fund-leaderboard", "基金排行榜")]
         public async Task FundLeaderBoardAsync([Summary("基金類型")] FundType fundType)
         {
-            var hashEntries = await RedisConnection.RedisDb.HashGetAllAsync($"support:{fundType}Fund:{Context.Guild.Id}");
+            var hashEntries = await RedisConnection.RedisDb.HashGetAllAsync($"SupportBot:{fundType}Fund:{Context.Guild.Id}");
 
             if (hashEntries.Length == 0)
             {
@@ -52,7 +60,7 @@ namespace DiscordSupportBot.Interaction.Fund
                 bool hasAny = false;
                 foreach (var fundType in fundTypes)
                 {
-                    var hashEntries = await RedisConnection.RedisDb.HashGetAllAsync($"support:{fundType}Fund:{Context.Guild.Id}");
+                    var hashEntries = await RedisConnection.RedisDb.HashGetAllAsync($"SupportBot:{fundType}Fund:{Context.Guild.Id}");
                     if (hashEntries.Length > 0)
                     {
                         hasAny = true;
@@ -80,6 +88,18 @@ namespace DiscordSupportBot.Interaction.Fund
         [MessageCommand("對該訊息的作者添加基金")]
         public async Task AddFundMessageCommandAsync(IMessage message)
         {
+            if (message.Author == null)
+            {
+                await Context.Interaction.SendErrorAsync("無法取得該訊息的作者");
+                return;
+            }
+
+            if (Context.Guild.GetUser(message.Author.Id) == null)
+            {
+                await Context.Interaction.SendErrorAsync("指定的使用者不在此伺服器中");
+                return;
+            }
+
             var selectMenuBuilder = new SelectMenuBuilder()
                 .WithCustomId("select_fund_type")
                 .WithMinValues(1)
