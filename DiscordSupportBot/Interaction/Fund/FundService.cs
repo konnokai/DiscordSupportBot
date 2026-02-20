@@ -22,6 +22,8 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             BadJoke,
             [ChoiceDisplay("炸寢")]
             SleepBomb,
+            [ChoiceDisplay("怪人")]
+            Freak,
         }
 
         private readonly DiscordSocketClient _client;
@@ -76,6 +78,7 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                 FundType.Clown => "小丑",
                 FundType.BadJoke => "爛笑話",
                 FundType.SleepBomb => "炸寢",
+                FundType.Freak => "怪人",
                 _ => fundType.ToString(),
             };
         }
