@@ -79,17 +79,46 @@ namespace DiscordSupportBot.Interaction.Fund
             return string.Empty;
         }
 
+        const long IncrementAmount = 500;
         internal static async Task<string> AddFundAsync(FundType fundType, ulong guildId, ulong userId)
         {
-            const long incrementAmount = 500;
+            var key = GetFundLeaderboardRedisKey(fundType, guildId);
+
+            // 獲取增加前的排名 (SortedSetRankAsync 回傳 0-based index)
+            var oldRank = await RedisConnection.RedisDb.SortedSetRankAsync(key, userId.ToString(), Order.Descending);
 
             // 單純使用 ZSET 作為唯一來源（score = 總額）
-            var newScore = await RedisConnection.RedisDb.SortedSetIncrementAsync(GetFundLeaderboardRedisKey(fundType, guildId), userId.ToString(), incrementAmount);
+            var newAmount = await RedisConnection.RedisDb.SortedSetIncrementAsync(key, userId.ToString(), IncrementAmount);
 
-            // SortedSetIncrementAsync 回傳 double，轉為 long
-            var newAmount = (long)newScore;
+            // 獲取增加後的排名
+            var newRank = await RedisConnection.RedisDb.SortedSetRankAsync(key, userId.ToString(), Order.Descending);
 
-            return $"已對 <@{userId}> 增加 {incrementAmount} {GetFundTypeName(fundType)}基金，現在金額: {newAmount}";
+            var message = $"已對 <@{userId}> 增加 {IncrementAmount} {GetFundTypeName(fundType)}基金，現在金額: {newAmount}";
+
+            // 檢測排名是否變更
+            if (oldRank.HasValue && newRank.HasValue && oldRank != newRank)
+            {
+                var oldRankDisplay = oldRank.Value + 1;
+                var newRankDisplay = newRank.Value + 1;
+                message += $"\n**喜報！排名已變更：第 {oldRankDisplay} 名 → 第 {newRankDisplay} 名";
+
+                // 若排名上升，查詢被超過的人
+                if (newRank.Value < oldRank.Value)
+                {
+                    // 被超過的人在新排名的前一位（index = newRank - 1）
+                    if (newRank.Value > 0)
+                    {
+                        var beatenEntries = await RedisConnection.RedisDb.SortedSetRangeByRankWithScoresAsync(key, newRank.Value - 1, newRank.Value - 1, Order.Descending);
+                        if (beatenEntries.Length > 0)
+                        {
+                            var beatenMemberId = beatenEntries[0].Element.ToString();
+                            message += $"，超越了** <@{beatenMemberId}>";
+                        }
+                    }
+                }
+            }
+
+            return message;
         }
 
         // 取得某基金前 N 名 (依 score 降冪)
