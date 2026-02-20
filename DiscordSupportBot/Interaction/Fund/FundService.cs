@@ -25,6 +25,8 @@ namespace DiscordSupportBot.Interaction.Fund
             SleepBomb,
             [ChoiceDisplay("怪人")]
             Freak,
+            [ChoiceDisplay("錯字")]
+            Typo,
         }
 
         private readonly DiscordSocketClient _client;
@@ -44,6 +46,8 @@ namespace DiscordSupportBot.Interaction.Fund
             if (!arg.Data.CustomId.StartsWith("add_lying_fund"))
                 return;
 
+            await arg.DeferAsync(false);
+
             var guildId = ulong.Parse(arg.Data.CustomId.Split(':')[1]);
             var targetUserId = ulong.Parse(arg.Data.CustomId.Split(':')[2]);
             var fundType = Enum.Parse<FundType>(arg.Data.Components
@@ -52,7 +56,7 @@ namespace DiscordSupportBot.Interaction.Fund
 
             var message = CheckIsAddOwner(fundType, guildId, arg.User.Id, targetUserId, out ulong needAddUserId);
             message += await AddFundAsync(fundType, guildId, needAddUserId);
-            await arg.SendConfirmAsync(message);
+            await arg.SendConfirmAsync(message, true);
         }
 
         internal static string CheckIsAddOwner(FundType fundType, ulong guildId, ulong executeUserId, ulong targetUserId, out ulong resultUserId)
@@ -96,25 +100,23 @@ namespace DiscordSupportBot.Interaction.Fund
             var message = $"已對 <@{userId}> 增加 {IncrementAmount} {GetFundTypeName(fundType)}基金，現在金額: {newAmount}";
 
             // 檢測排名是否變更
-            if (oldRank.HasValue && newRank.HasValue && oldRank != newRank)
+            if (oldRank.HasValue && newRank.HasValue && newRank < oldRank) // new 只會比 old 小 (1 < 2)
             {
-                var oldRankDisplay = oldRank.Value + 1;
-                var newRankDisplay = newRank.Value + 1;
-                message += $"\n**喜報！排名已變更：第 {oldRankDisplay} 名 → 第 {newRankDisplay} 名";
-
-                // 若排名上升，查詢被超過的人
-                if (newRank.Value < oldRank.Value)
+                var beatenMemberId = string.Empty;
+                var beatenEntries = await RedisConnection.RedisDb.SortedSetRangeByRankWithScoresAsync(key, newRank.Value - 1, newRank.Value - 1, Order.Descending);
+                if (beatenEntries.Length > 0) // 原則上不會是空的
                 {
-                    // 被超過的人在新排名的前一位（index = newRank - 1）
-                    if (newRank.Value > 0)
-                    {
-                        var beatenEntries = await RedisConnection.RedisDb.SortedSetRangeByRankWithScoresAsync(key, newRank.Value - 1, newRank.Value - 1, Order.Descending);
-                        if (beatenEntries.Length > 0)
-                        {
-                            var beatenMemberId = beatenEntries[0].Element.ToString();
-                            message += $"，超越了** <@{beatenMemberId}>";
-                        }
-                    }
+                    beatenMemberId = beatenEntries[0].Element.ToString();
+                }
+
+                var newRankDisplay = newRank.Value + 1;
+                if (string.IsNullOrEmpty(beatenMemberId))
+                {
+                    message += $"\n\n喜報！已成為{GetFundTypeName(fundType)}基金的榜 {newRankDisplay}";
+                }
+                else
+                {
+                    message += $"\n\n喜報！已超越 <@{beatenMemberId}> 成為{GetFundTypeName(fundType)}基金的榜 {newRankDisplay}";
                 }
             }
 
@@ -151,6 +153,7 @@ namespace DiscordSupportBot.Interaction.Fund
                 FundType.BadJoke => "爛笑話",
                 FundType.SleepBomb => "炸寢",
                 FundType.Freak => "怪人",
+                FundType.Typo => "錯字",
                 _ => fundType.ToString(),
             };
         }

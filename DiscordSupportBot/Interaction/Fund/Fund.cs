@@ -16,10 +16,12 @@ namespace DiscordSupportBot.Interaction.Fund
                 return;
             }
 
+            await Context.Interaction.DeferAsync(false);
+
             var userId = user.Id;
             var message = FundService.CheckIsAddOwner(fundType, Context.Guild.Id, Context.User.Id, userId, out ulong needAddUserId);
             message += await FundService.AddFundAsync(fundType, Context.Guild.Id, needAddUserId);
-            await Context.Interaction.SendConfirmAsync(message);
+            await Context.Interaction.SendConfirmAsync(message, true);
         }
 
         [RequireContext(ContextType.Guild)]
@@ -36,7 +38,7 @@ namespace DiscordSupportBot.Interaction.Fund
             }
 
             await Context.Interaction.SendConfirmAsync($"`{Context.Guild.Name}` {FundService.GetFundTypeName(fundType)}基金排行榜\n\n" +
-                $"{string.Join('\n', top.Select((x, idx) => $"#{idx + 1} <@{x.UserId}>: {x.Score}"))}");
+                $"{string.Join('\n', top.Select((x, idx) => $"{idx + 1}. <@{x.UserId}>: {x.Score}"))}");
         }
 
         [RequireContext(ContextType.Guild)]
@@ -59,7 +61,7 @@ namespace DiscordSupportBot.Interaction.Fund
                     if (top3.Count > 0)
                     {
                         hasAny = true;
-                        embed.AddField(FundService.GetFundTypeName(fundType), string.Join('\n', top3.Select((x, idx) => $"#{idx + 1} <@{x.UserId}>: {x.Score}")), true);
+                        embed.AddField(FundService.GetFundTypeName(fundType), string.Join('\n', top3.Select((x, idx) => $"{idx + 1}. <@{x.UserId}>: {x.Score}")), true);
                     }
                 }
 
