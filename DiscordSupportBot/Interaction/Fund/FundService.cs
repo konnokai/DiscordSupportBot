@@ -1,6 +1,7 @@
 ﻿using Discord.Interactions;
+using StackExchange.Redis;
 
-namespace DiscordSupportBot.Interaction.Fund.Service
+namespace DiscordSupportBot.Interaction.Fund
 {
     public class FundService : IInteractionService
     {
@@ -44,29 +45,71 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                 return;
 
             var guildId = ulong.Parse(arg.Data.CustomId.Split(':')[1]);
-            var userId = ulong.Parse(arg.Data.CustomId.Split(':')[2]);
+            var targetUserId = ulong.Parse(arg.Data.CustomId.Split(':')[2]);
             var fundType = Enum.Parse<FundType>(arg.Data.Components
                 .First(x => x.CustomId == "select_fund_type")
                 .Values.First().ToString());
 
-            var message = string.Empty;
-            if (userId == Program.ApplicatonOwner.Id)
-            {
-                message = "無法對 Owner 添加基金，反擊!\n";
-                userId = arg.User.Id;
-            }
-
-            message += await AddFundAsync(fundType, guildId, userId);
+            var message = CheckIsAddOwner(fundType, guildId, arg.User.Id, targetUserId, out ulong needAddUserId);
+            message += await AddFundAsync(fundType, guildId, needAddUserId);
             await arg.SendConfirmAsync(message);
         }
 
-        internal async Task<string> AddFundAsync(FundType fundType, ulong guildId, ulong userId)
+        internal static string CheckIsAddOwner(FundType fundType, ulong guildId, ulong executeUserId, ulong targetUserId, out ulong resultUserId)
         {
-            var newAmount = await RedisConnection.RedisDb.HashIncrementAsync(GetFundRedisKey(fundType, guildId), userId, 500);
-            return $"已對 <@{userId}> 增加 500 {GetFundTypeName(fundType)}基金，現在金額: {newAmount}";
+            resultUserId = targetUserId;
+
+            if (targetUserId == Program.ApplicatonOwner.Id)
+            {
+                resultUserId = executeUserId;
+
+                // 只用 ZSET -> 取得成員列表（降冪）
+                var zEntries = RedisConnection.RedisDb.SortedSetRangeByRank(GetFundLeaderboardRedisKey(fundType, guildId), 0, -1, Order.Descending);
+                if (zEntries != null && zEntries.Length != 0)
+                {
+                    var randomMember = zEntries[new Random().Next(0, zEntries.Length)].ToString();
+                    if (!ulong.TryParse(randomMember, out resultUserId)) // 原則上不會失敗，直接忽略
+                    {
+                    }
+                }
+
+                return "無法對 Owner 添加基金，亂彈!\n";
+            }
+
+            return string.Empty;
         }
 
-        internal string GetFundTypeName(FundType fundType)
+        internal static async Task<string> AddFundAsync(FundType fundType, ulong guildId, ulong userId)
+        {
+            const long incrementAmount = 500;
+
+            // 單純使用 ZSET 作為唯一來源（score = 總額）
+            var newScore = await RedisConnection.RedisDb.SortedSetIncrementAsync(GetFundLeaderboardRedisKey(fundType, guildId), userId.ToString(), incrementAmount);
+
+            // SortedSetIncrementAsync 回傳 double，轉為 long
+            var newAmount = (long)newScore;
+
+            return $"已對 <@{userId}> 增加 {incrementAmount} {GetFundTypeName(fundType)}基金，現在金額: {newAmount}";
+        }
+
+        // 取得某基金前 N 名 (依 score 降冪)
+        internal static async Task<List<(ulong UserId, long Score)>> GetTopFundAsync(FundType fundType, ulong guildId, int top = 0)
+        {
+            var key = GetFundLeaderboardRedisKey(fundType, guildId);
+            var entries = await RedisConnection.RedisDb.SortedSetRangeByRankWithScoresAsync(key, 0, top - 1, Order.Descending);
+
+            var list = new List<(ulong, long)>();
+            foreach (var entry in entries)
+            {
+                if (ulong.TryParse(entry.Element, out var uid))
+                {
+                    list.Add((uid, (long)entry.Score));
+                }
+            }
+            return list;
+        }
+
+        internal static string GetFundTypeName(FundType fundType)
         {
             return fundType switch
             {
@@ -83,9 +126,10 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             };
         }
 
-        internal string GetFundRedisKey(FundType fundType, ulong guildId)
+        // 取得排行榜 ZSET 的 key
+        internal static string GetFundLeaderboardRedisKey(FundType fundType, ulong guildId)
         {
-            return $"SupportBot:Fund:{fundType}:{guildId}";
+            return $"SupportBot:Fund:Leaderboard:{fundType}:{guildId}";
         }
     }
 }

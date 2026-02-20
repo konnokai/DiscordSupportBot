@@ -1,11 +1,10 @@
 ﻿using Discord.Interactions;
-using DiscordSupportBot.DataBase.Table;
 using System.Diagnostics;
-using FundType = DiscordSupportBot.Interaction.Fund.Service.FundService.FundType;
+using FundType = DiscordSupportBot.Interaction.Fund.FundService.FundType;
 
 namespace DiscordSupportBot.Interaction.Fund
 {
-    public class Fund : TopLevelModule<Service.FundService>
+    public class Fund : TopLevelModule<FundService>
     {
         [RequireContext(ContextType.Guild)]
         [SlashCommand("add-fund", "對某人添加基金")]
@@ -18,14 +17,8 @@ namespace DiscordSupportBot.Interaction.Fund
             }
 
             var userId = user.Id;
-            var message = string.Empty;
-            if (userId == Program.ApplicatonOwner.Id)
-            {
-                message = "無法對 Owner 添加基金，反擊!\n";
-                userId = Context.User.Id;
-            }
-
-            message += await _service.AddFundAsync(fundType, Context.Guild.Id, userId);
+            var message = FundService.CheckIsAddOwner(fundType, Context.Guild.Id, Context.User.Id, userId, out ulong needAddUserId);
+            message += await FundService.AddFundAsync(fundType, Context.Guild.Id, needAddUserId);
             await Context.Interaction.SendConfirmAsync(message);
         }
 
@@ -33,16 +26,17 @@ namespace DiscordSupportBot.Interaction.Fund
         [SlashCommand("fund-leaderboard", "基金排行榜")]
         public async Task FundLeaderBoardAsync([Summary("基金類型")] FundType fundType)
         {
-            var hashEntries = await RedisConnection.RedisDb.HashGetAllAsync(_service.GetFundRedisKey(fundType, Context.Guild.Id));
+            // 使用 ZSET 取得 top
+            var top = await FundService.GetTopFundAsync(fundType, Context.Guild.Id);
 
-            if (hashEntries.Length == 0)
+            if (top.Count == 0)
             {
-                await Context.Interaction.SendErrorAsync($"目前沒有任何人有{_service.GetFundTypeName(fundType)}基金");
+                await Context.Interaction.SendErrorAsync($"目前沒有任何人有{FundService.GetFundTypeName(fundType)}基金");
                 return;
             }
 
-            await Context.Interaction.SendConfirmAsync($"`{Context.Guild.Name}` {_service.GetFundTypeName(fundType)}基金排行榜\n\n" +
-                $"{string.Join('\n', hashEntries.OrderByDescending((x) => x.Value).Select((x) => $"<@{x.Name}>: {x.Value}"))}");
+            await Context.Interaction.SendConfirmAsync($"`{Context.Guild.Name}` {FundService.GetFundTypeName(fundType)}基金排行榜\n\n" +
+                $"{string.Join('\n', top.Select((x, idx) => $"#{idx + 1} <@{x.UserId}>: {x.Score}"))}");
         }
 
         [RequireContext(ContextType.Guild)]
@@ -61,11 +55,11 @@ namespace DiscordSupportBot.Interaction.Fund
                 bool hasAny = false;
                 foreach (var fundType in fundTypes)
                 {
-                    var hashEntries = await RedisConnection.RedisDb.HashGetAllAsync(_service.GetFundRedisKey(fundType, Context.Guild.Id));
-                    if (hashEntries.Length > 0)
+                    var top3 = await FundService.GetTopFundAsync(fundType, Context.Guild.Id, 3);
+                    if (top3.Count > 0)
                     {
                         hasAny = true;
-                        embed.AddField(_service.GetFundTypeName(fundType), string.Join('\n', hashEntries.OrderByDescending((x) => x.Value).Take(3).Select((x) => $"<@{x.Name}>: {x.Value}")), true);
+                        embed.AddField(FundService.GetFundTypeName(fundType), string.Join('\n', top3.Select((x, idx) => $"#{idx + 1} <@{x.UserId}>: {x.Score}")), true);
                     }
                 }
 
@@ -110,7 +104,7 @@ namespace DiscordSupportBot.Interaction.Fund
 
             foreach (var item in Enum.GetNames(typeof(FundType)))
             {
-                selectMenuBuilder.AddOption(_service.GetFundTypeName(Enum.Parse<FundType>(item, true)), item);
+                selectMenuBuilder.AddOption(FundService.GetFundTypeName(Enum.Parse<FundType>(item, true)), item);
             }
 
             var modalBuilder = new ModalBuilder();
