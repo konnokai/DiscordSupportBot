@@ -54,7 +54,8 @@ namespace DiscordSupportBot.Interaction.Fund
                 .First(x => x.CustomId == "select_fund_type")
                 .Values.First().ToString());
 
-            var message = CheckIsAddOwner(fundType, guildId, arg.User.Id, targetUserId, out ulong needAddUserId);
+            var message = $"[點我回原訊息]({arg.Message.GetJumpUrl()})\n\n";
+            message += CheckIsAddOwner(fundType, guildId, arg.User.Id, targetUserId, out ulong needAddUserId);
             message += await AddFundAsync(fundType, guildId, needAddUserId);
             await arg.SendConfirmAsync(message, true);
         }
