@@ -53,11 +53,20 @@ namespace DiscordSupportBot.Interaction.Fund
             var fundType = Enum.Parse<FundType>(arg.Data.Components
                 .First(x => x.CustomId == "select_fund_type")
                 .Values.First().ToString());
+            var jumpUrl = arg.Data.Components.First((x) => x.CustomId == "jump_url").Value;
 
-            var message = $"[點我回原訊息]({arg.Message.GetJumpUrl()})\n\n";
-            message += CheckIsAddOwner(fundType, guildId, arg.User.Id, targetUserId, out ulong needAddUserId);
-            message += await AddFundAsync(fundType, guildId, needAddUserId);
-            await arg.SendConfirmAsync(message, true);
+            try
+            {
+                var message = $"[點我回原訊息]({jumpUrl})\n\n";
+                message += CheckIsAddOwner(fundType, guildId, arg.User.Id, targetUserId, out ulong needAddUserId);
+                message += await AddFundAsync(fundType, guildId, needAddUserId);
+                await arg.SendConfirmAsync(message, true);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"FundService-ModalSubmitted: {guildId} | {targetUserId} | {fundType}");
+                await arg.SendErrorAsync($"處理過程發生錯誤: {ex.Message}", true);
+            }
         }
 
         internal static string CheckIsAddOwner(FundType fundType, ulong guildId, ulong executeUserId, ulong targetUserId, out ulong resultUserId)

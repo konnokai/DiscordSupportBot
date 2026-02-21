@@ -138,6 +138,8 @@ namespace DiscordSupportBot.Interaction.Fund
                 modalBuilder.AddTextDisplay("無法顯示訊息內容，但不影響添加基金");
             }
 
+            modalBuilder.AddTextInput("勿編輯，此攔供訊息跳轉用", "jump_url", required: true, value: message.GetJumpUrl());
+
             modalBuilder.AddSelectMenu("添加類型", selectMenuBuilder);
 
             await Context.Interaction.RespondWithModalAsync(modalBuilder.Build());
