@@ -113,7 +113,7 @@ namespace DiscordSupportBot.Interaction.Fund
             if (oldRank.HasValue && newRank.HasValue && newRank < oldRank) // new 只會比 old 小 (1 < 2)
             {
                 var beatenMemberId = string.Empty;
-                var beatenEntries = await RedisConnection.RedisDb.SortedSetRangeByRankWithScoresAsync(key, newRank.Value - 1, newRank.Value - 1, Order.Descending);
+                var beatenEntries = await RedisConnection.RedisDb.SortedSetRangeByRankWithScoresAsync(key, oldRank.Value, oldRank.Value - 1, Order.Descending);
                 if (beatenEntries.Length > 0) // 原則上不會是空的
                 {
                     beatenMemberId = beatenEntries[0].Element.ToString();
