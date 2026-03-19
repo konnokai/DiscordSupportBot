@@ -51,8 +51,7 @@ namespace DiscordSupportBot.Interaction.Fund
             var guildId = ulong.Parse(arg.Data.CustomId.Split(':')[1]);
             var targetUserId = ulong.Parse(arg.Data.CustomId.Split(':')[2]);
             var fundType = Enum.Parse<FundType>(arg.Data.Components
-                .First(x => x.CustomId == "select_fund_type")
-                .Values.First().ToString());
+                .First(x => x.CustomId == "radio_fund_type").Value);
             var jumpUrl = arg.Data.Components.First((x) => x.CustomId == "jump_url").Value;
 
             try
