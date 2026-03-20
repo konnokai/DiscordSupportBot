@@ -1,7 +1,7 @@
 ﻿using Discord.Interactions;
 using StackExchange.Redis;
 
-namespace DiscordSupportBot.Interaction.Fund
+namespace DiscordSupportBot.Interaction.Fund.Service
 {
     public class FundService : IInteractionService
     {

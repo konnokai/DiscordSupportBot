@@ -1,6 +1,7 @@
 ﻿using Discord.Interactions;
+using DiscordSupportBot.Interaction.Fund.Service;
 using System.Diagnostics;
-using FundType = DiscordSupportBot.Interaction.Fund.FundService.FundType;
+using FundType = DiscordSupportBot.Interaction.Fund.Service.FundService.FundType;
 
 namespace DiscordSupportBot.Interaction.Fund
 {
