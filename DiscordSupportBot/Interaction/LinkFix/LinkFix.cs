@@ -44,7 +44,9 @@ namespace DiscordSupportBot.Interaction.LinkFix
                 await Context.Interaction.SendErrorAsync($"{Format.Bold(oldDomain)} 已存在"); // 原則上不會觸發
         }
 
+        [SlashCommand("link-fix-list", "連結修正清單")]
         [RequireContext(ContextType.Guild)]
+        [RequireUserPermission(GuildPermission.ManageMessages)]
         public async Task LinkFixList()
         {
             var linkFixes = _service.GetLinkFixes(Context.Guild.Id);
