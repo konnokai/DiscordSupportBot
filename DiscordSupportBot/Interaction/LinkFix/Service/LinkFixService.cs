@@ -43,7 +43,7 @@ namespace DiscordSupportBot.Interaction.LinkFix.Service
             foreach (var word in words)
             {
                 // Enhance: Skip words that are likely to be markdown links or code blocks
-                if (word.StartsWith('<') && word.EndsWith('>'))
+                if (word.StartsWith('<') && word.EndsWith('>') || word.StartsWith("~~") && word.EndsWith("~~"))
                     continue;
 
                 var match = FullUrlRegex().Match(word);
@@ -57,12 +57,22 @@ namespace DiscordSupportBot.Interaction.LinkFix.Service
                 if (!guildDict.TryGetValue(domain, out var newDomain))
                     continue;
 
-                // Enhance: Preserve spoiler formatting if present
-                var hasSpoiler = word.StartsWith("||") && word.EndsWith("||");
-                var newUrl = match.Groups["prefix"].Value + newDomain + match.Groups["suffix"].Value.Replace("||", "");
-                await userMessage.ReplyAsync(hasSpoiler ? "||" + newUrl + "||" : newUrl, allowedMentions: AllowedMentions.None);
+                try
+                {
+                    // Enhance: Preserve spoiler formatting if present
+                    var hasSpoiler = word.StartsWith("||") && word.EndsWith("||");
+                    var newUrl = match.Groups["prefix"].Value + newDomain + match.Groups["suffix"].Value.Replace("||", "");
+                    await userMessage.ReplyAsync(hasSpoiler ? "||" + newUrl + "||" : newUrl, allowedMentions: AllowedMentions.None);
 
-                Log.Info($"[{textChannel.Guild}/{textChannel}/{userMessage.Author.Username}] (LinkFix): [{word}] => [{newUrl}]");
+                    try
+                    {
+                        await userMessage.ModifyAsync((act) => act.Flags = MessageFlags.SuppressEmbeds); // Suppress embeds to avoid confusion with the original link
+                    }
+                    catch { /* Ignore */ }
+
+                    Log.Info($"[{textChannel.Guild}/{textChannel}/{userMessage.Author.Username}] (LinkFix): [{word}] => [{newUrl}]");
+                }
+                catch (Exception) { /* Ignore */ }
             }
         }
 
