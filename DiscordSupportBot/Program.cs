@@ -1,5 +1,6 @@
 ﻿using Discord.Commands;
 using Discord.Interactions;
+using Discord.Webhook;
 using DiscordSupportBot.Interaction;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
@@ -262,10 +263,9 @@ namespace DiscordSupportBot
                 }
             };
 
-            Client.JoinedGuild += (guild) =>
+            Client.JoinedGuild += async (guild) =>
             {
-                SendMessageToDiscord($"加入 {guild.Name}({guild.Id})\n擁有者: {guild.OwnerId}");
-                return Task.CompletedTask;
+                await SendMessageToDiscordWebHookAsync($"加入 {guild.Name}({guild.Id})\n擁有者: {guild.OwnerId}");
             };
 
             Client.Ready += async () =>
@@ -451,25 +451,21 @@ namespace DiscordSupportBot
                 (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "\\" : "/") + fileName;
         }
 
-        public static void SendMessageToDiscord(string content)
+        public static async Task SendMessageToDiscordWebhookAsync(string content)
         {
-            Message message = new Message();
+            var userName = "Bot";
+            var avatarUrl = "";
 
-            if (IsConnect) message.username = Client.CurrentUser.Username;
-            else message.username = "Bot";
-
-            if (IsConnect) message.avatar_url = Client.CurrentUser.GetAvatarUrl();
-            else message.avatar_url = "";
-
-            message.content = content;
-
-            using (WebClient webClient = new WebClient())
+            if (IsConnect)
             {
-                webClient.Encoding = Encoding.UTF8;
-                webClient.Headers["Content-Type"] = "application/json";
-                webClient.UploadString(_botConfig.WebHookUrl, JsonConvert.SerializeObject(message));
+                userName = Client.CurrentUser.Username;
+                avatarUrl = Client.CurrentUser.GetAvatarUrl();
             }
+
+            var webhookClient = new DiscordWebhookClient(_botConfig.WebHookUrl);
+            await webhookClient.SendMessageAsync(content, username: userName, avatarUrl: avatarUrl).ConfigureAwait(false);
         }
+
         public static string GetLinkerTime(Assembly assembly)
         {
             const string BuildVersionMetadataPrefix = "+build";

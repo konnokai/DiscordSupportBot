@@ -6,5 +6,6 @@ namespace DiscordSupportBot.DataBase.Table
     {
         [Key]
         public int Id { get; set; }
+        public DateTime AddedAt { get; set; } = DateTime.Now;
     }
 }

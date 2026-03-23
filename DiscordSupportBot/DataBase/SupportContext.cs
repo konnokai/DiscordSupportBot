@@ -5,6 +5,7 @@ namespace DiscordSupportBot.DataBase
     class SupportContext : DbContext
     {
         public DbSet<GuildConfig> GuildConfig { get; set; }
+        public DbSet<LinkFixConfig> LinkFixConfig { get; set; } 
         public DbSet<NCChannelCOD> NCChannelCOD { get; set; }
         public DbSet<Lottery> Lottery { get; set; }
 

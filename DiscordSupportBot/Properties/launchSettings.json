@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Discord Support Bot": {
+    "DiscordSupportBot": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
