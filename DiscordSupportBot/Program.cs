@@ -265,7 +265,7 @@ namespace DiscordSupportBot
 
             Client.JoinedGuild += async (guild) =>
             {
-                await SendMessageToDiscordWebHookAsync($"加入 {guild.Name}({guild.Id})\n擁有者: {guild.OwnerId}");
+                await SendMessageToDiscordWebhookAsync($"加入 {guild.Name}({guild.Id})\n擁有者: {guild.OwnerId}");
             };
 
             Client.Ready += async () =>
