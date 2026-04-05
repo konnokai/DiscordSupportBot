@@ -47,12 +47,6 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             if (!arg.Data.CustomId.StartsWith("add_lying_fund"))
                 return;
 
-            if (arg.User.IsBot)
-            {
-                await arg.SendErrorAsync("無法對機器人添加基金");
-                return;
-            }
-
             await arg.DeferAsync(false);
 
             var guildId = ulong.Parse(arg.Data.CustomId.Split(':')[1]);

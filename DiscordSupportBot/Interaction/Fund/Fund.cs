@@ -99,9 +99,16 @@ namespace DiscordSupportBot.Interaction.Fund
                 return;
             }
 
-            if (Context.Guild.GetUser(message.Author.Id) == null)
+            var guildUser = Context.Guild.GetUser(message.Author.Id);
+            if (guildUser == null)
             {
                 await Context.Interaction.SendErrorAsync("指定的使用者不在此伺服器中");
+                return;
+            }
+
+            if (guildUser.IsBot)
+            {
+                await Context.Interaction.SendErrorAsync("無法對機器人添加基金");
                 return;
             }
 
