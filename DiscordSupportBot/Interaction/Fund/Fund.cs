@@ -11,9 +11,16 @@ namespace DiscordSupportBot.Interaction.Fund
         [SlashCommand("add-fund", "對某人添加基金")]
         public async Task AddFundAsync([Summary("基金類型")] FundType fundType, [Summary("目標使用者")] IUser user)
         {
-            if (Context.Guild.GetUser(user.Id) == null)
+            var guildUser = Context.Guild.GetUser(user.Id);
+            if (guildUser == null)
             {
                 await Context.Interaction.SendErrorAsync("指定的使用者不在此伺服器中");
+                return;
+            }
+
+            if (guildUser.IsBot)
+            {
+                await Context.Interaction.SendErrorAsync("無法對機器人添加基金");
                 return;
             }
 
