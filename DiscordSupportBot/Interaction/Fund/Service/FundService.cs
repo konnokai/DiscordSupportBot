@@ -1,4 +1,5 @@
 ﻿using Discord.Interactions;
+using Polly;
 using StackExchange.Redis;
 
 namespace DiscordSupportBot.Interaction.Fund.Service
