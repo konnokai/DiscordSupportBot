@@ -80,7 +80,9 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                 var zEntries = RedisConnection.RedisDb.SortedSetRangeByRank(GetFundLeaderboardRedisKey(fundType, guildId), 0, -1, Order.Descending);
                 if (zEntries != null && zEntries.Length != 0)
                 {
-                    var randomMember = zEntries[new Random().Next(0, zEntries.Length)].ToString();
+                    var zList = zEntries.ToList();
+                    zList.Add(executeUserId); // 將指令執行者也加入隨機選擇的範圍
+                    var randomMember = zList[new Random().Next(0, zList.Count)].ToString();
                     if (!ulong.TryParse(randomMember, out resultUserId)) // 原則上不會失敗，直接忽略
                     {
                     }
