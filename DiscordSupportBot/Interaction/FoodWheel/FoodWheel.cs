@@ -18,8 +18,11 @@ namespace DiscordSupportBot.Interaction.FoodWheel
         public async Task FoodWheelAsync()
         {
             var selectedFood = _foodList[_random.Next(_foodList.Count)];
-            await Context.Interaction.SendConfirmAsync($"吃 {Format.Underline(selectedFood)} 吧!" + 
-                $"\n-# 食物清單數量: {_foodList.Count}");
+            await Context.Interaction.RespondAsync(embed: new EmbedBuilder()
+                .WithOkColor()
+                .WithDescription($"吃 {Format.Underline(selectedFood)} 吧!")
+                .WithFooter($"食物清單數量: {_foodList.Count}")
+                .Build());
         }
     }
 }
