@@ -1,5 +1,4 @@
 ﻿using Discord.Interactions;
-using Polly;
 using StackExchange.Redis;
 
 namespace DiscordSupportBot.Interaction.Fund.Service
@@ -28,6 +27,10 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             Freak,
             [ChoiceDisplay("錯字")]
             Typo,
+            [ChoiceDisplay("作夢")]
+            Dreaming,
+            [ChoiceDisplay("藏圖")]
+            HiddenImage,
         }
 
         private readonly DiscordSocketClient _client;
@@ -166,6 +169,8 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                 FundType.SleepBomb => "炸寢",
                 FundType.Freak => "怪人",
                 FundType.Typo => "錯字",
+                FundType.Dreaming => "作夢",
+                FundType.HiddenImage => "藏圖",
                 _ => fundType.ToString(),
             };
         }
@@ -174,6 +179,14 @@ namespace DiscordSupportBot.Interaction.Fund.Service
         internal static string GetFundLeaderboardRedisKey(FundType fundType, ulong guildId)
         {
             return $"SupportBot:Fund:Leaderboard:{fundType}:{guildId}";
+        }
+
+        // 重置所有基金排行榜（刪除所有相關 ZSET key）
+        internal static async Task<long> ResetAllLeaderboardsAsync()
+        {
+            var keys = RedisConnection.RedisServer.Keys(database: 2, pattern: "SupportBot:Fund:Leaderboard:*").ToArray();
+            if (keys.Length == 0) return 0;
+            return await RedisConnection.RedisDb.KeyDeleteAsync(keys);
         }
     }
 }

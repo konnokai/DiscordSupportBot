@@ -23,7 +23,7 @@ namespace DiscordSupportBot
         public static bool IsConnect { get; private set; } = false;
 
 
-        static Timer timerAddBookMark, timerUpdateStatus, timerUpdateGuildInfo, timerSaveDatebase;
+        static Timer timerAddBookMark, timerUpdateStatus, timerUpdateGuildInfo, timerSaveDatebase, timerResetFundLeaderboard;
         static readonly List<ulong> _pinChannelList = new List<ulong>();
         static readonly BotConfig _botConfig = new BotConfig();
 
@@ -43,6 +43,7 @@ namespace DiscordSupportBot
             timerUpdateStatus = new Timer(TimerHandler2);
             timerUpdateGuildInfo = new Timer(TimerHandler3);
             timerSaveDatebase = new Timer(TimerHandler4);
+            timerResetFundLeaderboard = new Timer(TimerHandler5);
 
             MakePinChannelList();
 
@@ -185,6 +186,25 @@ namespace DiscordSupportBot
             await UserActivity.SaveDatebaseAsync();
         }
 
+        private static async void TimerHandler5(object state)
+        {
+            if (IsDisconnect) return;
+
+            try
+            {
+                // 重設下次觸發時間為再下一個月一號 00:00（精確對齊）
+                var nextMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(1);
+                timerResetFundLeaderboard.Change((long)Math.Round(nextMonth.Subtract(DateTime.Now).TotalMilliseconds), Timeout.Infinite);
+
+                var deletedCount = await Interaction.Fund.Service.FundService.ResetAllLeaderboardsAsync();
+                Log.Info($"已重置所有基金排行榜，共刪除 {deletedCount} 個 key");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "TimerHandler5-ResetFundLeaderboard");
+            }
+        }
+
         private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
         {
             IsDisconnect = true;
@@ -273,6 +293,9 @@ namespace DiscordSupportBot
 #if RELEASE
                 timerAddBookMark.Change((long)(Math.Round(Convert.ToDateTime($"{DateTime.Now.AddDays(1):yyyy/MM/dd 00:00:00}").Subtract(DateTime.Now).TotalSeconds) + 3) * 1000, 24 * 60 * 60 * 1000);
                 timerUpdateGuildInfo.Change((long)Math.Round(Convert.ToDateTime($"{DateTime.Now.AddMinutes(1):yyyy/MM/dd HH:mm:00}").Subtract(DateTime.Now).TotalSeconds) * 1000, 5 * 60 * 1000);
+
+                var nextMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(1);
+                timerResetFundLeaderboard.Change((long)Math.Round(nextMonth.Subtract(DateTime.Now).TotalMilliseconds), (long)(30.4375 * 24 * 60 * 60 * 1000));
 
                 #region 正常寫法 
                 //DateTime end = DateTime.Now.AddDays(1);
