@@ -62,7 +62,7 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             {
                 var message = $"[點我回原訊息]({jumpUrl})\n\n";
                 message += CheckIsAddOwner(fundType, guildId, arg.User.Id, targetUserId, out ulong needAddUserId);
-                message += await AddFundAsync(fundType, guildId, needAddUserId);
+                message += await AddFundAsync(fundType, guildId, arg.Channel.Id, needAddUserId);
                 await arg.SendConfirmAsync(message, true);
             }
             catch (Exception ex)
@@ -99,8 +99,11 @@ namespace DiscordSupportBot.Interaction.Fund.Service
         }
 
         const long IncrementAmount = 500;
-        internal static async Task<string> AddFundAsync(FundType fundType, ulong guildId, ulong userId)
+        const string NotifyChannelsKey = "SupportBot:Fund:NotifyChannels";
+
+        internal static async Task<string> AddFundAsync(FundType fundType, ulong guildId, ulong channelId, ulong userId)
         {
+            await RedisConnection.RedisDb.SetAddAsync(NotifyChannelsKey, channelId.ToString());
             var key = GetFundLeaderboardRedisKey(fundType, guildId);
 
             // 獲取增加前的排名 (SortedSetRankAsync 回傳 0-based index)
@@ -181,12 +184,23 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             return $"SupportBot:Fund:Leaderboard:{fundType}:{guildId}";
         }
 
-        // 重置所有基金排行榜（刪除所有相關 ZSET key）
-        internal static async Task<long> ResetAllLeaderboardsAsync()
+        // 重置所有基金排行榜（刪除所有相關 ZSET key），並回傳曾觸發的 channel 清單
+        internal static async Task<(long DeletedCount, List<ulong> ChannelIds)> ResetAllLeaderboardsAsync()
         {
+            var channelEntries = await RedisConnection.RedisDb.SetMembersAsync(NotifyChannelsKey);
+            var channelIds = channelEntries
+                .Select(e => ulong.TryParse(e, out var id) ? id : 0UL)
+                .Where(id => id != 0)
+                .ToList();
+
             var keys = RedisConnection.RedisServer.Keys(database: 2, pattern: "SupportBot:Fund:Leaderboard:*").ToArray();
-            if (keys.Length == 0) return 0;
-            return await RedisConnection.RedisDb.KeyDeleteAsync(keys);
+            long deleted = 0;
+            if (keys.Length > 0)
+                deleted = await RedisConnection.RedisDb.KeyDeleteAsync(keys);
+
+            await RedisConnection.RedisDb.KeyDeleteAsync(NotifyChannelsKey);
+
+            return (deleted, channelIds);
         }
     }
 }

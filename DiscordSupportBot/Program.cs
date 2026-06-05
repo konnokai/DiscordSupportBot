@@ -196,8 +196,26 @@ namespace DiscordSupportBot
                 var nextMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(1);
                 timerResetFundLeaderboard.Change((long)Math.Round(nextMonth.Subtract(DateTime.Now).TotalMilliseconds), Timeout.Infinite);
 
-                var deletedCount = await Interaction.Fund.Service.FundService.ResetAllLeaderboardsAsync();
-                Log.Info($"已重置所有基金排行榜，共刪除 {deletedCount} 個 key");
+                var (deletedCount, channelIds) = await Interaction.Fund.Service.FundService.ResetAllLeaderboardsAsync();
+                Log.Info($"已重置所有基金排行榜，共刪除 {deletedCount} 個 key，通知 {channelIds.Count} 個頻道");
+
+                var embed = new EmbedBuilder()
+                    .WithColor(00, 229, 132)
+                    .WithDescription("每月排行榜已重置")
+                    .Build();
+
+                foreach (var channelId in channelIds)
+                {
+                    try
+                    {
+                        if (Client.GetChannel(channelId) is ITextChannel textChannel)
+                            await textChannel.SendMessageAsync(embed: embed);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, $"TimerHandler5-Notify: channelId={channelId}");
+                    }
+                }
             }
             catch (Exception ex)
             {
