@@ -1,5 +1,6 @@
 ﻿using Discord.Interactions;
 using StackExchange.Redis;
+using System.Reflection;
 
 namespace DiscordSupportBot.Interaction.Fund.Service
 {
@@ -55,7 +56,7 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             var guildId = ulong.Parse(arg.Data.CustomId.Split(':')[1]);
             var targetUserId = ulong.Parse(arg.Data.CustomId.Split(':')[2]);
             var fundType = Enum.Parse<FundType>(arg.Data.Components
-                .First(x => x.CustomId == "radio_fund_type").Value);
+                .First(x => x.CustomId == "select_fund_type").Values.First());
             var jumpUrl = arg.Data.Components.First((x) => x.CustomId == "jump_url").Value;
 
             try
@@ -160,22 +161,10 @@ namespace DiscordSupportBot.Interaction.Fund.Service
 
         internal static string GetFundTypeName(FundType fundType)
         {
-            return fundType switch
-            {
-                FundType.Lying => "說謊",
-                FundType.Dizzy => "暈船",
-                FundType.HentaiDog => "色狗",
-                FundType.FuckBoy => "渣男",
-                FundType.Masochism => "抖M",
-                FundType.Clown => "小丑",
-                FundType.BadJoke => "爛笑話",
-                FundType.SleepBomb => "炸寢",
-                FundType.Freak => "怪人",
-                FundType.Typo => "錯字",
-                FundType.Dreaming => "作夢",
-                FundType.HiddenImage => "藏圖",
-                _ => fundType.ToString(),
-            };
+            return fundType.GetType()
+                .GetField(fundType.ToString())
+                .GetCustomAttribute<ChoiceDisplayAttribute>()
+                .Name;
         }
 
         // 取得排行榜 ZSET 的 key

@@ -112,13 +112,13 @@ namespace DiscordSupportBot.Interaction.Fund
                 return;
             }
 
-            var radioGroupBuilder = new RadioGroupBuilder()
-                .WithCustomId("radio_fund_type")
+            var selectMenuBuilder = new SelectMenuBuilder()
+                .WithCustomId("select_fund_type")
                 .WithRequired(true);
 
             foreach (var item in Enum.GetNames(typeof(FundType)))
             {
-                radioGroupBuilder.AddOption(FundService.GetFundTypeName(Enum.Parse<FundType>(item, true)), item);
+                selectMenuBuilder.AddOption(FundService.GetFundTypeName(Enum.Parse<FundType>(item, true)), item);
             }
 
             var modalBuilder = new ModalBuilder();
@@ -152,7 +152,7 @@ namespace DiscordSupportBot.Interaction.Fund
 
             modalBuilder.AddTextInput("勿編輯，此攔供訊息跳轉用", "jump_url", required: true, value: message.GetJumpUrl());
 
-            modalBuilder.AddRadioGroup("添加類型", radioGroupBuilder);
+            modalBuilder.AddSelectMenu("添加類型", selectMenuBuilder);
 
             await Context.Interaction.RespondWithModalAsync(modalBuilder.Build());
         }
