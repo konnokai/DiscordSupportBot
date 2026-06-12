@@ -236,7 +236,9 @@ namespace DiscordSupportBot
                 LogLevel = LogSeverity.Warning,
                 ConnectionTimeout = int.MaxValue,
                 MessageCacheSize = 50,
-                GatewayIntents = GatewayIntents.All & ~GatewayIntents.GuildInvites & ~GatewayIntents.GuildScheduledEvents,
+                GatewayIntents = (GatewayIntents.AllUnprivileged | GatewayIntents.GuildMembers | GatewayIntents.MessageContent)
+                 & ~GatewayIntents.GuildInvites
+                 & ~GatewayIntents.GuildScheduledEvents,
                 AlwaysDownloadDefaultStickers = false,
                 AlwaysResolveStickers = false,
                 FormatUsersInBidirectionalUnicode = false,
