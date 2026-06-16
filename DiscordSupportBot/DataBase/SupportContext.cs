@@ -8,6 +8,7 @@ namespace DiscordSupportBot.DataBase
         public DbSet<LinkFixConfig> LinkFixConfig { get; set; } 
         public DbSet<NCChannelCOD> NCChannelCOD { get; set; }
         public DbSet<Lottery> Lottery { get; set; }
+        public DbSet<FoodWheelEntry> FoodWheelEntry { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
             => options.UseSqlite($"Data Source={Program.GetDataFilePath("DataBase.db")}");
