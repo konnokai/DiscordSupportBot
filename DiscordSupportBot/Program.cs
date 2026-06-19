@@ -331,8 +331,9 @@ namespace DiscordSupportBot
 
                 UptimeKumaClient.Init(_botConfig.UptimeKumaPushUrl, Client);
 
-                var appInfo = await Client.GetApplicationInfoAsync().ConfigureAwait(false);
-                ApplicatonOwner = appInfo.Team != null ? Client.GetUser(appInfo.Team.OwnerUserId) : appInfo.Owner;
+                //var appInfo = await Client.GetApplicationInfoAsync().ConfigureAwait(false);
+                //ApplicatonOwner = appInfo.Team != null ? Client.GetUser(appInfo.Team.OwnerUserId) : appInfo.Owner;
+                ApplicatonOwner = await Client.Rest.GetUserAsync(284989733229297664); // 不知道為啥用 team 後會出現 null，直接寫死 zzz
 
                 IsConnect = true;
 
