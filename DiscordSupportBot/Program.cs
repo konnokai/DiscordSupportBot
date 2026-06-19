@@ -331,7 +331,8 @@ namespace DiscordSupportBot
 
                 UptimeKumaClient.Init(_botConfig.UptimeKumaPushUrl, Client);
 
-                ApplicatonOwner = (await Client.GetApplicationInfoAsync().ConfigureAwait(false)).Owner;
+                var appInfo = await Client.GetApplicationInfoAsync().ConfigureAwait(false);
+                ApplicatonOwner = appInfo.Team != null ? Client.GetUser(appInfo.Team.OwnerUserId) : appInfo.Owner;
 
                 IsConnect = true;
 
