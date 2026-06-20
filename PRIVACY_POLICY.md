@@ -51,8 +51,7 @@
 
 - **Message Content（訊息內容）**：用於前綴指令解析、連結修正功能讀取訊息中的網址，以及統計訊息中自訂表情的使用次數。訊息內容僅即時處理，不予儲存。
 - **Server Members（伺服器成員）**：用於抽獎隨機抽選成員、顯示伺服器成員數、蜜罐功能踢出成員，以及監聽成員身分組變更以進行自動身分組管理。
-
-本 Bot **未使用** Presence（在線狀態）Intent。
+- **Presence（在線狀態）**：用於偵測成員是否正在語音頻道內直播，以自動設定或清除該語音頻道的狀態文字。本 Bot 僅讀取直播／活動狀態用於即時判斷，不予儲存。
 
 ## 4. 資料儲存與安全
 
@@ -150,8 +149,7 @@ To provide the features above, the Bot requests and uses the following Discord p
 
 - **Message Content** — used for prefix-command parsing, for the link-fix feature to read URLs within messages, and to count custom-emote usage in messages. Message content is processed in real time and is not stored.
 - **Server Members** — used to randomly select members for giveaways, display server member counts, kick members for the honeypot feature, and listen for member role changes to perform automatic role management.
-
-The Bot does **not** use the Presence intent.
+- **Presence** — used to detect whether a member is streaming within a voice channel, in order to automatically set or clear that voice channel's status text. The Bot only reads streaming/activity state for real-time decisions and does not store it.
 
 ## 4. Data Storage and Security
 

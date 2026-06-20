@@ -15,6 +15,7 @@
 | 🍔 隨機 | 食物轉盤 | `/food-wheel` |
 | 🔗 連結修正 | 自動將無法預覽的網址轉換為可嵌入版本 | `/link-fix`、`/link-fix-list` |
 | 🔊 語音 | 加入指定頻道後自動建立專屬語音頻道 | `/set-auto-voice-channel`、`/remove-auto-voice-channel` |
+| 🔴 直播狀態 | 成員於語音頻道直播時自動設定頻道狀態，停播自動清除 | `/toggle-streaming-status`、`/set-streaming-status-template` |
 | 🧵 討論串 | 按鈕觸發自動建立私密討論串 | `/auto-create-private-thread` |
 | 🛡️ 管理 | 蜜罐反洗版、自動身分組、Bot 代發／編輯訊息 | `/set-honeypot`、`/remove-honeypot`、`/auto-grant-role`、`/send-message-to-this-channel`、`/edit-message` |
 | 🎮 專屬 | 遊戲帳號 Id 註冊／查詢（特定伺服器） | `/id register`、`/id search`、`/id set-platform` |
@@ -28,8 +29,9 @@
 
 - **Message Content Intent** — 前綴指令解析、連結修正、表情使用統計
 - **Server Members Intent** — 抽獎抽選、成員數顯示、蜜罐踢出、自動身分組
+- **Presence Intent** — 偵測成員在語音頻道的直播狀態，以自動設定／清除頻道狀態
 
-> 未使用 Presence Intent。詳見 [服務條款](./TERMS_OF_SERVICE.md) 與 [隱私權政策](./PRIVACY_POLICY.md)。
+> 詳見 [服務條款](./TERMS_OF_SERVICE.md) 與 [隱私權政策](./PRIVACY_POLICY.md)。
 
 ## 🛠️ 技術棧
 
