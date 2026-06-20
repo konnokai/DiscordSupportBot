@@ -93,8 +93,10 @@ namespace DiscordSupportBot.Interaction.StreamingStatus.Services
             {
                 // ponytail: 單一直播者；同頻道多人直播時以最後觸發者為準，要支援多人接力再回掃 vch.ConnectedUsers
                 string template = GetTemplate(user.Guild.Id);
-                await SetVoiceStatusAsync(vch.Id, template.Replace("{platform}", platform));
+                string status = template.Replace("{platform}", platform);
+                await SetVoiceStatusAsync(vch.Id, status);
                 await RedisConnection.RedisDb.HashSetAsync(RedisKey, vch.Id.ToString(), user.Id.ToString());
+                Log.Info($"設定直播狀態: {user.Guild.Name}/{vch.Name} ({user.Username} - {platform}): {status}");
             }
             else
             {
@@ -110,6 +112,7 @@ namespace DiscordSupportBot.Interaction.StreamingStatus.Services
             {
                 await SetVoiceStatusAsync(channel.Id, "");
                 await RedisConnection.RedisDb.HashDeleteAsync(RedisKey, channel.Id.ToString());
+                Log.Info($"清除直播狀態: {channel.Guild.Name}/{channel.Name} (使用者 {userId})");
             }
         }
 
