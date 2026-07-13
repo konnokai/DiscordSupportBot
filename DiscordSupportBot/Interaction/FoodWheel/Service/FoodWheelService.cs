@@ -89,9 +89,11 @@ namespace DiscordSupportBot.Interaction.FoodWheel.Service
                 if (!_openCcInitialized)
                 {
                     // 字典目錄以執行檔位置為準，避免工作目錄不同時找不到資源
+                    // MaxMatch 不需載入 Jieba，啟動快且短菜名的轉換結果實測比 Jieba 分詞更準確
                     ZhConverter.Initialize(
                         Path.Combine(AppContext.BaseDirectory, "Dictionary"),
-                        Path.Combine(AppContext.BaseDirectory, "JiebaResource"));
+                        Path.Combine(AppContext.BaseDirectory, "JiebaResource"),
+                        segmentMode: SegmentMode.MaxMatch);
                     _openCcInitialized = true;
                 }
 

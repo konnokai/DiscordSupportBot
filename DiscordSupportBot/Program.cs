@@ -279,6 +279,18 @@ namespace DiscordSupportBot
             await service.GetService<CommandHandler>().InitializeAsync();
             #endregion
 
+            // gateway 連線狀態與錯誤原本完全無聲，掛上 log 才看得到連線失敗的原因
+            Client.Log += (msg) =>
+            {
+                if (msg.Exception != null)
+                    Log.Error($"[Discord] {msg.Source}: {msg.Message} {msg.Exception}");
+                else
+                    Log.Warn($"[Discord] {msg.Source}: {msg.Message}");
+                return Task.CompletedTask;
+            };
+            Client.Connected += () => { Log.Info("Discord 已連線"); return Task.CompletedTask; };
+            Client.Disconnected += (ex) => { Log.Warn($"Discord 連線中斷: {ex?.Message}"); return Task.CompletedTask; };
+
             Client.GuildMemberUpdated += async (before, after) => //僅限特定伺服器使用
             {
                 var beforeUser = before.Value;
