@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using OpenCCNET;
 using System.Collections.Concurrent;
 
 namespace DiscordSupportBot.Interaction.FoodWheel.Service
@@ -26,6 +27,28 @@ namespace DiscordSupportBot.Interaction.FoodWheel.Service
         /// </summary>
         private readonly ConcurrentDictionary<(ulong UserId, WheelType Type, WheelEntryKind Kind), ConcurrentDictionary<string, byte>> _entries = new();
 
+        /// <summary>
+        /// 主清單快照 (硬編碼 ∪ 遠端食譜)，刷新時整個 reference 原子替換
+        /// </summary>
+        private sealed record RecipeSnapshot(
+            IReadOnlyList<string> Food,
+            IReadOnlyList<string> Drink,
+            IReadOnlyDictionary<string, string> Links);
+
+        private volatile RecipeSnapshot _snapshot;
+
+        private sealed class RemoteRecipe
+        {
+            [JsonProperty("name")] public string Name { get; set; }
+            [JsonProperty("category")] public string Category { get; set; }
+            [JsonProperty("source_path")] public string SourcePath { get; set; }
+        }
+
+        private const string RecipesUrl = "https://eat.ryanuo.cc/recipes.json";
+        private static readonly HttpClient _httpClient = new();
+        private static readonly HashSet<string> _foodCategories = ["荤菜", "素菜", "主食", "水产", "早餐", "汤与粥", "甜品"];
+        private static bool _openCcInitialized;
+
         public FoodWheelService()
         {
             using var db = new SupportContext();
@@ -35,10 +58,74 @@ namespace DiscordSupportBot.Interaction.FoodWheel.Service
                 var set = _entries.GetOrAdd((entry.UserId, (WheelType)entry.WheelType, (WheelEntryKind)entry.Kind), _ => new());
                 set.TryAdd(entry.Item, 0);
             }
+
+            _snapshot = new(FoodList, DrinkList, new Dictionary<string, string>());
+
+            Task.Run(RefreshRemoteRecipesAsync);
+
+            // 下次台灣時間 (UTC+8) 週一 15:00
+            var nowTw = DateTime.UtcNow.AddHours(8);
+            var next = nowTw.Date.AddDays(((int)DayOfWeek.Monday - (int)nowTw.DayOfWeek + 7) % 7).AddHours(15);
+            if (next <= nowTw) next = next.AddDays(7);
+            _ = new Timer((_) => _ = RefreshRemoteRecipesAsync(), null, next - nowTw, TimeSpan.FromDays(7));
         }
 
         public IReadOnlyList<string> GetMasterList(WheelType type)
-            => type == WheelType.Drink ? DrinkList : FoodList;
+            => type == WheelType.Drink ? _snapshot.Drink : _snapshot.Food;
+
+        /// <summary>
+        /// 取得遠端食譜項目對應的 HowToCook 食譜連結
+        /// </summary>
+        public bool TryGetRecipeLink(string item, out string url)
+            => _snapshot.Links.TryGetValue(item, out url);
+
+        /// <summary>
+        /// 抓取遠端食譜清單，轉繁體後與硬編碼清單合併去重
+        /// </summary>
+        private async Task RefreshRemoteRecipesAsync()
+        {
+            try
+            {
+                if (!_openCcInitialized)
+                {
+                    // 字典目錄以執行檔位置為準，避免工作目錄不同時找不到資源
+                    ZhConverter.Initialize(
+                        Path.Combine(AppContext.BaseDirectory, "Dictionary"),
+                        Path.Combine(AppContext.BaseDirectory, "JiebaResource"));
+                    _openCcInitialized = true;
+                }
+
+                var json = await _httpClient.GetStringAsync(RecipesUrl);
+                var recipes = JsonConvert.DeserializeObject<List<RemoteRecipe>>(json) ?? [];
+
+                var food = new List<string>(FoodList); var foodSeen = new HashSet<string>(FoodList);
+                var drink = new List<string>(DrinkList); var drinkSeen = new HashSet<string>(DrinkList);
+                var links = new Dictionary<string, string>();
+
+                foreach (var recipe in recipes)
+                {
+                    List<string> target; HashSet<string> seen;
+                    if (recipe.Category == "饮料") { target = drink; seen = drinkSeen; }
+                    else if (_foodCategories.Contains(recipe.Category)) { target = food; seen = foodSeen; }
+                    else continue; // 排除 半成品加工 / 酱料和其它材料
+
+                    var name = ZhConverter.HansToTW(recipe.Name, true);
+                    if (!seen.Add(name))
+                        continue;
+
+                    target.Add(name);
+                    links[name] = "https://github.com/Anduin2017/HowToCook/blob/master/" +
+                        string.Join('/', recipe.SourcePath.Split('/').Select(Uri.EscapeDataString));
+                }
+
+                _snapshot = new(food, drink, links);
+                Log.Info($"食譜清單已更新: 食物 {food.Count} 項, 飲料 {drink.Count} 項");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "RefreshRemoteRecipes"); // 失敗保留上一份快照 (至少有硬編碼清單)
+            }
+        }
 
         /// <summary>
         /// 取得使用者指定種類 (黑名單 / 自訂) 的項目清單

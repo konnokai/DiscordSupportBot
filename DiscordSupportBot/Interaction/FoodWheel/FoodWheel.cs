@@ -100,9 +100,12 @@ namespace DiscordSupportBot.Interaction.FoodWheel
             }
 
             var selected = items[Random.Shared.Next(items.Count)];
+            var display = service.TryGetRecipeLink(selected, out var url)
+                ? Format.Url(Format.Underline(selected), url)
+                : Format.Underline(selected);
             await context.Interaction.RespondAsync(embed: new EmbedBuilder()
                 .WithOkColor()
-                .WithDescription($"{verb} {Format.Underline(selected)} 吧!")
+                .WithDescription($"{verb} {display} 吧!")
                 .WithFooter($"{TypeName(type)}清單數量: {items.Count}")
                 .Build());
         }
