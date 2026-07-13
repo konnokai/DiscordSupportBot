@@ -236,8 +236,8 @@ namespace DiscordSupportBot
                 LogLevel = LogSeverity.Warning,
                 ConnectionTimeout = int.MaxValue,
                 MessageCacheSize = 50,
-                GatewayIntents = GatewayIntents.All &~ GatewayIntents.GuildInvites &~ GatewayIntents.GuildScheduledEvents
-                    &~ (!_botConfig.IsEnablePresenceIntent ? GatewayIntents.GuildPresences : GatewayIntents.None),
+                GatewayIntents = GatewayIntents.All & ~GatewayIntents.GuildInvites & ~GatewayIntents.GuildScheduledEvents
+                    & ~(!_botConfig.IsEnablePresenceIntent ? GatewayIntents.GuildPresences : GatewayIntents.None),
                 AlwaysDownloadDefaultStickers = false,
                 AlwaysResolveStickers = false,
                 FormatUsersInBidirectionalUnicode = false,
@@ -282,6 +282,11 @@ namespace DiscordSupportBot
 
             Client.GuildMemberUpdated += async (before, after) => //僅限特定伺服器使用
             {
+                if (!before.HasValue) // 不確定是不是因為還沒快取到人導致會回傳 null
+                {
+                    return;
+                }
+
                 var beforeUser = before.Value;
                 if (beforeUser.Roles == after.Roles) return;
 
@@ -325,6 +330,8 @@ namespace DiscordSupportBot
                 //long dayCount = (long)Math.Round(ts.TotalSeconds) + 3;
                 //timerAddBookMark.Change(dayCount * 1000, 24 * 60 * 60 * 1000);
                 #endregion
+
+                await Client.DownloadUsersAsync([Client.GetGuild(463657254105645056)]);
 #endif
 
                 timerUpdateStatus.Change(0, 20 * 60 * 1000);
