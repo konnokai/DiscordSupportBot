@@ -11,6 +11,12 @@ namespace DiscordSupportBot.Interaction.StreamingStatus
         [SlashCommand("toggle-streaming-status", "切換成員在語音頻道內以 Twitch/YouTube 直播時自動設定該頻道狀態")]
         public async Task ToggleStreamingStatusAsync()
         {
+            if (!_service.IsEnable)
+            {
+                await Context.Interaction.SendErrorAsync($"此功能需要啟用 Presence Intent，請向 {Program.ApplicatonOwner} 確認");
+                return;
+            }
+
             await DeferAsync(true);
 
             try

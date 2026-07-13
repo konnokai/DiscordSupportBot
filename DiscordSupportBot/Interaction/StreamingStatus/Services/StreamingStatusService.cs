@@ -11,6 +11,8 @@ namespace DiscordSupportBot.Interaction.StreamingStatus.Services
         // 已啟用本功能的伺服器；整包替換參考以避免併發問題（presence 事件量大）
         private HashSet<ulong> _enabledGuilds = new();
 
+        internal bool IsEnable { get; private set; } = false;
+
         public StreamingStatusService(DiscordSocketClient client, BotConfig botConfig)
         {
             _client = client;
@@ -21,8 +23,13 @@ namespace DiscordSupportBot.Interaction.StreamingStatus.Services
             Task.Run(RefreshEnabledGuilds);
             _ = new Timer((_) => RefreshEnabledGuilds(), null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(5));
 
+            if (!botConfig.IsEnablePresenceIntent)
+                return;
+
             _client.PresenceUpdated += OnPresenceUpdated;
             _client.UserVoiceStateUpdated += OnVoiceStateUpdated;
+
+            IsEnable = true;
         }
 
         public void SetEnabled(ulong guildId, bool enabled)

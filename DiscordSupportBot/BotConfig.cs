@@ -19,6 +19,8 @@ public class BotConfig
     [NotRequirement]
     public string? UptimeKumaPushUrl { get; set; } = default;
 
+    public bool IsEnablePresenceIntent { get; set; } = false;
+
     public void InitBotConfig()
     {
         if (Utility.InDocker)
@@ -92,6 +94,7 @@ public class BotConfig
                 TestSlashCommandGuildId = config.TestSlashCommandGuildId;
                 RedisOption = config.RedisOption;
                 UptimeKumaPushUrl = config.UptimeKumaPushUrl;
+                IsEnablePresenceIntent = config.IsEnablePresenceIntent;
             }
             catch (Exception ex)
             {
