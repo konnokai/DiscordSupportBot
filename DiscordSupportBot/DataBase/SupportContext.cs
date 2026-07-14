@@ -9,9 +9,19 @@ namespace DiscordSupportBot.DataBase
         public DbSet<NCChannelCOD> NCChannelCOD { get; set; }
         public DbSet<Lottery> Lottery { get; set; }
         public DbSet<FoodWheelEntry> FoodWheelEntry { get; set; }
+        public DbSet<AutoCreatePrivateThreadConfig> AutoCreatePrivateThreadConfig { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
             => options.UseSqlite($"Data Source={Program.GetDataFilePath("DataBase.db")}");
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            var config = modelBuilder.Entity<AutoCreatePrivateThreadConfig>();
+            config.Property(x => x.MentionUserIds).IsRequired();
+            config.Property(x => x.MentionRoleIds).IsRequired();
+            config.HasIndex(x => x.MessageId)
+                .IsUnique();
+        }
 
         public static SupportContext GetDbContext()
         {

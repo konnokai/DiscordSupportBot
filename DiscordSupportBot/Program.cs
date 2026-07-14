@@ -370,27 +370,26 @@ namespace DiscordSupportBot
                     }
                 }
 #else
-                    int commandCount = 0;
+                    string commandSignature = string.Empty;
                     try
                     {
+                        if (File.Exists(GetDataFilePath("CommandSignature.bin")))
+                            commandSignature = Encoding.UTF8.GetString(File.ReadAllBytes(GetDataFilePath("CommandSignature.bin")));
 
-                        if (File.Exists(GetDataFilePath("CommandCount.bin")))
-                            commandCount = BitConverter.ToInt32(File.ReadAllBytes(GetDataFilePath("CommandCount.bin")));
-
-                        File.WriteAllBytes(GetDataFilePath("CommandCount.bin"), BitConverter.GetBytes(iService.GetService<InteractionHandler>().CommandCount));
+                        File.WriteAllBytes(GetDataFilePath("CommandSignature.bin"), Encoding.UTF8.GetBytes(iService.GetService<InteractionHandler>().CommandSignature));
                     }
                     catch (Exception ex)
                     {
-                        Log.Error("設定指令數量失敗，請確認檔案是否正常");
+                        Log.Error("設定指令 Hash 失敗，請確認檔案是否正常");
                         Log.Error(ex.Message);
-                        if (File.Exists(GetDataFilePath("CommandCount.bin")))
-                            File.Delete(GetDataFilePath("CommandCount.bin"));
+                        if (File.Exists(GetDataFilePath("CommandSignature.bin")))
+                            File.Delete(GetDataFilePath("CommandSignature.bin"));
 
                         IsDisconnect = true;
                         return;
                     }
 
-                    if (commandCount != iService.GetService<InteractionHandler>().CommandCount)
+                    if (commandSignature != iService.GetService<InteractionHandler>().CommandSignature)
                     {
                         try
                         {
