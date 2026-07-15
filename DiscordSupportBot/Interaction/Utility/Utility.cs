@@ -21,7 +21,7 @@ namespace DiscordSupportBot.Interaction.Utility
         [SlashCommand("invite", "取得邀請連結")]
         public async Task InviteAsync()
         {
-            await Context.Interaction.SendConfirmAsync("<https://discordapp.com/api/oauth2/authorize?client_id=" + _client.CurrentUser.Id + "&permissions=268774467&scope=bot%20applications.commands>", ephemeral: true);
+            await Context.Interaction.SendConfirmAsync("<https://discordapp.com/api/oauth2/authorize?client_id=" + _client.CurrentUser.Id + "&permissions=362136726551&scope=bot%20applications.commands>", ephemeral: true);
         }
 
         [SlashCommand("status", "顯示機器人目前的狀態")]

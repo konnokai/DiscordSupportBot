@@ -84,7 +84,7 @@ namespace DiscordSupportBot.Interaction.Admin.HoneyPot
                 // 封鎖用戶 + 刪除全部訊息
                 await guildUser.BanAsync(1, "在蜜罐頻道發言");
 
-                Log.Info($"用戶 {guildUser.Username} ({guildUser.Id}) 在蜜罐頻道 {guildChannel.Name} ({guildChannel.Id}) 發言，已被停權");
+                Log.Info($"用戶 {guildUser.Username} ({guildUser.Id}) 在蜜罐頻道 {guildChannel.Name} ({guildChannel.Id}) 發言，已被停權並自動刪除一天內的訊息");
 
                 try
                 {

@@ -8,7 +8,7 @@ namespace DiscordSupportBot.Interaction.Admin.HoneyPot
         [RequireContext(ContextType.Guild)]
         [DefaultMemberPermissions(GuildPermission.Administrator)]
         [RequireUserPermission(GuildPermission.Administrator)]
-        [RequireBotPermission(GuildPermission.KickMembers)]
+        [RequireBotPermission(GuildPermission.BanMembers)]
         [SlashCommand("set-honeypot", "設定蜜罐頻道，在此頻道發言的用戶將會被停權")]
         public async Task SetHoneyPotAsync(ITextChannel channel)
         {
