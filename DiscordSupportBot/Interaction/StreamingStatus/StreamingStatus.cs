@@ -5,8 +5,8 @@ namespace DiscordSupportBot.Interaction.StreamingStatus
     public class StreamingStatus : TopLevelModule<Services.StreamingStatusService>
     {
         [RequireContext(ContextType.Guild)]
-        [DefaultMemberPermissions(GuildPermission.Administrator)]
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [DefaultMemberPermissions(GuildPermission.ManageChannels)]
+        [RequireUserPermission(GuildPermission.ManageChannels)]
         [RequireBotPermission(GuildPermission.ManageChannels)]
         [SlashCommand("toggle-streaming-status", "切換成員在語音頻道內以 Twitch/YouTube 直播時自動設定該頻道狀態")]
         public async Task ToggleStreamingStatusAsync()
@@ -33,6 +33,7 @@ namespace DiscordSupportBot.Interaction.StreamingStatus
                 else
                 {
                     guildConfig.EnableStreamingStatus = !guildConfig.EnableStreamingStatus;
+                    guildConfig.StreamingStatusTemplate ??= "正在 {platform} 直播中";
                     db.GuildConfig.Update(guildConfig);
                 }
 
@@ -52,8 +53,8 @@ namespace DiscordSupportBot.Interaction.StreamingStatus
         }
 
         [RequireContext(ContextType.Guild)]
-        [DefaultMemberPermissions(GuildPermission.Administrator)]
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [DefaultMemberPermissions(GuildPermission.ManageChannels)]
+        [RequireUserPermission(GuildPermission.ManageChannels)]
         [SlashCommand("set-streaming-status-template", "設定直播狀態文字模板，需包含 {platform} 作為平台名稱位置")]
         public async Task SetStreamingStatusTemplateAsync([Summary("template", "例如：正在 {platform} 直播中")] string template)
         {
