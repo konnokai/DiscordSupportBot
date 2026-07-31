@@ -5,6 +5,7 @@
     static HttpClient httpClient;
     static string uptimeKumaPushUrl;
     static bool isInit = false;
+    static int isPushing;
 
     public static bool Init(string uptimeKumaPushUrl, DiscordSocketClient discordSocketClient = null)
     {
@@ -39,6 +40,9 @@
 
     private static async Task UptimeKumaTimerHandler(object state)
     {
+        if (Interlocked.CompareExchange(ref isPushing, 1, 0) != 0)
+            return;
+
         try
         {
             string latency = _client.Latency.ToString() ?? "";
@@ -63,6 +67,10 @@
         catch (Exception ex)
         {
             Log.Error($"UptimeKumaTimerHandler: {ex}");
+        }
+        finally
+        {
+            Volatile.Write(ref isPushing, 0);
         }
     }
 }

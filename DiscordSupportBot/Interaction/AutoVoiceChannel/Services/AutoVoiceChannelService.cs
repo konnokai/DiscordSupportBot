@@ -6,6 +6,8 @@ namespace DiscordSupportBot.Interaction.AutoVoiceChannel.Services
     {
         private readonly ConcurrentDictionary<ulong, HashSet<ulong>> _voiceChannelCache = new();
         private readonly DiscordSocketClient _client;
+        private readonly Timer _maintenanceTimer;
+        private int _isRunningMaintenance;
         private enum ChannelEvent { Create, MoveOnly, Error, None };
 
         public AutoVoiceChannelService(DiscordSocketClient client)
@@ -13,15 +15,41 @@ namespace DiscordSupportBot.Interaction.AutoVoiceChannel.Services
             _client = client;
             _client.UserVoiceStateUpdated += _client_UserVoiceStateUpdated;
 
-            Task.Run(RefreshVoiceChannelCacheAsync);
-
-            _ = new Timer((obj) =>
+            Interlocked.Exchange(ref _isRunningMaintenance, 1);
+            _ = Task.Run(async () =>
             {
-                _ = Task.Run(async () =>
+                try
+                {
+                    await RefreshVoiceChannelCacheAsync();
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "AutoVoiceChannel-InitialRefresh");
+                }
+                finally
+                {
+                    Volatile.Write(ref _isRunningMaintenance, 0);
+                }
+            });
+
+            _maintenanceTimer = new Timer(async (obj) =>
+            {
+                if (Interlocked.CompareExchange(ref _isRunningMaintenance, 1, 0) != 0)
+                    return;
+
+                try
                 {
                     await RemoveEmptyVoiceChannel();
                     await RefreshVoiceChannelCacheAsync();
-                });
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "AutoVoiceChannel-Maintenance");
+                }
+                finally
+                {
+                    Volatile.Write(ref _isRunningMaintenance, 0);
+                }
             }, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(5));
         }
 

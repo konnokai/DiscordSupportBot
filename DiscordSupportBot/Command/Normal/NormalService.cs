@@ -5,6 +5,7 @@
         private DiscordSocketClient _client;
         private Timer _timerAutoWheel;
         private SocketTextChannel socketText = null;
+        private int _isSendingAutoWheelReminder;
 
         public NormalService(DiscordSocketClient client)
         {
@@ -14,34 +15,47 @@
             {
                 if (DateTime.Now.DayOfWeek != DayOfWeek.Saturday) return;
                 if (DateTime.Now.Minute != 0) return;
-                if (socketText == null) socketText = _client.GetGuild(756532032275873923).GetTextChannel(756762145961541713);
+                if (Interlocked.CompareExchange(ref _isSendingAutoWheelReminder, 1, 0) != 0)
+                    return;
 
-                switch (DateTime.Now.Hour)
+                try
                 {
-                    case 10:
-                        await socketText.SendMessageAsync(
-                           embed: new EmbedBuilder()
-                           .WithOkColor()
-                           .WithTitle("提醒: 今天有眷屬快樂俄羅斯輪盤")
-                           .WithDescription("正式報名是 19:00，20:00 開抽\n" +
-                            "獎品: `客製化身份組一天x1`\n" +
-                            "或者: `勞改一天x1`\n" +
-                            "客製化身份組可加圖片\n" +
-                            "勞改者將會由輪盤決定去哪裡")
-                           .Build()
-                        ).ConfigureAwait(false);
-                        break;
-                    case 19:
-                        await socketText.SendMessageAsync(
-                          embed: new EmbedBuilder()
-                          .WithOkColor()
-                          .WithTitle("提醒: 快樂輪盤報名")
-                          .WithDescription("請點擊下面的派對橘貓報名\n" +
-                           "20:00 開始抽")
-                          .Build()
-                        ).ContinueWith(async (msg) =>
-                           await (await msg).AddReactionAsync(await _client.GetGuild(756532032275873923).GetEmoteAsync(856398828486524929)));
-                        break;
+                    if (socketText == null) socketText = _client.GetGuild(756532032275873923).GetTextChannel(756762145961541713);
+
+                    switch (DateTime.Now.Hour)
+                    {
+                        case 10:
+                            await socketText.SendMessageAsync(
+                               embed: new EmbedBuilder()
+                               .WithOkColor()
+                               .WithTitle("提醒: 今天有眷屬快樂俄羅斯輪盤")
+                               .WithDescription("正式報名是 19:00，20:00 開抽\n" +
+                                "獎品: `客製化身份組一天x1`\n" +
+                                 "或者: `勞改一天x1`\n" +
+                                 "客製化身份組可加圖片\n" +
+                                 "勞改者將會由輪盤決定去哪裡")
+                                .Build()
+                             ).ConfigureAwait(false);
+                            break;
+                        case 19:
+                            var message = await socketText.SendMessageAsync(
+                              embed: new EmbedBuilder()
+                              .WithOkColor()
+                              .WithTitle("提醒: 快樂輪盤報名")
+                              .WithDescription("請點擊下面的派對橘貓報名\n" +
+                               "20:00 開始抽")
+                              .Build());
+                            await message.AddReactionAsync(await _client.GetGuild(756532032275873923).GetEmoteAsync(856398828486524929));
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "AutoWheelTimer");
+                }
+                finally
+                {
+                    Volatile.Write(ref _isSendingAutoWheelReminder, 0);
                 }
             });
 

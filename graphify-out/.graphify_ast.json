@@ -1,0 +1,1356 @@
+{
+  "nodes": [
+    {
+      "id": "discordsupportbot_interaction_admin_honeypot_honeypot",
+      "label": "HoneyPot.cs",
+      "file_type": "code",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPot.cs",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "csharp_namespace:024d21f08a12d874",
+      "label": "DiscordSupportBot.Interaction.Admin.HoneyPot",
+      "file_type": "code",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPot.cs",
+      "source_location": "L4",
+      "type": "namespace",
+      "metadata": {
+        "kind": "csharp_namespace",
+        "namespace": "DiscordSupportBot.Interaction.Admin.HoneyPot"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_admin_honeypot_honeypot_discordsupportbot_interaction_admin_honeypot_honeypot",
+      "label": "HoneyPot",
+      "file_type": "code",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPot.cs",
+      "source_location": "L6",
+      "metadata": {
+        "namespace": "DiscordSupportBot.Interaction.Admin.HoneyPot",
+        "scope_chain": [
+          "s61"
+        ]
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "toplevelmodule",
+      "label": "TopLevelModule",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_admin_honeypot_honeypot_discordsupportbot_interaction_admin_honeypot_honeypot_sethoneypotasync",
+      "label": ".SetHoneyPotAsync()",
+      "file_type": "code",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPot.cs",
+      "source_location": "L8",
+      "metadata": {
+        "namespace": "DiscordSupportBot.Interaction.Admin.HoneyPot",
+        "scope_chain": [
+          "s61"
+        ]
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "itextchannel",
+      "label": "ITextChannel",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_admin_honeypot_honeypot_cs_task",
+      "label": "Task",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_admin_honeypot_honeypot_cs_requirecontext",
+      "label": "RequireContext",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_admin_honeypot_honeypot_cs_defaultmemberpermissions",
+      "label": "DefaultMemberPermissions",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_admin_honeypot_honeypot_cs_requireuserpermission",
+      "label": "RequireUserPermission",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_admin_honeypot_honeypot_cs_requirebotpermission",
+      "label": "RequireBotPermission",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_admin_honeypot_honeypot_cs_slashcommand",
+      "label": "SlashCommand",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_admin_honeypot_honeypot_discordsupportbot_interaction_admin_honeypot_honeypot_removehoneypotasync",
+      "label": ".RemoveHoneyPotAsync()",
+      "file_type": "code",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPot.cs",
+      "source_location": "L54",
+      "metadata": {
+        "namespace": "DiscordSupportBot.Interaction.Admin.HoneyPot",
+        "scope_chain": [
+          "s61"
+        ]
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_admin_honeypot_honeypotservice",
+      "label": "HoneyPotService.cs",
+      "file_type": "code",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPotService.cs",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_admin_honeypot_honeypotservice_discordsupportbot_interaction_admin_honeypot_honeypotservice",
+      "label": "HoneyPotService",
+      "file_type": "code",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPotService.cs",
+      "source_location": "L5",
+      "metadata": {
+        "namespace": "DiscordSupportBot.Interaction.Admin.HoneyPot",
+        "scope_chain": [
+          "s32"
+        ]
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "iinteractionservice",
+      "label": "IInteractionService",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "hashset",
+      "label": "HashSet",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_admin_honeypot_honeypotservice_cs_discordsocketclient",
+      "label": "DiscordSocketClient",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_admin_honeypot_honeypotservice_discordsupportbot_interaction_admin_honeypot_honeypotservice_refreshhoneypotchannels",
+      "label": ".RefreshHoneyPotChannels()",
+      "file_type": "code",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPotService.cs",
+      "source_location": "L18",
+      "metadata": {
+        "namespace": "DiscordSupportBot.Interaction.Admin.HoneyPot",
+        "scope_chain": [
+          "s32"
+        ]
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_admin_honeypot_honeypotservice_discordsupportbot_interaction_admin_honeypot_honeypotservice_addhoneypotchannel",
+      "label": ".AddHoneyPotChannel()",
+      "file_type": "code",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPotService.cs",
+      "source_location": "L29",
+      "metadata": {
+        "namespace": "DiscordSupportBot.Interaction.Admin.HoneyPot",
+        "scope_chain": [
+          "s32"
+        ]
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_admin_honeypot_honeypotservice_discordsupportbot_interaction_admin_honeypot_honeypotservice_removehoneypotchannel",
+      "label": ".RemoveHoneyPotChannel()",
+      "file_type": "code",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPotService.cs",
+      "source_location": "L34",
+      "metadata": {
+        "namespace": "DiscordSupportBot.Interaction.Admin.HoneyPot",
+        "scope_chain": [
+          "s32"
+        ]
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_admin_honeypot_honeypotservice_discordsupportbot_interaction_admin_honeypot_honeypotservice_ishoneypotchannel",
+      "label": ".IsHoneyPotChannel()",
+      "file_type": "code",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPotService.cs",
+      "source_location": "L39",
+      "metadata": {
+        "namespace": "DiscordSupportBot.Interaction.Admin.HoneyPot",
+        "scope_chain": [
+          "s32"
+        ]
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_admin_honeypot_honeypotservice_discordsupportbot_interaction_admin_honeypot_honeypotservice_client_messagereceived",
+      "label": "._client_MessageReceived()",
+      "file_type": "code",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPotService.cs",
+      "source_location": "L44",
+      "metadata": {
+        "namespace": "DiscordSupportBot.Interaction.Admin.HoneyPot",
+        "scope_chain": [
+          "s32"
+        ]
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "socketmessage",
+      "label": "SocketMessage",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_admin_honeypot_honeypotservice_cs_task",
+      "label": "Task",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_streamingstatus_streamingstatus",
+      "label": "StreamingStatus.cs",
+      "file_type": "code",
+      "source_file": "DiscordSupportBot/Interaction/StreamingStatus/StreamingStatus.cs",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "csharp_namespace:1a67caa0a7698517",
+      "label": "DiscordSupportBot.Interaction.StreamingStatus",
+      "file_type": "code",
+      "source_file": "DiscordSupportBot/Interaction/StreamingStatus/StreamingStatus.cs",
+      "source_location": "L3",
+      "type": "namespace",
+      "metadata": {
+        "kind": "csharp_namespace",
+        "namespace": "DiscordSupportBot.Interaction.StreamingStatus"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_streamingstatus_streamingstatus_discordsupportbot_interaction_streamingstatus_streamingstatus",
+      "label": "StreamingStatus",
+      "file_type": "code",
+      "source_file": "DiscordSupportBot/Interaction/StreamingStatus/StreamingStatus.cs",
+      "source_location": "L5",
+      "metadata": {
+        "namespace": "DiscordSupportBot.Interaction.StreamingStatus",
+        "scope_chain": [
+          "s31"
+        ]
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "toplevelmodule",
+      "label": "TopLevelModule",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "streamingstatusservice",
+      "label": "StreamingStatusService",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_streamingstatus_streamingstatus_discordsupportbot_interaction_streamingstatus_streamingstatus_togglestreamingstatusasync",
+      "label": ".ToggleStreamingStatusAsync()",
+      "file_type": "code",
+      "source_file": "DiscordSupportBot/Interaction/StreamingStatus/StreamingStatus.cs",
+      "source_location": "L7",
+      "metadata": {
+        "namespace": "DiscordSupportBot.Interaction.StreamingStatus",
+        "scope_chain": [
+          "s31"
+        ]
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_streamingstatus_streamingstatus_cs_task",
+      "label": "Task",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_streamingstatus_streamingstatus_cs_requirecontext",
+      "label": "RequireContext",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_streamingstatus_streamingstatus_cs_defaultmemberpermissions",
+      "label": "DefaultMemberPermissions",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_streamingstatus_streamingstatus_cs_requireuserpermission",
+      "label": "RequireUserPermission",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_streamingstatus_streamingstatus_cs_requirebotpermission",
+      "label": "RequireBotPermission",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_streamingstatus_streamingstatus_cs_slashcommand",
+      "label": "SlashCommand",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_streamingstatus_streamingstatus_discordsupportbot_interaction_streamingstatus_streamingstatus_setstreamingstatustemplateasync",
+      "label": ".SetStreamingStatusTemplateAsync()",
+      "file_type": "code",
+      "source_file": "DiscordSupportBot/Interaction/StreamingStatus/StreamingStatus.cs",
+      "source_location": "L55",
+      "metadata": {
+        "namespace": "DiscordSupportBot.Interaction.StreamingStatus",
+        "scope_chain": [
+          "s31"
+        ]
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_utility_utility",
+      "label": "Utility.cs",
+      "file_type": "code",
+      "source_file": "DiscordSupportBot/Interaction/Utility/Utility.cs",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "csharp_namespace:5297f0d2c8802999",
+      "label": "DiscordSupportBot.Interaction.Utility",
+      "file_type": "code",
+      "source_file": "DiscordSupportBot/Interaction/Utility/Utility.cs",
+      "source_location": "L3",
+      "type": "namespace",
+      "metadata": {
+        "kind": "csharp_namespace",
+        "namespace": "DiscordSupportBot.Interaction.Utility"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility",
+      "label": "Utility",
+      "file_type": "code",
+      "source_file": "DiscordSupportBot/Interaction/Utility/Utility.cs",
+      "source_location": "L5",
+      "metadata": {
+        "namespace": "DiscordSupportBot.Interaction.Utility",
+        "scope_chain": [
+          "s34"
+        ]
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "toplevelmodule",
+      "label": "TopLevelModule",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "utilityservice",
+      "label": "UtilityService",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_utility_utility_cs_discordsocketclient",
+      "label": "DiscordSocketClient",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility_pingasync",
+      "label": ".PingAsync()",
+      "file_type": "code",
+      "source_file": "DiscordSupportBot/Interaction/Utility/Utility.cs",
+      "source_location": "L15",
+      "metadata": {
+        "namespace": "DiscordSupportBot.Interaction.Utility",
+        "scope_chain": [
+          "s34"
+        ]
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_utility_utility_cs_task",
+      "label": "Task",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_utility_utility_cs_slashcommand",
+      "label": "SlashCommand",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility_inviteasync",
+      "label": ".InviteAsync()",
+      "file_type": "code",
+      "source_file": "DiscordSupportBot/Interaction/Utility/Utility.cs",
+      "source_location": "L21",
+      "metadata": {
+        "namespace": "DiscordSupportBot.Interaction.Utility",
+        "scope_chain": [
+          "s34"
+        ]
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility_statusasync",
+      "label": ".StatusAsync()",
+      "file_type": "code",
+      "source_file": "DiscordSupportBot/Interaction/Utility/Utility.cs",
+      "source_location": "L27",
+      "metadata": {
+        "namespace": "DiscordSupportBot.Interaction.Utility",
+        "scope_chain": [
+          "s34"
+        ]
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility_subasync",
+      "label": ".SubAsync()",
+      "file_type": "code",
+      "source_file": "DiscordSupportBot/Interaction/Utility/Utility.cs",
+      "source_location": "L45",
+      "metadata": {
+        "namespace": "DiscordSupportBot.Interaction.Utility",
+        "scope_chain": [
+          "s34"
+        ]
+      },
+      "_origin": "ast"
+    }
+  ],
+  "edges": [
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypot",
+      "target": "discord_interactions",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPot.cs",
+      "source_location": "L1",
+      "weight": 1.0,
+      "metadata": {
+        "using_kind": "namespace",
+        "target_fqn": "Discord.Interactions",
+        "scope_kind": "file"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypot",
+      "target": "system_diagnostics",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPot.cs",
+      "source_location": "L2",
+      "weight": 1.0,
+      "metadata": {
+        "using_kind": "namespace",
+        "target_fqn": "System.Diagnostics",
+        "scope_kind": "file"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypot",
+      "target": "csharp_namespace:024d21f08a12d874",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPot.cs",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypot",
+      "target": "discordsupportbot_interaction_admin_honeypot_honeypot_discordsupportbot_interaction_admin_honeypot_honeypot",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPot.cs",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypot_discordsupportbot_interaction_admin_honeypot_honeypot",
+      "target": "toplevelmodule",
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPot.cs",
+      "source_location": "L6",
+      "weight": 1.0,
+      "metadata": {
+        "ref_token": "TopLevelModule"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypot_discordsupportbot_interaction_admin_honeypot_honeypot",
+      "target": "discordsupportbot_interaction_admin_honeypot_honeypotservice_discordsupportbot_interaction_admin_honeypot_honeypotservice",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPot.cs",
+      "source_location": "L6",
+      "weight": 1.0,
+      "context": "generic_arg",
+      "metadata": {
+        "ref_token": "HoneyPotService"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypot_discordsupportbot_interaction_admin_honeypot_honeypot",
+      "target": "discordsupportbot_interaction_admin_honeypot_honeypot_discordsupportbot_interaction_admin_honeypot_honeypot_sethoneypotasync",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPot.cs",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypot_discordsupportbot_interaction_admin_honeypot_honeypot_sethoneypotasync",
+      "target": "itextchannel",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPot.cs",
+      "source_location": "L8",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "ITextChannel"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypot_discordsupportbot_interaction_admin_honeypot_honeypot_sethoneypotasync",
+      "target": "discordsupportbot_interaction_admin_honeypot_honeypot_cs_task",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPot.cs",
+      "source_location": "L8",
+      "weight": 1.0,
+      "context": "return_type",
+      "metadata": {
+        "ref_token": "Task"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypot_discordsupportbot_interaction_admin_honeypot_honeypot_sethoneypotasync",
+      "target": "discordsupportbot_interaction_admin_honeypot_honeypot_cs_requirecontext",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPot.cs",
+      "source_location": "L8",
+      "weight": 1.0,
+      "context": "attribute",
+      "metadata": {
+        "ref_token": "RequireContext"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypot_discordsupportbot_interaction_admin_honeypot_honeypot_sethoneypotasync",
+      "target": "discordsupportbot_interaction_admin_honeypot_honeypot_cs_defaultmemberpermissions",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPot.cs",
+      "source_location": "L8",
+      "weight": 1.0,
+      "context": "attribute",
+      "metadata": {
+        "ref_token": "DefaultMemberPermissions"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypot_discordsupportbot_interaction_admin_honeypot_honeypot_sethoneypotasync",
+      "target": "discordsupportbot_interaction_admin_honeypot_honeypot_cs_requireuserpermission",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPot.cs",
+      "source_location": "L8",
+      "weight": 1.0,
+      "context": "attribute",
+      "metadata": {
+        "ref_token": "RequireUserPermission"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypot_discordsupportbot_interaction_admin_honeypot_honeypot_sethoneypotasync",
+      "target": "discordsupportbot_interaction_admin_honeypot_honeypot_cs_requirebotpermission",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPot.cs",
+      "source_location": "L8",
+      "weight": 1.0,
+      "context": "attribute",
+      "metadata": {
+        "ref_token": "RequireBotPermission"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypot_discordsupportbot_interaction_admin_honeypot_honeypot_sethoneypotasync",
+      "target": "discordsupportbot_interaction_admin_honeypot_honeypot_cs_slashcommand",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPot.cs",
+      "source_location": "L8",
+      "weight": 1.0,
+      "context": "attribute",
+      "metadata": {
+        "ref_token": "SlashCommand"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypot_discordsupportbot_interaction_admin_honeypot_honeypot",
+      "target": "discordsupportbot_interaction_admin_honeypot_honeypot_discordsupportbot_interaction_admin_honeypot_honeypot_removehoneypotasync",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPot.cs",
+      "source_location": "L54",
+      "weight": 1.0
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypot_discordsupportbot_interaction_admin_honeypot_honeypot_removehoneypotasync",
+      "target": "discordsupportbot_interaction_admin_honeypot_honeypot_cs_task",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPot.cs",
+      "source_location": "L54",
+      "weight": 1.0,
+      "context": "return_type",
+      "metadata": {
+        "ref_token": "Task"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypot_discordsupportbot_interaction_admin_honeypot_honeypot_removehoneypotasync",
+      "target": "discordsupportbot_interaction_admin_honeypot_honeypot_cs_requirecontext",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPot.cs",
+      "source_location": "L54",
+      "weight": 1.0,
+      "context": "attribute",
+      "metadata": {
+        "ref_token": "RequireContext"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypot_discordsupportbot_interaction_admin_honeypot_honeypot_removehoneypotasync",
+      "target": "discordsupportbot_interaction_admin_honeypot_honeypot_cs_defaultmemberpermissions",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPot.cs",
+      "source_location": "L54",
+      "weight": 1.0,
+      "context": "attribute",
+      "metadata": {
+        "ref_token": "DefaultMemberPermissions"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypot_discordsupportbot_interaction_admin_honeypot_honeypot_removehoneypotasync",
+      "target": "discordsupportbot_interaction_admin_honeypot_honeypot_cs_requireuserpermission",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPot.cs",
+      "source_location": "L54",
+      "weight": 1.0,
+      "context": "attribute",
+      "metadata": {
+        "ref_token": "RequireUserPermission"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypot_discordsupportbot_interaction_admin_honeypot_honeypot_removehoneypotasync",
+      "target": "discordsupportbot_interaction_admin_honeypot_honeypot_cs_slashcommand",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPot.cs",
+      "source_location": "L54",
+      "weight": 1.0,
+      "context": "attribute",
+      "metadata": {
+        "ref_token": "SlashCommand"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypotservice",
+      "target": "system_diagnostics",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPotService.cs",
+      "source_location": "L1",
+      "weight": 1.0,
+      "metadata": {
+        "using_kind": "namespace",
+        "target_fqn": "System.Diagnostics",
+        "scope_kind": "file"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypotservice",
+      "target": "csharp_namespace:024d21f08a12d874",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPotService.cs",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypotservice",
+      "target": "discordsupportbot_interaction_admin_honeypot_honeypotservice_discordsupportbot_interaction_admin_honeypot_honeypotservice",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPotService.cs",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypotservice_discordsupportbot_interaction_admin_honeypot_honeypotservice",
+      "target": "iinteractionservice",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPotService.cs",
+      "source_location": "L5",
+      "weight": 1.0,
+      "metadata": {
+        "ref_token": "IInteractionService"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypotservice_discordsupportbot_interaction_admin_honeypot_honeypotservice",
+      "target": "hashset",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPotService.cs",
+      "source_location": "L7",
+      "weight": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "HashSet"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypotservice_discordsupportbot_interaction_admin_honeypot_honeypotservice",
+      "target": "discordsupportbot_interaction_admin_honeypot_honeypotservice_cs_discordsocketclient",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPotService.cs",
+      "source_location": "L8",
+      "weight": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "DiscordSocketClient"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypotservice_discordsupportbot_interaction_admin_honeypot_honeypotservice",
+      "target": "discordsupportbot_interaction_admin_honeypot_honeypotservice_discordsupportbot_interaction_admin_honeypot_honeypotservice_refreshhoneypotchannels",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPotService.cs",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypotservice_discordsupportbot_interaction_admin_honeypot_honeypotservice",
+      "target": "discordsupportbot_interaction_admin_honeypot_honeypotservice_discordsupportbot_interaction_admin_honeypot_honeypotservice_addhoneypotchannel",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPotService.cs",
+      "source_location": "L29",
+      "weight": 1.0
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypotservice_discordsupportbot_interaction_admin_honeypot_honeypotservice",
+      "target": "discordsupportbot_interaction_admin_honeypot_honeypotservice_discordsupportbot_interaction_admin_honeypot_honeypotservice_removehoneypotchannel",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPotService.cs",
+      "source_location": "L34",
+      "weight": 1.0
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypotservice_discordsupportbot_interaction_admin_honeypot_honeypotservice",
+      "target": "discordsupportbot_interaction_admin_honeypot_honeypotservice_discordsupportbot_interaction_admin_honeypot_honeypotservice_ishoneypotchannel",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPotService.cs",
+      "source_location": "L39",
+      "weight": 1.0
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypotservice_discordsupportbot_interaction_admin_honeypot_honeypotservice",
+      "target": "discordsupportbot_interaction_admin_honeypot_honeypotservice_discordsupportbot_interaction_admin_honeypot_honeypotservice_client_messagereceived",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPotService.cs",
+      "source_location": "L44",
+      "weight": 1.0
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypotservice_discordsupportbot_interaction_admin_honeypot_honeypotservice_client_messagereceived",
+      "target": "socketmessage",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPotService.cs",
+      "source_location": "L44",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "SocketMessage"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypotservice_discordsupportbot_interaction_admin_honeypot_honeypotservice_client_messagereceived",
+      "target": "discordsupportbot_interaction_admin_honeypot_honeypotservice_cs_task",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPotService.cs",
+      "source_location": "L44",
+      "weight": 1.0,
+      "context": "return_type",
+      "metadata": {
+        "ref_token": "Task"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_admin_honeypot_honeypotservice_discordsupportbot_interaction_admin_honeypot_honeypotservice_client_messagereceived",
+      "target": "discordsupportbot_interaction_admin_honeypot_honeypotservice_discordsupportbot_interaction_admin_honeypot_honeypotservice_ishoneypotchannel",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Admin/HoneyPot/HoneyPotService.cs",
+      "source_location": "L57",
+      "weight": 1.0
+    },
+    {
+      "source": "discordsupportbot_interaction_streamingstatus_streamingstatus",
+      "target": "discord_interactions",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/StreamingStatus/StreamingStatus.cs",
+      "source_location": "L1",
+      "weight": 1.0,
+      "metadata": {
+        "using_kind": "namespace",
+        "target_fqn": "Discord.Interactions",
+        "scope_kind": "file"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_streamingstatus_streamingstatus",
+      "target": "csharp_namespace:1a67caa0a7698517",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/StreamingStatus/StreamingStatus.cs",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "discordsupportbot_interaction_streamingstatus_streamingstatus",
+      "target": "discordsupportbot_interaction_streamingstatus_streamingstatus_discordsupportbot_interaction_streamingstatus_streamingstatus",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/StreamingStatus/StreamingStatus.cs",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "discordsupportbot_interaction_streamingstatus_streamingstatus_discordsupportbot_interaction_streamingstatus_streamingstatus",
+      "target": "toplevelmodule",
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/StreamingStatus/StreamingStatus.cs",
+      "source_location": "L5",
+      "weight": 1.0,
+      "metadata": {
+        "ref_token": "TopLevelModule"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_streamingstatus_streamingstatus_discordsupportbot_interaction_streamingstatus_streamingstatus",
+      "target": "streamingstatusservice",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/StreamingStatus/StreamingStatus.cs",
+      "source_location": "L5",
+      "weight": 1.0,
+      "context": "generic_arg",
+      "metadata": {
+        "ref_token": "StreamingStatusService",
+        "qualified": true,
+        "ref_qualifier": "Services"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_streamingstatus_streamingstatus_discordsupportbot_interaction_streamingstatus_streamingstatus",
+      "target": "discordsupportbot_interaction_streamingstatus_streamingstatus_discordsupportbot_interaction_streamingstatus_streamingstatus_togglestreamingstatusasync",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/StreamingStatus/StreamingStatus.cs",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "discordsupportbot_interaction_streamingstatus_streamingstatus_discordsupportbot_interaction_streamingstatus_streamingstatus_togglestreamingstatusasync",
+      "target": "discordsupportbot_interaction_streamingstatus_streamingstatus_cs_task",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/StreamingStatus/StreamingStatus.cs",
+      "source_location": "L7",
+      "weight": 1.0,
+      "context": "return_type",
+      "metadata": {
+        "ref_token": "Task"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_streamingstatus_streamingstatus_discordsupportbot_interaction_streamingstatus_streamingstatus_togglestreamingstatusasync",
+      "target": "discordsupportbot_interaction_streamingstatus_streamingstatus_cs_requirecontext",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/StreamingStatus/StreamingStatus.cs",
+      "source_location": "L7",
+      "weight": 1.0,
+      "context": "attribute",
+      "metadata": {
+        "ref_token": "RequireContext"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_streamingstatus_streamingstatus_discordsupportbot_interaction_streamingstatus_streamingstatus_togglestreamingstatusasync",
+      "target": "discordsupportbot_interaction_streamingstatus_streamingstatus_cs_defaultmemberpermissions",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/StreamingStatus/StreamingStatus.cs",
+      "source_location": "L7",
+      "weight": 1.0,
+      "context": "attribute",
+      "metadata": {
+        "ref_token": "DefaultMemberPermissions"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_streamingstatus_streamingstatus_discordsupportbot_interaction_streamingstatus_streamingstatus_togglestreamingstatusasync",
+      "target": "discordsupportbot_interaction_streamingstatus_streamingstatus_cs_requireuserpermission",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/StreamingStatus/StreamingStatus.cs",
+      "source_location": "L7",
+      "weight": 1.0,
+      "context": "attribute",
+      "metadata": {
+        "ref_token": "RequireUserPermission"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_streamingstatus_streamingstatus_discordsupportbot_interaction_streamingstatus_streamingstatus_togglestreamingstatusasync",
+      "target": "discordsupportbot_interaction_streamingstatus_streamingstatus_cs_requirebotpermission",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/StreamingStatus/StreamingStatus.cs",
+      "source_location": "L7",
+      "weight": 1.0,
+      "context": "attribute",
+      "metadata": {
+        "ref_token": "RequireBotPermission"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_streamingstatus_streamingstatus_discordsupportbot_interaction_streamingstatus_streamingstatus_togglestreamingstatusasync",
+      "target": "discordsupportbot_interaction_streamingstatus_streamingstatus_cs_slashcommand",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/StreamingStatus/StreamingStatus.cs",
+      "source_location": "L7",
+      "weight": 1.0,
+      "context": "attribute",
+      "metadata": {
+        "ref_token": "SlashCommand"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_streamingstatus_streamingstatus_discordsupportbot_interaction_streamingstatus_streamingstatus",
+      "target": "discordsupportbot_interaction_streamingstatus_streamingstatus_discordsupportbot_interaction_streamingstatus_streamingstatus_setstreamingstatustemplateasync",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/StreamingStatus/StreamingStatus.cs",
+      "source_location": "L55",
+      "weight": 1.0
+    },
+    {
+      "source": "discordsupportbot_interaction_streamingstatus_streamingstatus_discordsupportbot_interaction_streamingstatus_streamingstatus_setstreamingstatustemplateasync",
+      "target": "discordsupportbot_interaction_streamingstatus_streamingstatus_cs_task",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/StreamingStatus/StreamingStatus.cs",
+      "source_location": "L55",
+      "weight": 1.0,
+      "context": "return_type",
+      "metadata": {
+        "ref_token": "Task"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_streamingstatus_streamingstatus_discordsupportbot_interaction_streamingstatus_streamingstatus_setstreamingstatustemplateasync",
+      "target": "discordsupportbot_interaction_streamingstatus_streamingstatus_cs_requirecontext",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/StreamingStatus/StreamingStatus.cs",
+      "source_location": "L55",
+      "weight": 1.0,
+      "context": "attribute",
+      "metadata": {
+        "ref_token": "RequireContext"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_streamingstatus_streamingstatus_discordsupportbot_interaction_streamingstatus_streamingstatus_setstreamingstatustemplateasync",
+      "target": "discordsupportbot_interaction_streamingstatus_streamingstatus_cs_defaultmemberpermissions",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/StreamingStatus/StreamingStatus.cs",
+      "source_location": "L55",
+      "weight": 1.0,
+      "context": "attribute",
+      "metadata": {
+        "ref_token": "DefaultMemberPermissions"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_streamingstatus_streamingstatus_discordsupportbot_interaction_streamingstatus_streamingstatus_setstreamingstatustemplateasync",
+      "target": "discordsupportbot_interaction_streamingstatus_streamingstatus_cs_requireuserpermission",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/StreamingStatus/StreamingStatus.cs",
+      "source_location": "L55",
+      "weight": 1.0,
+      "context": "attribute",
+      "metadata": {
+        "ref_token": "RequireUserPermission"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_streamingstatus_streamingstatus_discordsupportbot_interaction_streamingstatus_streamingstatus_setstreamingstatustemplateasync",
+      "target": "discordsupportbot_interaction_streamingstatus_streamingstatus_cs_slashcommand",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/StreamingStatus/StreamingStatus.cs",
+      "source_location": "L55",
+      "weight": 1.0,
+      "context": "attribute",
+      "metadata": {
+        "ref_token": "SlashCommand"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_utility_utility",
+      "target": "discord_interactions",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Utility/Utility.cs",
+      "source_location": "L1",
+      "weight": 1.0,
+      "metadata": {
+        "using_kind": "namespace",
+        "target_fqn": "Discord.Interactions",
+        "scope_kind": "file"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_utility_utility",
+      "target": "csharp_namespace:5297f0d2c8802999",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Utility/Utility.cs",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "discordsupportbot_interaction_utility_utility",
+      "target": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Utility/Utility.cs",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility",
+      "target": "toplevelmodule",
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Utility/Utility.cs",
+      "source_location": "L5",
+      "weight": 1.0,
+      "metadata": {
+        "ref_token": "TopLevelModule"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility",
+      "target": "utilityservice",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Utility/Utility.cs",
+      "source_location": "L5",
+      "weight": 1.0,
+      "context": "generic_arg",
+      "metadata": {
+        "ref_token": "UtilityService"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility",
+      "target": "discordsupportbot_interaction_utility_utility_cs_discordsocketclient",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Utility/Utility.cs",
+      "source_location": "L8",
+      "weight": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "DiscordSocketClient"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility",
+      "target": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility_pingasync",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Utility/Utility.cs",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility_pingasync",
+      "target": "discordsupportbot_interaction_utility_utility_cs_task",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Utility/Utility.cs",
+      "source_location": "L15",
+      "weight": 1.0,
+      "context": "return_type",
+      "metadata": {
+        "ref_token": "Task"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility_pingasync",
+      "target": "discordsupportbot_interaction_utility_utility_cs_slashcommand",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Utility/Utility.cs",
+      "source_location": "L15",
+      "weight": 1.0,
+      "context": "attribute",
+      "metadata": {
+        "ref_token": "SlashCommand"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility",
+      "target": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility_inviteasync",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Utility/Utility.cs",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility_inviteasync",
+      "target": "discordsupportbot_interaction_utility_utility_cs_task",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Utility/Utility.cs",
+      "source_location": "L21",
+      "weight": 1.0,
+      "context": "return_type",
+      "metadata": {
+        "ref_token": "Task"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility_inviteasync",
+      "target": "discordsupportbot_interaction_utility_utility_cs_slashcommand",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Utility/Utility.cs",
+      "source_location": "L21",
+      "weight": 1.0,
+      "context": "attribute",
+      "metadata": {
+        "ref_token": "SlashCommand"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility",
+      "target": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility_statusasync",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Utility/Utility.cs",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility_statusasync",
+      "target": "discordsupportbot_interaction_utility_utility_cs_task",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Utility/Utility.cs",
+      "source_location": "L27",
+      "weight": 1.0,
+      "context": "return_type",
+      "metadata": {
+        "ref_token": "Task"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility_statusasync",
+      "target": "discordsupportbot_interaction_utility_utility_cs_slashcommand",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Utility/Utility.cs",
+      "source_location": "L27",
+      "weight": 1.0,
+      "context": "attribute",
+      "metadata": {
+        "ref_token": "SlashCommand"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility",
+      "target": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility_subasync",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Utility/Utility.cs",
+      "source_location": "L45",
+      "weight": 1.0
+    },
+    {
+      "source": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility_subasync",
+      "target": "discordsupportbot_interaction_utility_utility_cs_task",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Utility/Utility.cs",
+      "source_location": "L45",
+      "weight": 1.0,
+      "context": "return_type",
+      "metadata": {
+        "ref_token": "Task"
+      }
+    },
+    {
+      "source": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility_subasync",
+      "target": "discordsupportbot_interaction_utility_utility_cs_slashcommand",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Utility/Utility.cs",
+      "source_location": "L45",
+      "weight": 1.0,
+      "context": "attribute",
+      "metadata": {
+        "ref_token": "SlashCommand"
+      }
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

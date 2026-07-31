@@ -48,6 +48,7 @@ namespace DiscordSupportBot.Interaction.FoodWheel.Service
         private static readonly HttpClient _httpClient = new();
         private static readonly HashSet<string> _foodCategories = ["荤菜", "素菜", "主食", "水产", "早餐", "汤与粥", "甜品"];
         private static bool _openCcInitialized;
+        private readonly Timer _refreshTimer;
 
         public FoodWheelService()
         {
@@ -67,7 +68,7 @@ namespace DiscordSupportBot.Interaction.FoodWheel.Service
             var nowTw = DateTime.UtcNow.AddHours(8);
             var next = nowTw.Date.AddDays(((int)DayOfWeek.Monday - (int)nowTw.DayOfWeek + 7) % 7).AddHours(15);
             if (next <= nowTw) next = next.AddDays(7);
-            _ = new Timer((_) => _ = RefreshRemoteRecipesAsync(), null, next - nowTw, TimeSpan.FromDays(7));
+            _refreshTimer = new Timer((_) => _ = RefreshRemoteRecipesAsync(), null, next - nowTw, TimeSpan.FromDays(7));
         }
 
         public IReadOnlyList<string> GetMasterList(WheelType type)

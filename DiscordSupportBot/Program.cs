@@ -24,6 +24,10 @@ namespace DiscordSupportBot
 
 
         static Timer timerAddBookMark, timerUpdateStatus, timerUpdateGuildInfo, timerSaveDatebase, timerResetFundLeaderboard;
+        static int _isSendingBookmarks;
+        static int _isUpdatingGuildInfo;
+        static int _isResettingFundLeaderboard;
+        static readonly SemaphoreSlim _saveDatabaseLock = new(1, 1);
         static readonly List<ulong> _pinChannelList = new List<ulong>();
         static readonly BotConfig _botConfig = new BotConfig();
 
@@ -74,18 +78,34 @@ namespace DiscordSupportBot
             MainAsync().ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
-        private static void TimerHandler(object state) //僅限指定伺服器使用
+        private static async void TimerHandler(object state) //僅限指定伺服器使用
         {
             if (IsDisconnect) return;
-
-            string text = DateTime.Now.ToString("yyyy/MM/dd") + " 書籤";
-            foreach (ITextChannel item in Client.GetGuild(463657254105645056).TextChannels.Where((x) => x.IsNsfw))
+            if (Interlocked.CompareExchange(ref _isSendingBookmarks, 1, 0) != 0)
             {
-                if (_pinChannelList.Contains(item.Id))
+                Log.Warn("書籤發送仍在執行，略過重複觸發");
+                return;
+            }
+
+            try
+            {
+                string text = DateTime.Now.ToString("yyyy/MM/dd") + " 書籤";
+                foreach (ITextChannel item in Client.GetGuild(463657254105645056).TextChannels.Where((x) => x.IsNsfw))
                 {
-                    item.SendMessageAsync(text);
-                    Log.FormatColorWrite("已發送文字 \"" + text + "\" 到 " + item.Guild.Name + "/" + item.Name, ConsoleColor.DarkCyan);
+                    if (_pinChannelList.Contains(item.Id))
+                    {
+                        await item.SendMessageAsync(text);
+                        Log.FormatColorWrite("已發送文字 \"" + text + "\" 到 " + item.Guild.Name + "/" + item.Name, ConsoleColor.DarkCyan);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "TimerHandler-SendBookmarks");
+            }
+            finally
+            {
+                Volatile.Write(ref _isSendingBookmarks, 0);
             }
         }
 
@@ -99,9 +119,15 @@ namespace DiscordSupportBot
         private static async void TimerHandler3(object state)
         {
             if (IsDisconnect) return;
-
-            using (var db = new SupportContext())
+            if (Interlocked.CompareExchange(ref _isUpdatingGuildInfo, 1, 0) != 0)
             {
+                Log.Warn("伺服器資訊更新仍在執行，略過重複觸發");
+                return;
+            }
+
+            try
+            {
+                using var db = new SupportContext();
                 foreach (var item in db.GuildConfig.ToList().Where((x) => x.ChannelMemberId != 0 || x.ChannelNitroId != 0))
                 {
                     SocketGuild guild = Client.GetGuild(item.GuildId);
@@ -176,19 +202,48 @@ namespace DiscordSupportBot
                     db.SaveChanges();
                 }
             }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "TimerHandler3-UpdateGuildInfo");
+            }
+            finally
+            {
+                Volatile.Write(ref _isUpdatingGuildInfo, 0);
+            }
         }
 
         private static async void TimerHandler4(object state)
         {
             if (IsDisconnect) return;
+            if (!await _saveDatabaseLock.WaitAsync(0))
+            {
+                Log.Warn("活動資料庫保存仍在執行，略過重複觸發");
+                return;
+            }
 
-            await EmoteActivity.SaveDatebaseAsync();
-            await UserActivity.SaveDatebaseAsync();
+            try
+            {
+                await EmoteActivity.SaveDatebaseAsync();
+                await UserActivity.SaveDatebaseAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "TimerHandler4-SaveDatabase");
+            }
+            finally
+            {
+                _saveDatabaseLock.Release();
+            }
         }
 
         private static async void TimerHandler5(object state)
         {
             if (IsDisconnect) return;
+            if (Interlocked.CompareExchange(ref _isResettingFundLeaderboard, 1, 0) != 0)
+            {
+                Log.Warn("基金排行榜重置仍在執行，略過重複觸發");
+                return;
+            }
 
             try
             {
@@ -220,6 +275,10 @@ namespace DiscordSupportBot
             catch (Exception ex)
             {
                 Log.Error(ex, "TimerHandler5-ResetFundLeaderboard");
+            }
+            finally
+            {
+                Volatile.Write(ref _isResettingFundLeaderboard, 0);
             }
         }
 
@@ -321,7 +380,7 @@ namespace DiscordSupportBot
                 timerUpdateGuildInfo.Change((long)Math.Round(Convert.ToDateTime($"{DateTime.Now.AddMinutes(1):yyyy/MM/dd HH:mm:00}").Subtract(DateTime.Now).TotalSeconds) * 1000, 5 * 60 * 1000);
 
                 var nextMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(1);
-                timerResetFundLeaderboard.Change((long)Math.Round(nextMonth.Subtract(DateTime.Now).TotalMilliseconds), (long)(30.4375 * 24 * 60 * 60 * 1000));
+                timerResetFundLeaderboard.Change((long)Math.Round(nextMonth.Subtract(DateTime.Now).TotalMilliseconds), Timeout.Infinite);
 
                 #region 正常寫法 
                 //DateTime end = DateTime.Now.AddDays(1);
@@ -439,8 +498,16 @@ namespace DiscordSupportBot
 
 #if RELEASE
             Log.Info("保存資料庫中...");
-            await EmoteActivity.SaveDatebaseAsync();
-            await UserActivity.SaveDatebaseAsync();
+            await _saveDatabaseLock.WaitAsync();
+            try
+            {
+                await EmoteActivity.SaveDatebaseAsync();
+                await UserActivity.SaveDatebaseAsync();
+            }
+            finally
+            {
+                _saveDatabaseLock.Release();
+            }
 #endif
             await Client.StopAsync();
 

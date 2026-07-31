@@ -7,6 +7,8 @@ namespace DiscordSupportBot.Interaction.StreamingStatus.Services
 
         private readonly DiscordSocketClient _client;
         private readonly HttpClient _httpClient;
+        private readonly Timer _refreshTimer;
+        private int _isRefreshingEnabledGuilds;
 
         // 已啟用本功能的伺服器；整包替換參考以避免併發問題（presence 事件量大）
         private HashSet<ulong> _enabledGuilds = new();
@@ -21,7 +23,7 @@ namespace DiscordSupportBot.Interaction.StreamingStatus.Services
             _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bot {botConfig.DiscordToken}");
 
             Task.Run(RefreshEnabledGuilds);
-            _ = new Timer((_) => RefreshEnabledGuilds(), null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(5));
+            _refreshTimer = new Timer((_) => RefreshEnabledGuilds(), null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(5));
 
             if (!botConfig.IsEnablePresenceIntent)
                 return;
@@ -41,6 +43,9 @@ namespace DiscordSupportBot.Interaction.StreamingStatus.Services
 
         private void RefreshEnabledGuilds()
         {
+            if (Interlocked.CompareExchange(ref _isRefreshingEnabledGuilds, 1, 0) != 0)
+                return;
+
             try
             {
                 using var db = SupportContext.GetDbContext();
@@ -49,6 +54,10 @@ namespace DiscordSupportBot.Interaction.StreamingStatus.Services
             catch (Exception ex)
             {
                 Log.Error(ex, "RefreshEnabledGuilds");
+            }
+            finally
+            {
+                Volatile.Write(ref _isRefreshingEnabledGuilds, 0);
             }
         }
 
