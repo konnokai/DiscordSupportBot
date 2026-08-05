@@ -142,7 +142,7 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             if (includeAddOneButton)
             {
                 components = new ComponentBuilder()
-                    .WithButton("+1", $"{AddOneCustomIdPrefix}{(int)fundType}:{targetUserId}", ButtonStyle.Success)
+                    .WithButton("讓他飛", $"{AddOneCustomIdPrefix}{(int)fundType}:{targetUserId}", ButtonStyle.Success)
                     .Build();
             }
 
