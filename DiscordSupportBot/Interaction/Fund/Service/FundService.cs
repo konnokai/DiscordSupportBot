@@ -114,7 +114,8 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                     arg.GuildId.Value,
                     arg.Channel.Id,
                     arg.User.Id,
-                    targetUserId);
+                    targetUserId,
+                    includeAddOneButton: false);
             }
             catch (Exception ex)
             {
@@ -130,15 +131,20 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             ulong channelId,
             ulong executeUserId,
             ulong targetUserId,
-            string messagePrefix = "")
+            string messagePrefix = "",
+            bool includeAddOneButton = true)
         {
             var message = messagePrefix;
             message += CheckIsAddOwner(fundType, guildId, executeUserId, targetUserId, out var needAddUserId);
             message += await AddFundAsync(fundType, guildId, channelId, needAddUserId);
 
-            var components = new ComponentBuilder()
-                .WithButton("+1", $"{AddOneCustomIdPrefix}{(int)fundType}:{targetUserId}", ButtonStyle.Success)
-                .Build();
+            MessageComponent components = null;
+            if (includeAddOneButton)
+            {
+                components = new ComponentBuilder()
+                    .WithButton("+1", $"{AddOneCustomIdPrefix}{(int)fundType}:{targetUserId}", ButtonStyle.Success)
+                    .Build();
+            }
 
             await interaction.SendConfirmAsync(message, true, components: components);
         }
