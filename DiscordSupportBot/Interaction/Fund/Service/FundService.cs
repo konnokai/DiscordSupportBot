@@ -7,6 +7,7 @@ namespace DiscordSupportBot.Interaction.Fund.Service
     public class FundService : IInteractionService
     {
         private const string AddOneCustomIdPrefix = "fund-add-one:";
+        private const string AddOneCooldownKeyPrefix = "SupportBot:Fund:AddOneCooldown";
 
         public enum FundType
         {
@@ -92,6 +93,18 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                 if (arg.GuildId == null || !TryParseAddOneCustomId(arg.Data.CustomId, out var fundType, out var targetUserId))
                 {
                     await arg.SendErrorAsync("基金按鈕資料無效", true);
+                    return;
+                }
+
+                var cooldownKey = $"{AddOneCooldownKeyPrefix}:{arg.Message.Id}:{arg.User.Id}";
+                var canUseButton = await RedisConnection.RedisDb.StringSetAsync(
+                    cooldownKey,
+                    1,
+                    expiry: TimeSpan.FromHours(1),
+                    when: When.NotExists);
+                if (!canUseButton)
+                {
+                    await arg.SendErrorAsync("無法連續使用此按鈕", true);
                     return;
                 }
 
