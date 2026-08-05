@@ -6,6 +6,8 @@ namespace DiscordSupportBot.Interaction.Fund.Service
 {
     public class FundService : IInteractionService
     {
+        private const string AddOneCustomIdPrefix = "fund-add-one:";
+
         public enum FundType
         {
             [ChoiceDisplay("說謊")]
@@ -41,6 +43,7 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             _client = client;
 
             _client.ModalSubmitted += _client_ModalSubmitted;
+            _client.ButtonExecuted += HandleAddOneButtonAsync;
         }
 
         private async Task _client_ModalSubmitted(SocketModal arg)
@@ -61,16 +64,88 @@ namespace DiscordSupportBot.Interaction.Fund.Service
 
             try
             {
-                var message = $"[點我回原訊息]({jumpUrl})\n\n";
-                message += CheckIsAddOwner(fundType, guildId, arg.User.Id, targetUserId, out ulong needAddUserId);
-                message += await AddFundAsync(fundType, guildId, arg.Channel.Id, needAddUserId);
-                await arg.SendConfirmAsync(message, true);
+                await AddFundAndRespondAsync(
+                    arg,
+                    fundType,
+                    guildId,
+                    arg.Channel.Id,
+                    arg.User.Id,
+                    targetUserId,
+                    $"[點我回原訊息]({jumpUrl})\n\n");
             }
             catch (Exception ex)
             {
                 Log.Error(ex, $"FundService-ModalSubmitted: {guildId} | {targetUserId} | {fundType}");
                 await arg.SendErrorAsync($"處理過程發生錯誤: {ex.Message}", true);
             }
+        }
+
+        private async Task HandleAddOneButtonAsync(SocketMessageComponent arg)
+        {
+            if (arg.HasResponded || !arg.Data.CustomId.StartsWith(AddOneCustomIdPrefix, StringComparison.Ordinal))
+                return;
+
+            await arg.DeferAsync(false);
+
+            try
+            {
+                if (arg.GuildId == null || !TryParseAddOneCustomId(arg.Data.CustomId, out var fundType, out var targetUserId))
+                {
+                    await arg.SendErrorAsync("基金按鈕資料無效", true);
+                    return;
+                }
+
+                await AddFundAndRespondAsync(
+                    arg,
+                    fundType,
+                    arg.GuildId.Value,
+                    arg.Channel.Id,
+                    arg.User.Id,
+                    targetUserId);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"FundService-AddOneButton: {arg.GuildId} | {arg.User.Id} | {arg.Data.CustomId}");
+                await arg.SendErrorAsync($"處理過程發生錯誤: {ex.Message}", true);
+            }
+        }
+
+        internal static async Task AddFundAndRespondAsync(
+            IDiscordInteraction interaction,
+            FundType fundType,
+            ulong guildId,
+            ulong channelId,
+            ulong executeUserId,
+            ulong targetUserId,
+            string messagePrefix = "")
+        {
+            var message = messagePrefix;
+            message += CheckIsAddOwner(fundType, guildId, executeUserId, targetUserId, out var needAddUserId);
+            message += await AddFundAsync(fundType, guildId, channelId, needAddUserId);
+
+            var components = new ComponentBuilder()
+                .WithButton("+1", $"{AddOneCustomIdPrefix}{(int)fundType}:{targetUserId}", ButtonStyle.Success)
+                .Build();
+
+            await interaction.SendConfirmAsync(message, true, components: components);
+        }
+
+        private static bool TryParseAddOneCustomId(string customId, out FundType fundType, out ulong targetUserId)
+        {
+            fundType = default;
+            targetUserId = default;
+
+            var values = customId[AddOneCustomIdPrefix.Length..].Split(':');
+            if (values.Length != 2 ||
+                !int.TryParse(values[0], out var fundTypeValue) ||
+                !Enum.IsDefined(typeof(FundType), fundTypeValue) ||
+                !ulong.TryParse(values[1], out targetUserId))
+            {
+                return false;
+            }
+
+            fundType = (FundType)fundTypeValue;
+            return true;
         }
 
         internal static string CheckIsAddOwner(FundType fundType, ulong guildId, ulong executeUserId, ulong targetUserId, out ulong resultUserId)

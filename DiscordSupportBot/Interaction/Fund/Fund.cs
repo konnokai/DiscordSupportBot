@@ -26,10 +26,13 @@ namespace DiscordSupportBot.Interaction.Fund
 
             await Context.Interaction.DeferAsync(false);
 
-            var userId = user.Id;
-            var message = FundService.CheckIsAddOwner(fundType, Context.Guild.Id, Context.User.Id, userId, out ulong needAddUserId);
-            message += await FundService.AddFundAsync(fundType, Context.Guild.Id, Context.Channel.Id, needAddUserId);   
-            await Context.Interaction.SendConfirmAsync(message, true);
+            await FundService.AddFundAndRespondAsync(
+                Context.Interaction,
+                fundType,
+                Context.Guild.Id,
+                Context.Channel.Id,
+                Context.User.Id,
+                user.Id);
         }
 
         [RequireContext(ContextType.Guild)]
