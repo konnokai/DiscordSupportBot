@@ -136,7 +136,7 @@ namespace DiscordSupportBot.Interaction.Fund.Service
         {
             var message = messagePrefix;
             message += CheckIsAddOwner(fundType, guildId, executeUserId, targetUserId, out var needAddUserId);
-            message += await AddFundAsync(fundType, guildId, channelId, needAddUserId);
+            message += await AddFundAsync(fundType, guildId, channelId, executeUserId, needAddUserId);
 
             MessageComponent components = null;
             if (includeAddOneButton)
@@ -193,24 +193,26 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             return string.Empty;
         }
 
-        const long IncrementAmount = 500;
+        const long MinIncrementAmount = 200;
+        const long MaxIncrementAmount = 1000;
         const string NotifyChannelsKey = "SupportBot:Fund:NotifyChannels";
 
-        internal static async Task<string> AddFundAsync(FundType fundType, ulong guildId, ulong channelId, ulong userId)
+        internal static async Task<string> AddFundAsync(FundType fundType, ulong guildId, ulong channelId, ulong executeUserId, ulong userId)
         {
             await RedisConnection.RedisDb.SetAddAsync(NotifyChannelsKey, channelId.ToString());
             var key = GetFundLeaderboardRedisKey(fundType, guildId);
+            var incrementAmount = Random.Shared.NextInt64(MinIncrementAmount, MaxIncrementAmount + 1);
 
             // 獲取增加前的排名 (SortedSetRankAsync 回傳 0-based index)
             var oldRank = await RedisConnection.RedisDb.SortedSetRankAsync(key, userId.ToString(), Order.Descending);
 
             // 單純使用 ZSET 作為唯一來源（score = 總額）
-            var newAmount = await RedisConnection.RedisDb.SortedSetIncrementAsync(key, userId.ToString(), IncrementAmount);
+            var newAmount = await RedisConnection.RedisDb.SortedSetIncrementAsync(key, userId.ToString(), incrementAmount);
 
             // 獲取增加後的排名
             var newRank = await RedisConnection.RedisDb.SortedSetRankAsync(key, userId.ToString(), Order.Descending);
 
-            var message = $"已對 <@{userId}> 增加 {IncrementAmount} {GetFundTypeName(fundType)}基金，現在金額: {newAmount}";
+            var message = $"<@{executeUserId}> 已對 <@{userId}> 增加 {incrementAmount} {GetFundTypeName(fundType)}基金，現在金額: {newAmount}";
 
             // 檢測排名是否變更
             if (oldRank.HasValue && newRank.HasValue && newRank < oldRank) // new 只會比 old 小 (1 < 2)
