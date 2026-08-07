@@ -134,7 +134,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_command_administration_administraionservice",
       "community": 28,
-      "community_name": "AdministraionService",
+      "community_name": ".FormatColorWrite",
       "norm_label": "administraionservice.cs"
     },
     {
@@ -150,7 +150,7 @@
       "_origin": "ast",
       "id": "csharp_namespace:7ba097e509052bcc",
       "community": 28,
-      "community_name": "AdministraionService",
+      "community_name": ".FormatColorWrite",
       "norm_label": "discordsupportbot.command.administration"
     },
     {
@@ -167,7 +167,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_command_administration_administraionservice_discordsupportbot_command_administration_administraionservice",
       "community": 28,
-      "community_name": "AdministraionService",
+      "community_name": ".FormatColorWrite",
       "norm_label": "administraionservice"
     },
     {
@@ -189,7 +189,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_command_administration_administraionservice_cs_discordsocketclient",
       "community": 28,
-      "community_name": "AdministraionService",
+      "community_name": ".FormatColorWrite",
       "norm_label": "discordsocketclient"
     },
     {
@@ -206,7 +206,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_command_administration_administraionservice_discordsupportbot_command_administration_administraionservice_clearuser",
       "community": 28,
-      "community_name": "AdministraionService",
+      "community_name": ".FormatColorWrite",
       "norm_label": ".clearuser()"
     },
     {
@@ -217,7 +217,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_command_administration_administraionservice_cs_itextchannel",
       "community": 28,
-      "community_name": "AdministraionService",
+      "community_name": ".FormatColorWrite",
       "norm_label": "itextchannel"
     },
     {
@@ -228,7 +228,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_command_administration_administraionservice_cs_task",
       "community": 28,
-      "community_name": "AdministraionService",
+      "community_name": ".FormatColorWrite",
       "norm_label": "task"
     },
     {
@@ -245,7 +245,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_command_administration_administraionservice_discordsupportbot_command_administration_administraionservice_checkrole",
       "community": 28,
-      "community_name": "AdministraionService",
+      "community_name": ".FormatColorWrite",
       "norm_label": ".checkrole()"
     },
     {
@@ -256,7 +256,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_command_administration_administraionservice_cs_socketcommandcontext",
       "community": 28,
-      "community_name": "AdministraionService",
+      "community_name": ".FormatColorWrite",
       "norm_label": "socketcommandcontext"
     },
     {
@@ -273,7 +273,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_command_administration_administraionservice_discordsupportbot_command_administration_administraionservice_kick",
       "community": 28,
-      "community_name": "AdministraionService",
+      "community_name": ".FormatColorWrite",
       "norm_label": ".kick()"
     },
     {
@@ -2240,8 +2240,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "preconditionattribute",
-      "community": 44,
-      "community_name": ".CheckRequirementsAsync",
+      "community": 42,
+      "community_name": ".CheckPermissionsAsync",
       "norm_label": "preconditionattribute"
     },
     {
@@ -2340,8 +2340,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_command_toplevelmodule_discordsupportbot_command_toplevelmodule",
-      "community": 73,
-      "community_name": "TopLevelModule",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": "toplevelmodule"
     },
     {
@@ -2351,8 +2351,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "modulebase",
-      "community": 73,
-      "community_name": "TopLevelModule",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": "modulebase"
     },
     {
@@ -2362,8 +2362,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_command_toplevelmodule_cs_socketcommandcontext",
-      "community": 73,
-      "community_name": "TopLevelModule",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": "socketcommandcontext"
     },
     {
@@ -2379,8 +2379,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_command_toplevelmodule_discordsupportbot_command_toplevelmodule_promptuserconfirmasync",
-      "community": 73,
-      "community_name": "TopLevelModule",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": ".promptuserconfirmasync()"
     },
     {
@@ -2390,8 +2390,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_command_toplevelmodule_cs_embedbuilder",
-      "community": 73,
-      "community_name": "TopLevelModule",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": "embedbuilder"
     },
     {
@@ -2401,8 +2401,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_command_toplevelmodule_cs_task",
-      "community": 73,
-      "community_name": "TopLevelModule",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": "task"
     },
     {
@@ -2418,8 +2418,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_command_toplevelmodule_discordsupportbot_command_toplevelmodule_getuserinputasync",
-      "community": 73,
-      "community_name": "TopLevelModule",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": ".getuserinputasync()"
     },
     {
@@ -2429,8 +2429,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "discordsupportbot_common_extensions_arrayextensions",
-      "community": 76,
-      "community_name": "ArrayExtensions",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "arrayextensions.cs"
     },
     {
@@ -2445,7 +2445,7 @@
       },
       "_origin": "ast",
       "id": "csharp_namespace:1259a200707e20ab",
-      "community": 45,
+      "community": 1,
       "community_name": "DiscordSupportBot.Common",
       "norm_label": "discordsupportbot.common"
     },
@@ -2462,8 +2462,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_common_extensions_arrayextensions_discordsupportbot_common_arrayextensions",
-      "community": 76,
-      "community_name": "ArrayExtensions",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "arrayextensions"
     },
     {
@@ -2479,8 +2479,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_common_extensions_arrayextensions_discordsupportbot_common_arrayextensions_with",
-      "community": 76,
-      "community_name": "ArrayExtensions",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": ".with()"
     },
     {
@@ -2496,8 +2496,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_common_extensions_arrayextensions_discordsupportbot_common_arrayextensions_map",
-      "community": 76,
-      "community_name": "ArrayExtensions",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": ".map()"
     },
     {
@@ -2507,8 +2507,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_common_extensions_arrayextensions_cs_func",
-      "community": 76,
-      "community_name": "ArrayExtensions",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "func"
     },
     {
@@ -2518,8 +2518,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_common_extensions_arrayextensions_cs_ireadonlycollection",
-      "community": 76,
-      "community_name": "ArrayExtensions",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "ireadonlycollection"
     },
     {
@@ -2529,8 +2529,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "discordsupportbot_common_extensions_imessagechannelextensions",
-      "community": 75,
-      "community_name": "MessageChannelExtensions",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "imessagechannelextensions.cs"
     },
     {
@@ -2545,8 +2545,8 @@
       },
       "_origin": "ast",
       "id": "csharp_namespace:c7ae83146058b718",
-      "community": 75,
-      "community_name": "MessageChannelExtensions",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "discordsupportbot.extensions"
     },
     {
@@ -2562,8 +2562,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_common_extensions_imessagechannelextensions_discordsupportbot_extensions_messagechannelextensions",
-      "community": 75,
-      "community_name": "MessageChannelExtensions",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "messagechannelextensions"
     },
     {
@@ -2579,8 +2579,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_common_extensions_imessagechannelextensions_discordsupportbot_extensions_messagechannelextensions_sendasync",
-      "community": 70,
-      "community_name": ".SendAsync",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": ".sendasync()"
     },
     {
@@ -2590,8 +2590,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_common_extensions_imessagechannelextensions_cs_imessagechannel",
-      "community": 70,
-      "community_name": ".SendAsync",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "imessagechannel"
     },
     {
@@ -2601,8 +2601,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "embed",
-      "community": 70,
-      "community_name": ".SendAsync",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "embed"
     },
     {
@@ -2612,8 +2612,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_common_extensions_imessagechannelextensions_cs_ireadonlycollection",
-      "community": 70,
-      "community_name": ".SendAsync",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "ireadonlycollection"
     },
     {
@@ -2623,8 +2623,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_common_extensions_imessagechannelextensions_cs_messagecomponent",
-      "community": 70,
-      "community_name": ".SendAsync",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "messagecomponent"
     },
     {
@@ -2634,8 +2634,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_common_extensions_imessagechannelextensions_cs_task",
-      "community": 70,
-      "community_name": ".SendAsync",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "task"
     },
     {
@@ -2645,8 +2645,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_common_extensions_imessagechannelextensions_cs_iusermessage",
-      "community": 70,
-      "community_name": ".SendAsync",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "iusermessage"
     },
     {
@@ -2662,8 +2662,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_common_extensions_imessagechannelextensions_discordsupportbot_extensions_messagechannelextensions_editasync",
-      "community": 70,
-      "community_name": ".SendAsync",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": ".editasync()"
     },
     {
@@ -2679,8 +2679,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_common_extensions_imessagechannelextensions_discordsupportbot_extensions_messagechannelextensions_sanitizementions",
-      "community": 75,
-      "community_name": "MessageChannelExtensions",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": ".sanitizementions()"
     },
     {
@@ -2696,8 +2696,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_common_extensions_imessagechannelextensions_discordsupportbot_extensions_messagechannelextensions_sanitizerolementions",
-      "community": 75,
-      "community_name": "MessageChannelExtensions",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": ".sanitizerolementions()"
     },
     {
@@ -2713,8 +2713,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_common_extensions_imessagechannelextensions_discordsupportbot_extensions_messagechannelextensions_sanitizeallmentions",
-      "community": 75,
-      "community_name": "MessageChannelExtensions",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": ".sanitizeallmentions()"
     },
     {
@@ -2724,7 +2724,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "discordsupportbot_common_replacements_replacementbuilder",
-      "community": 45,
+      "community": 1,
       "community_name": "DiscordSupportBot.Common",
       "norm_label": "replacementbuilder.cs"
     },
@@ -3027,8 +3027,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_common_replacements_replacementbuilder_discordsupportbot_common_replacementbuilder_build",
-      "community": 77,
-      "community_name": "Replacer",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": ".build()"
     },
     {
@@ -3038,8 +3038,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "discordsupportbot_common_replacements_replacer",
-      "community": 77,
-      "community_name": "Replacer",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "replacer.cs"
     },
     {
@@ -3055,8 +3055,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_common_replacements_replacer_discordsupportbot_common_replacer",
-      "community": 77,
-      "community_name": "Replacer",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "replacer"
     },
     {
@@ -3066,8 +3066,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_common_replacements_replacer_cs_ienumerable",
-      "community": 77,
-      "community_name": "Replacer",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "ienumerable"
     },
     {
@@ -3083,8 +3083,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_common_replacements_replacer_discordsupportbot_common_replacer_replace",
-      "community": 68,
-      "community_name": "SmartText",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": ".replace()"
     },
     {
@@ -3095,7 +3095,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smartembedtext",
       "community": 1,
-      "community_name": "SmartEmbedTextBase",
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "smartembedtext.cs"
     },
     {
@@ -3112,7 +3112,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smartembedtext_discordsupportbot_common_smartembedarrayelementtext",
       "community": 1,
-      "community_name": "SmartEmbedTextBase",
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "smartembedarrayelementtext"
     },
     {
@@ -3129,7 +3129,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smartembedtext_discordsupportbot_common_smartembedarrayelementtext_getembedinternal",
       "community": 1,
-      "community_name": "SmartEmbedTextBase",
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": ".getembedinternal()"
     },
     {
@@ -3140,7 +3140,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smartembedtext_cs_embedbuilder",
       "community": 1,
-      "community_name": "SmartEmbedTextBase",
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "embedbuilder"
     },
     {
@@ -3157,7 +3157,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smartembedtext_discordsupportbot_common_smartembedtext",
       "community": 1,
-      "community_name": "SmartEmbedTextBase",
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "smartembedtext"
     },
     {
@@ -3174,7 +3174,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smartembedtext_discordsupportbot_common_smartembedtext_fromembed",
       "community": 1,
-      "community_name": "SmartEmbedTextBase",
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": ".fromembed()"
     },
     {
@@ -3185,7 +3185,7 @@
       "_origin": "ast",
       "id": "iembed",
       "community": 1,
-      "community_name": "SmartEmbedTextBase",
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "iembed"
     },
     {
@@ -3202,7 +3202,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smartembedtext_discordsupportbot_common_smartembedtext_getembedinternal",
       "community": 1,
-      "community_name": "SmartEmbedTextBase",
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": ".getembedinternal()"
     },
     {
@@ -3219,7 +3219,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smartembedtext_discordsupportbot_common_smartembedtextbase",
       "community": 1,
-      "community_name": "SmartEmbedTextBase",
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "smartembedtextbase"
     },
     {
@@ -3236,7 +3236,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smartembedtext_discordsupportbot_common_smartembedtextbase_getembed",
       "community": 1,
-      "community_name": "SmartEmbedTextBase",
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": ".getembed()"
     },
     {
@@ -3253,7 +3253,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smartembedtext_discordsupportbot_common_smartembedtextbase_getembedinternal",
       "community": 1,
-      "community_name": "SmartEmbedTextBase",
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": ".getembedinternal()"
     },
     {
@@ -3270,7 +3270,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smartembedtext_discordsupportbot_common_smartembedtextbase_normalizefields",
       "community": 1,
-      "community_name": "SmartEmbedTextBase",
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": ".normalizefields()"
     },
     {
@@ -3280,7 +3280,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smartembedtextarray",
-      "community": 45,
+      "community": 1,
       "community_name": "DiscordSupportBot.Common",
       "norm_label": "smartembedtextarray.cs"
     },
@@ -3297,8 +3297,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smartembedtextarray_discordsupportbot_common_smartembedtextarray",
-      "community": 68,
-      "community_name": "SmartText",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "smartembedtextarray"
     },
     {
@@ -3314,8 +3314,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smartembedtextarray_discordsupportbot_common_smartembedtextarray_getembedbuilders",
-      "community": 68,
-      "community_name": "SmartText",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": ".getembedbuilders()"
     },
     {
@@ -3325,8 +3325,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smartembedtextarray_cs_embedbuilder",
-      "community": 68,
-      "community_name": "SmartText",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "embedbuilder"
     },
     {
@@ -3342,8 +3342,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smartembedtextarray_discordsupportbot_common_smartembedtextarray_normalizefields",
-      "community": 68,
-      "community_name": "SmartText",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": ".normalizefields()"
     },
     {
@@ -3353,8 +3353,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smartplaintext",
-      "community": 68,
-      "community_name": "SmartText",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "smartplaintext.cs"
     },
     {
@@ -3370,8 +3370,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smartplaintext_discordsupportbot_common_smartplaintext",
-      "community": 68,
-      "community_name": "SmartText",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "smartplaintext"
     },
     {
@@ -3387,8 +3387,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smartplaintext_discordsupportbot_common_smartplaintext_tostring",
-      "community": 68,
-      "community_name": "SmartText",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": ".tostring()"
     },
     {
@@ -3398,7 +3398,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smarttext",
-      "community": 45,
+      "community": 1,
       "community_name": "DiscordSupportBot.Common",
       "norm_label": "smarttext.cs"
     },
@@ -3415,8 +3415,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smarttext_discordsupportbot_common_smarttext",
-      "community": 68,
-      "community_name": "SmartText",
+      "community": 1,
+      "community_name": "DiscordSupportBot.Common",
       "norm_label": "smarttext"
     },
     {
@@ -3432,8 +3432,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smarttext_discordsupportbot_common_smarttext_createfrom",
-      "community": 78,
-      "community_name": "._client_ModalSubmitted",
+      "community": 6,
+      "community_name": "IInteractionService",
       "norm_label": ".createfrom()"
     },
     {
@@ -3443,7 +3443,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smarttextembedauthor",
-      "community": 45,
+      "community": 1,
       "community_name": "DiscordSupportBot.Common",
       "norm_label": "smarttextembedauthor.cs"
     },
@@ -3460,7 +3460,7 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smarttextembedauthor_discordsupportbot_common_smarttextembedauthor",
-      "community": 45,
+      "community": 1,
       "community_name": "DiscordSupportBot.Common",
       "norm_label": "smarttextembedauthor"
     },
@@ -3471,7 +3471,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smarttextembedfield",
-      "community": 45,
+      "community": 1,
       "community_name": "DiscordSupportBot.Common",
       "norm_label": "smarttextembedfield.cs"
     },
@@ -3488,7 +3488,7 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smarttextembedfield_discordsupportbot_common_smarttextembedfield",
-      "community": 45,
+      "community": 1,
       "community_name": "DiscordSupportBot.Common",
       "norm_label": "smarttextembedfield"
     },
@@ -3499,7 +3499,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smarttextembedfooter",
-      "community": 45,
+      "community": 1,
       "community_name": "DiscordSupportBot.Common",
       "norm_label": "smarttextembedfooter.cs"
     },
@@ -3516,7 +3516,7 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_common_smarttext_smarttextembedfooter_discordsupportbot_common_smarttextembedfooter",
-      "community": 45,
+      "community": 1,
       "community_name": "DiscordSupportBot.Common",
       "norm_label": "smarttextembedfooter"
     },
@@ -3527,8 +3527,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "discordsupportbot_database_activity_emoteactivity",
-      "community": 69,
-      "community_name": "DiscordSupportBot.DataBase.Activity",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": "emoteactivity.cs"
     },
     {
@@ -3543,8 +3543,8 @@
       },
       "_origin": "ast",
       "id": "csharp_namespace:ed69860a53140a1d",
-      "community": 69,
-      "community_name": "DiscordSupportBot.DataBase.Activity",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": "discordsupportbot.database.activity"
     },
     {
@@ -3560,8 +3560,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_database_activity_emoteactivity_discordsupportbot_database_activity_emoteactivity",
-      "community": 71,
-      "community_name": ".GetActivityAsync",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": "emoteactivity"
     },
     {
@@ -3577,8 +3577,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_database_activity_emoteactivity_discordsupportbot_database_activity_emoteactivity_addactivityasync",
-      "community": 71,
-      "community_name": ".GetActivityAsync",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": ".addactivityasync()"
     },
     {
@@ -3588,8 +3588,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_database_activity_emoteactivity_cs_task",
-      "community": 71,
-      "community_name": ".GetActivityAsync",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": "task"
     },
     {
@@ -3605,8 +3605,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_database_activity_emoteactivity_discordsupportbot_database_activity_emoteactivity_getactivityasync",
-      "community": 71,
-      "community_name": ".GetActivityAsync",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": ".getactivityasync()"
     },
     {
@@ -3616,8 +3616,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_database_activity_emoteactivity_cs_list",
-      "community": 71,
-      "community_name": ".GetActivityAsync",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": "list"
     },
     {
@@ -3633,8 +3633,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_database_activity_emoteactivity_discordsupportbot_database_activity_emoteactivity_savedatebaseasync",
-      "community": 71,
-      "community_name": ".GetActivityAsync",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": ".savedatebaseasync()"
     },
     {
@@ -3650,8 +3650,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_database_activity_emoteactivity_discordsupportbot_database_activity_emoteactivity_executesqlcommandasync",
-      "community": 71,
-      "community_name": ".GetActivityAsync",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": ".executesqlcommandasync()"
     },
     {
@@ -3667,8 +3667,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_database_activity_emoteactivity_discordsupportbot_database_activity_emoteactivity_select",
-      "community": 71,
-      "community_name": ".GetActivityAsync",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": ".select()"
     },
     {
@@ -3678,8 +3678,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "discordsupportbot_database_activity_emotetable",
-      "community": 69,
-      "community_name": "DiscordSupportBot.DataBase.Activity",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": "emotetable.cs"
     },
     {
@@ -3695,8 +3695,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_database_activity_emotetable_discordsupportbot_database_activity_emotetable",
-      "community": 69,
-      "community_name": "DiscordSupportBot.DataBase.Activity",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": "emotetable"
     },
     {
@@ -3706,8 +3706,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "discordsupportbot_database_activity_useractivity",
-      "community": 69,
-      "community_name": "DiscordSupportBot.DataBase.Activity",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": "useractivity.cs"
     },
     {
@@ -3723,8 +3723,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_database_activity_useractivity_discordsupportbot_database_activity_useractivity",
-      "community": 72,
-      "community_name": "UserActivity",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": "useractivity"
     },
     {
@@ -3740,8 +3740,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_database_activity_useractivity_discordsupportbot_database_activity_useractivity_addactivity",
-      "community": 72,
-      "community_name": "UserActivity",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": ".addactivity()"
     },
     {
@@ -3751,8 +3751,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_database_activity_useractivity_cs_task",
-      "community": 72,
-      "community_name": "UserActivity",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": "task"
     },
     {
@@ -3768,8 +3768,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_database_activity_useractivity_discordsupportbot_database_activity_useractivity_getactivityasync",
-      "community": 72,
-      "community_name": "UserActivity",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": ".getactivityasync()"
     },
     {
@@ -3779,8 +3779,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_database_activity_useractivity_cs_list",
-      "community": 72,
-      "community_name": "UserActivity",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": "list"
     },
     {
@@ -3796,8 +3796,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_database_activity_useractivity_discordsupportbot_database_activity_useractivity_savedatebaseasync",
-      "community": 72,
-      "community_name": "UserActivity",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": ".savedatebaseasync()"
     },
     {
@@ -3813,8 +3813,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_database_activity_useractivity_discordsupportbot_database_activity_useractivity_executesqlcommandasync",
-      "community": 72,
-      "community_name": "UserActivity",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": ".executesqlcommandasync()"
     },
     {
@@ -3830,8 +3830,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_database_activity_useractivity_discordsupportbot_database_activity_useractivity_select",
-      "community": 72,
-      "community_name": "UserActivity",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": ".select()"
     },
     {
@@ -3841,8 +3841,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "discordsupportbot_database_activity_usertable",
-      "community": 69,
-      "community_name": "DiscordSupportBot.DataBase.Activity",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": "usertable.cs"
     },
     {
@@ -3858,8 +3858,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_database_activity_usertable_discordsupportbot_database_activity_usertable",
-      "community": 69,
-      "community_name": "DiscordSupportBot.DataBase.Activity",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": "usertable"
     },
     {
@@ -4519,8 +4519,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "discordsupportbot_globalusings",
-      "community": 69,
-      "community_name": "DiscordSupportBot.DataBase.Activity",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": "globalusings.cs"
     },
     {
@@ -4631,8 +4631,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "discordsupportbot_interaction_activity_activity",
-      "community": 62,
-      "community_name": "Activity",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": "activity.cs"
     },
     {
@@ -4647,8 +4647,8 @@
       },
       "_origin": "ast",
       "id": "csharp_namespace:3551a67fa4793a4d",
-      "community": 62,
-      "community_name": "Activity",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": "discordsupportbot.interaction.activity"
     },
     {
@@ -4664,8 +4664,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_interaction_activity_activity_discordsupportbot_interaction_activity_activity",
-      "community": 62,
-      "community_name": "Activity",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": "activity"
     },
     {
@@ -4681,8 +4681,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_interaction_activity_activity_discordsupportbot_interaction_activity_activity_messageactivityasync",
-      "community": 62,
-      "community_name": "Activity",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": ".messageactivityasync()"
     },
     {
@@ -4692,8 +4692,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_interaction_activity_activity_cs_task",
-      "community": 62,
-      "community_name": "Activity",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": "task"
     },
     {
@@ -4703,8 +4703,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_interaction_activity_activity_cs_slashcommand",
-      "community": 62,
-      "community_name": "Activity",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": "slashcommand"
     },
     {
@@ -4714,8 +4714,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_interaction_activity_activity_cs_requirecontext",
-      "community": 62,
-      "community_name": "Activity",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": "requirecontext"
     },
     {
@@ -4731,8 +4731,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_interaction_activity_activity_discordsupportbot_interaction_activity_activity_emoteactivityasync",
-      "community": 62,
-      "community_name": "Activity",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": ".emoteactivityasync()"
     },
     {
@@ -4748,8 +4748,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_interaction_activity_activity_discordsupportbot_interaction_activity_activity_emoteusecountasync",
-      "community": 62,
-      "community_name": "Activity",
+      "community": 3,
+      "community_name": ".HandleCommandAsync",
       "norm_label": ".emoteusecountasync()"
     },
     {
@@ -5409,8 +5409,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_interaction_admin_sendmessage_sendmessageservice_discordsupportbot_interaction_admin_service_sendmessageservice_client_modalsubmitted",
-      "community": 78,
-      "community_name": "._client_ModalSubmitted",
+      "community": 6,
+      "community_name": "IInteractionService",
       "norm_label": "._client_modalsubmitted()"
     },
     {
@@ -5420,8 +5420,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_interaction_admin_sendmessage_sendmessageservice_cs_socketmodal",
-      "community": 78,
-      "community_name": "._client_ModalSubmitted",
+      "community": 6,
+      "community_name": "IInteractionService",
       "norm_label": "socketmodal"
     },
     {
@@ -5431,8 +5431,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_interaction_admin_sendmessage_sendmessageservice_cs_task",
-      "community": 78,
-      "community_name": "._client_ModalSubmitted",
+      "community": 6,
+      "community_name": "IInteractionService",
       "norm_label": "task"
     },
     {
@@ -5636,8 +5636,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "discordsupportbot_interaction_attribute_requireguildmembercountattribute",
-      "community": 34,
-      "community_name": "DiscordSupportBot.Interaction.Attribute",
+      "community": 44,
+      "community_name": ".CheckRequirementsAsync",
       "norm_label": "requireguildmembercountattribute.cs"
     },
     {
@@ -6387,7 +6387,7 @@
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "id": "discordsupportbot_interaction_autocreateprivatethread_service_autocreateprivatethreadservice_cs_semaphoreslim",
+      "id": "semaphoreslim",
       "community": 5,
       "community_name": "AutoCreatePrivateThreadService",
       "norm_label": "semaphoreslim"
@@ -9342,21 +9342,10 @@
       "norm_label": "discordsocketclient"
     },
     {
-      "label": "SemaphoreSlim",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "discordsupportbot_interaction_fund_service_fundservice_cs_semaphoreslim",
-      "community": 7,
-      "community_name": "FundService",
-      "norm_label": "semaphoreslim"
-    },
-    {
       "label": "._client_ModalSubmitted()",
       "file_type": "code",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L52",
+      "source_location": "L50",
       "metadata": {
         "namespace": "DiscordSupportBot.Interaction.Fund.Service",
         "scope_chain": [
@@ -9395,7 +9384,7 @@
       "label": ".HandleAddOneButtonAsync()",
       "file_type": "code",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L86",
+      "source_location": "L84",
       "metadata": {
         "namespace": "DiscordSupportBot.Interaction.Fund.Service",
         "scope_chain": [
@@ -9420,27 +9409,10 @@
       "norm_label": "socketmessagecomponent"
     },
     {
-      "label": ".AppendFundResultAsync()",
-      "file_type": "code",
-      "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L132",
-      "metadata": {
-        "namespace": "DiscordSupportBot.Interaction.Fund.Service",
-        "scope_chain": [
-          "s88"
-        ]
-      },
-      "_origin": "ast",
-      "id": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice_appendfundresultasync",
-      "community": 7,
-      "community_name": "FundService",
-      "norm_label": ".appendfundresultasync()"
-    },
-    {
       "label": ".AddFundAndRespondAsync()",
       "file_type": "code",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L147",
+      "source_location": "L127",
       "metadata": {
         "namespace": "DiscordSupportBot.Interaction.Fund.Service",
         "scope_chain": [
@@ -9468,7 +9440,7 @@
       "label": ".TryParseAddOneCustomId()",
       "file_type": "code",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L174",
+      "source_location": "L162",
       "metadata": {
         "namespace": "DiscordSupportBot.Interaction.Fund.Service",
         "scope_chain": [
@@ -9485,7 +9457,7 @@
       "label": ".GetAddOneCooldownKey()",
       "file_type": "code",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L194",
+      "source_location": "L182",
       "metadata": {
         "namespace": "DiscordSupportBot.Interaction.Fund.Service",
         "scope_chain": [
@@ -9502,7 +9474,7 @@
       "label": ".CheckIsAddOwner()",
       "file_type": "code",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L197",
+      "source_location": "L185",
       "metadata": {
         "namespace": "DiscordSupportBot.Interaction.Fund.Service",
         "scope_chain": [
@@ -9530,7 +9502,7 @@
       "label": ".AddFundAsync()",
       "file_type": "code",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L227",
+      "source_location": "L215",
       "metadata": {
         "namespace": "DiscordSupportBot.Interaction.Fund.Service",
         "scope_chain": [
@@ -9547,7 +9519,7 @@
       "label": ".GetTopFundAsync()",
       "file_type": "code",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L269",
+      "source_location": "L257",
       "metadata": {
         "namespace": "DiscordSupportBot.Interaction.Fund.Service",
         "scope_chain": [
@@ -9597,7 +9569,7 @@
       "label": ".GetFundTypeName()",
       "file_type": "code",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L285",
+      "source_location": "L273",
       "metadata": {
         "namespace": "DiscordSupportBot.Interaction.Fund.Service",
         "scope_chain": [
@@ -9614,7 +9586,7 @@
       "label": ".GetFundLeaderboardRedisKey()",
       "file_type": "code",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L294",
+      "source_location": "L282",
       "metadata": {
         "namespace": "DiscordSupportBot.Interaction.Fund.Service",
         "scope_chain": [
@@ -9631,7 +9603,7 @@
       "label": ".ResetAllLeaderboardsAsync()",
       "file_type": "code",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L300",
+      "source_location": "L288",
       "metadata": {
         "namespace": "DiscordSupportBot.Interaction.Fund.Service",
         "scope_chain": [
@@ -9929,8 +9901,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_interaction_help_service_helpservice_discordsupportbot_interaction_help_service_helpservice",
-      "community": 74,
-      "community_name": "HelpService",
+      "community": 6,
+      "community_name": "IInteractionService",
       "norm_label": "helpservice"
     },
     {
@@ -9946,8 +9918,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_interaction_help_service_helpservice_discordsupportbot_interaction_help_service_helpservice_getcommandhelp",
-      "community": 74,
-      "community_name": "HelpService",
+      "community": 6,
+      "community_name": "IInteractionService",
       "norm_label": ".getcommandhelp()"
     },
     {
@@ -9957,8 +9929,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_interaction_help_service_helpservice_cs_slashcommandinfo",
-      "community": 74,
-      "community_name": "HelpService",
+      "community": 6,
+      "community_name": "IInteractionService",
       "norm_label": "slashcommandinfo"
     },
     {
@@ -9968,8 +9940,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_interaction_help_service_helpservice_cs_embedbuilder",
-      "community": 74,
-      "community_name": "HelpService",
+      "community": 6,
+      "community_name": "IInteractionService",
       "norm_label": "embedbuilder"
     },
     {
@@ -9985,8 +9957,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_interaction_help_service_helpservice_discordsupportbot_interaction_help_service_helpservice_getcommandrequirements",
-      "community": 74,
-      "community_name": "HelpService",
+      "community": 6,
+      "community_name": "IInteractionService",
       "norm_label": ".getcommandrequirements()"
     },
     {
@@ -10002,8 +9974,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_interaction_help_service_helpservice_discordsupportbot_interaction_help_service_helpservice_getbotcommandrequirements",
-      "community": 74,
-      "community_name": "HelpService",
+      "community": 6,
+      "community_name": "IInteractionService",
       "norm_label": ".getbotcommandrequirements()"
     },
     {
@@ -10019,8 +9991,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_interaction_help_service_helpservice_discordsupportbot_interaction_help_service_helpservice_getcommandexamplestring",
-      "community": 74,
-      "community_name": "HelpService",
+      "community": 6,
+      "community_name": "IInteractionService",
       "norm_label": ".getcommandexamplestring()"
     },
     {
@@ -11938,8 +11910,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "discordsupportbot_interaction_utility_utility",
-      "community": 6,
-      "community_name": "IInteractionService",
+      "community": 45,
+      "community_name": "Utility",
       "norm_label": "utility/utility.cs"
     },
     {
@@ -11954,8 +11926,8 @@
       },
       "_origin": "ast",
       "id": "csharp_namespace:5297f0d2c8802999",
-      "community": 6,
-      "community_name": "IInteractionService",
+      "community": 45,
+      "community_name": "Utility",
       "norm_label": "discordsupportbot.interaction.utility"
     },
     {
@@ -11971,8 +11943,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility",
-      "community": 6,
-      "community_name": "IInteractionService",
+      "community": 45,
+      "community_name": "Utility",
       "norm_label": "utility"
     },
     {
@@ -11982,8 +11954,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_interaction_utility_utility_cs_discordsocketclient",
-      "community": 6,
-      "community_name": "IInteractionService",
+      "community": 45,
+      "community_name": "Utility",
       "norm_label": "discordsocketclient"
     },
     {
@@ -11999,8 +11971,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility_pingasync",
-      "community": 6,
-      "community_name": "IInteractionService",
+      "community": 45,
+      "community_name": "Utility",
       "norm_label": ".pingasync()"
     },
     {
@@ -12010,8 +11982,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_interaction_utility_utility_cs_task",
-      "community": 6,
-      "community_name": "IInteractionService",
+      "community": 45,
+      "community_name": "Utility",
       "norm_label": "task"
     },
     {
@@ -12021,8 +11993,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_interaction_utility_utility_cs_slashcommand",
-      "community": 6,
-      "community_name": "IInteractionService",
+      "community": 45,
+      "community_name": "Utility",
       "norm_label": "slashcommand"
     },
     {
@@ -12038,8 +12010,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility_inviteasync",
-      "community": 6,
-      "community_name": "IInteractionService",
+      "community": 45,
+      "community_name": "Utility",
       "norm_label": ".inviteasync()"
     },
     {
@@ -12055,8 +12027,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility_statusasync",
-      "community": 6,
-      "community_name": "IInteractionService",
+      "community": 45,
+      "community_name": "Utility",
       "norm_label": ".statusasync()"
     },
     {
@@ -12072,8 +12044,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_interaction_utility_utility_discordsupportbot_interaction_utility_utility_subasync",
-      "community": 6,
-      "community_name": "IInteractionService",
+      "community": 45,
+      "community_name": "Utility",
       "norm_label": ".subasync()"
     },
     {
@@ -12083,8 +12055,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "discordsupportbot_interaction_utility_utilityservice",
-      "community": 6,
-      "community_name": "IInteractionService",
+      "community": 45,
+      "community_name": "Utility",
       "norm_label": "utilityservice.cs"
     },
     {
@@ -12100,8 +12072,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_interaction_utility_utilityservice_discordsupportbot_interaction_utility_utilityservice",
-      "community": 6,
-      "community_name": "IInteractionService",
+      "community": 45,
+      "community_name": "Utility",
       "norm_label": "utilityservice"
     },
     {
@@ -12112,7 +12084,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_log",
       "community": 26,
-      "community_name": ".FormatColorWrite",
+      "community_name": "Log",
       "norm_label": "log.cs"
     },
     {
@@ -12123,7 +12095,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_log_log",
       "community": 26,
-      "community_name": ".FormatColorWrite",
+      "community_name": "Log",
       "norm_label": "log"
     },
     {
@@ -12134,7 +12106,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_log_cs_object",
       "community": 26,
-      "community_name": ".FormatColorWrite",
+      "community_name": "Log",
       "norm_label": "object"
     },
     {
@@ -12145,7 +12117,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_log_log_new",
       "community": 26,
-      "community_name": ".FormatColorWrite",
+      "community_name": "Log",
       "norm_label": ".new()"
     },
     {
@@ -12178,7 +12150,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_log_log_error",
       "community": 26,
-      "community_name": ".FormatColorWrite",
+      "community_name": "Log",
       "norm_label": ".error()"
     },
     {
@@ -12189,7 +12161,7 @@
       "_origin": "ast",
       "id": "exception",
       "community": 26,
-      "community_name": ".FormatColorWrite",
+      "community_name": "Log",
       "norm_label": "exception"
     },
     {
@@ -12199,7 +12171,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "discordsupportbot_log_log_formatcolorwrite",
-      "community": 26,
+      "community": 28,
       "community_name": ".FormatColorWrite",
       "norm_label": ".formatcolorwrite()"
     },
@@ -12210,7 +12182,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "consolecolor",
-      "community": 26,
+      "community": 28,
       "community_name": ".FormatColorWrite",
       "norm_label": "consolecolor"
     },
@@ -12222,7 +12194,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_log_log_logmsg",
       "community": 26,
-      "community_name": ".FormatColorWrite",
+      "community_name": "Log",
       "norm_label": ".logmsg()"
     },
     {
@@ -12233,7 +12205,7 @@
       "_origin": "ast",
       "id": "logmessage",
       "community": 26,
-      "community_name": ".FormatColorWrite",
+      "community_name": "Log",
       "norm_label": "logmessage"
     },
     {
@@ -12244,7 +12216,7 @@
       "_origin": "ast",
       "id": "discordsupportbot_log_cs_task",
       "community": 26,
-      "community_name": ".FormatColorWrite",
+      "community_name": "Log",
       "norm_label": "task"
     },
     {
@@ -12410,8 +12382,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "discordsupportbot_migrations_20200922140128_delete_timechannel_designer",
-      "community": 31,
-      "community_name": "DiscordSupportBot.Migrations",
+      "community": 24,
+      "community_name": "DiscordSupportBot.DataBase",
       "norm_label": "20200922140128_delete-timechannel.designer.cs"
     },
     {
@@ -12443,8 +12415,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_migrations_20200922140128_delete_timechannel_designer_discordsupportbot_migrations_deletetimechannel",
-      "community": 31,
-      "community_name": "DiscordSupportBot.Migrations",
+      "community": 24,
+      "community_name": "DiscordSupportBot.DataBase",
       "norm_label": "deletetimechannel"
     },
     {
@@ -12460,8 +12432,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_migrations_20200922140128_delete_timechannel_designer_discordsupportbot_migrations_deletetimechannel_buildtargetmodel",
-      "community": 31,
-      "community_name": "DiscordSupportBot.Migrations",
+      "community": 24,
+      "community_name": "DiscordSupportBot.DataBase",
       "norm_label": ".buildtargetmodel()"
     },
     {
@@ -12471,8 +12443,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_migrations_20200922140128_delete_timechannel_designer_cs_modelbuilder",
-      "community": 31,
-      "community_name": "DiscordSupportBot.Migrations",
+      "community": 24,
+      "community_name": "DiscordSupportBot.DataBase",
       "norm_label": "modelbuilder"
     },
     {
@@ -12684,8 +12656,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "discordsupportbot_migrations_20220809155244_ncchannel_designer",
-      "community": 79,
-      "community_name": "20220809155244_NCChannel.Designer.cs",
+      "community": 24,
+      "community_name": "DiscordSupportBot.DataBase",
       "norm_label": "20220809155244_ncchannel.designer.cs"
     },
     {
@@ -12701,8 +12673,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_migrations_20220809155244_ncchannel_designer_discordsupportbot_migrations_ncchannel",
-      "community": 79,
-      "community_name": "20220809155244_NCChannel.Designer.cs",
+      "community": 24,
+      "community_name": "DiscordSupportBot.DataBase",
       "norm_label": "ncchannel"
     },
     {
@@ -12718,8 +12690,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_migrations_20220809155244_ncchannel_designer_discordsupportbot_migrations_ncchannel_buildtargetmodel",
-      "community": 79,
-      "community_name": "20220809155244_NCChannel.Designer.cs",
+      "community": 24,
+      "community_name": "DiscordSupportBot.DataBase",
       "norm_label": ".buildtargetmodel()"
     },
     {
@@ -12729,8 +12701,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_migrations_20220809155244_ncchannel_designer_cs_modelbuilder",
-      "community": 79,
-      "community_name": "20220809155244_NCChannel.Designer.cs",
+      "community": 24,
+      "community_name": "DiscordSupportBot.DataBase",
       "norm_label": "modelbuilder"
     },
     {
@@ -13200,8 +13172,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "discordsupportbot_migrations_20250825091521_addhoneypotchannel_designer",
-      "community": 24,
-      "community_name": "DiscordSupportBot.DataBase",
+      "community": 62,
+      "community_name": "20250825091521_AddHoneyPotChannel.Designer.cs",
       "norm_label": "20250825091521_addhoneypotchannel.designer.cs"
     },
     {
@@ -13217,8 +13189,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_migrations_20250825091521_addhoneypotchannel_designer_discordsupportbot_migrations_addhoneypotchannel",
-      "community": 24,
-      "community_name": "DiscordSupportBot.DataBase",
+      "community": 62,
+      "community_name": "20250825091521_AddHoneyPotChannel.Designer.cs",
       "norm_label": "addhoneypotchannel"
     },
     {
@@ -13234,8 +13206,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_migrations_20250825091521_addhoneypotchannel_designer_discordsupportbot_migrations_addhoneypotchannel_buildtargetmodel",
-      "community": 24,
-      "community_name": "DiscordSupportBot.DataBase",
+      "community": 62,
+      "community_name": "20250825091521_AddHoneyPotChannel.Designer.cs",
       "norm_label": ".buildtargetmodel()"
     },
     {
@@ -13245,8 +13217,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_migrations_20250825091521_addhoneypotchannel_designer_cs_modelbuilder",
-      "community": 24,
-      "community_name": "DiscordSupportBot.DataBase",
+      "community": 62,
+      "community_name": "20250825091521_AddHoneyPotChannel.Designer.cs",
       "norm_label": "modelbuilder"
     },
     {
@@ -13716,8 +13688,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "discordsupportbot_migrations_20260714105323_addautocreateprivatethreadmentions_designer",
-      "community": 24,
-      "community_name": "DiscordSupportBot.DataBase",
+      "community": 31,
+      "community_name": "DiscordSupportBot.Migrations",
       "norm_label": "20260714105323_addautocreateprivatethreadmentions.designer.cs"
     },
     {
@@ -13733,8 +13705,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_migrations_20260714105323_addautocreateprivatethreadmentions_designer_discordsupportbot_migrations_addautocreateprivatethreadmentions",
-      "community": 24,
-      "community_name": "DiscordSupportBot.DataBase",
+      "community": 31,
+      "community_name": "DiscordSupportBot.Migrations",
       "norm_label": "addautocreateprivatethreadmentions"
     },
     {
@@ -13750,8 +13722,8 @@
       },
       "_origin": "ast",
       "id": "discordsupportbot_migrations_20260714105323_addautocreateprivatethreadmentions_designer_discordsupportbot_migrations_addautocreateprivatethreadmentions_buildtargetmodel",
-      "community": 24,
-      "community_name": "DiscordSupportBot.DataBase",
+      "community": 31,
+      "community_name": "DiscordSupportBot.Migrations",
       "norm_label": ".buildtargetmodel()"
     },
     {
@@ -13761,8 +13733,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "discordsupportbot_migrations_20260714105323_addautocreateprivatethreadmentions_designer_cs_modelbuilder",
-      "community": 24,
-      "community_name": "DiscordSupportBot.DataBase",
+      "community": 31,
+      "community_name": "DiscordSupportBot.Migrations",
       "norm_label": "modelbuilder"
     },
     {
@@ -26662,21 +26634,6 @@
       "confidence_score": 1.0
     },
     {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "DiscordSupportBot/Interaction/AutoCreatePrivateThread/Service/AutoCreatePrivateThreadService.cs",
-      "source_location": "L25",
-      "weight": 1.0,
-      "context": "field",
-      "metadata": {
-        "ref_token": "SemaphoreSlim"
-      },
-      "_origin": "ast",
-      "source": "discordsupportbot_interaction_autocreateprivatethread_service_autocreateprivatethreadservice_discordsupportbot_interaction_autocreateprivatethread_service_autocreateprivatethreadservice",
-      "target": "discordsupportbot_interaction_autocreateprivatethread_service_autocreateprivatethreadservice_cs_semaphoreslim",
-      "confidence_score": 1.0
-    },
-    {
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/AutoCreatePrivateThread/Service/AutoCreatePrivateThreadService.cs",
@@ -26904,6 +26861,21 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/AutoCreatePrivateThread/Service/AutoCreatePrivateThreadService.cs",
+      "source_location": "L25",
+      "weight": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "SemaphoreSlim"
+      },
+      "_origin": "ast",
+      "source": "discordsupportbot_interaction_autocreateprivatethread_service_autocreateprivatethreadservice_discordsupportbot_interaction_autocreateprivatethread_service_autocreateprivatethreadservice",
+      "target": "semaphoreslim",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/AutoCreatePrivateThread/Service/AutoCreatePrivateThreadService.cs",
       "source_location": "L530",
       "weight": 1.0,
       "context": "field",
@@ -26912,7 +26884,7 @@
       },
       "_origin": "ast",
       "source": "discordsupportbot_interaction_autocreateprivatethread_service_autocreateprivatethreadservice_discordsupportbot_interaction_autocreateprivatethread_service_buttonlockstate",
-      "target": "discordsupportbot_interaction_autocreateprivatethread_service_autocreateprivatethreadservice_cs_semaphoreslim",
+      "target": "semaphoreslim",
       "confidence_score": 1.0
     },
     {
@@ -32049,7 +32021,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L147",
+      "source_location": "L127",
       "weight": 1.0,
       "context": "parameter_type",
       "metadata": {
@@ -32064,7 +32036,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L227",
+      "source_location": "L215",
       "weight": 1.0,
       "context": "parameter_type",
       "metadata": {
@@ -32079,7 +32051,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L197",
+      "source_location": "L185",
       "weight": 1.0,
       "context": "parameter_type",
       "metadata": {
@@ -32094,7 +32066,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L294",
+      "source_location": "L282",
       "weight": 1.0,
       "context": "parameter_type",
       "metadata": {
@@ -32109,7 +32081,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L285",
+      "source_location": "L273",
       "weight": 1.0,
       "context": "parameter_type",
       "metadata": {
@@ -32124,7 +32096,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L269",
+      "source_location": "L257",
       "weight": 1.0,
       "context": "parameter_type",
       "metadata": {
@@ -32139,7 +32111,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L174",
+      "source_location": "L162",
       "weight": 1.0,
       "context": "parameter_type",
       "metadata": {
@@ -32411,22 +32383,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L42",
-      "weight": 1.0,
-      "context": "field",
-      "metadata": {
-        "ref_token": "SemaphoreSlim"
-      },
-      "_origin": "ast",
-      "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice",
-      "target": "discordsupportbot_interaction_fund_service_fundservice_cs_semaphoreslim",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L225",
+      "source_location": "L213",
       "weight": 1.0,
       "context": "field",
       "metadata": {
@@ -32441,7 +32398,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L147",
+      "source_location": "L127",
       "weight": 1.0,
       "_origin": "ast",
       "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice",
@@ -32452,7 +32409,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L227",
+      "source_location": "L215",
       "weight": 1.0,
       "_origin": "ast",
       "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice",
@@ -32463,18 +32420,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L132",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice",
-      "target": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice_appendfundresultasync",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L197",
+      "source_location": "L185",
       "weight": 1.0,
       "_origin": "ast",
       "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice",
@@ -32485,7 +32431,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L52",
+      "source_location": "L50",
       "weight": 1.0,
       "_origin": "ast",
       "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice",
@@ -32496,7 +32442,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L194",
+      "source_location": "L182",
       "weight": 1.0,
       "_origin": "ast",
       "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice",
@@ -32507,7 +32453,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L294",
+      "source_location": "L282",
       "weight": 1.0,
       "_origin": "ast",
       "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice",
@@ -32518,7 +32464,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L285",
+      "source_location": "L273",
       "weight": 1.0,
       "_origin": "ast",
       "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice",
@@ -32529,7 +32475,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L269",
+      "source_location": "L257",
       "weight": 1.0,
       "_origin": "ast",
       "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice",
@@ -32540,7 +32486,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L86",
+      "source_location": "L84",
       "weight": 1.0,
       "_origin": "ast",
       "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice",
@@ -32551,7 +32497,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L300",
+      "source_location": "L288",
       "weight": 1.0,
       "_origin": "ast",
       "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice",
@@ -32562,7 +32508,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L174",
+      "source_location": "L162",
       "weight": 1.0,
       "_origin": "ast",
       "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice",
@@ -32584,7 +32530,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L224",
+      "source_location": "L212",
       "weight": 1.0,
       "context": "field",
       "metadata": {
@@ -32599,7 +32545,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L52",
+      "source_location": "L50",
       "weight": 1.0,
       "context": "parameter_type",
       "metadata": {
@@ -32614,7 +32560,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L52",
+      "source_location": "L50",
       "weight": 1.0,
       "context": "return_type",
       "metadata": {
@@ -32630,7 +32576,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L70",
+      "source_location": "L68",
       "weight": 1.0,
       "_origin": "ast",
       "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice_client_modalsubmitted",
@@ -32641,7 +32587,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L147",
+      "source_location": "L127",
       "weight": 1.0,
       "context": "return_type",
       "metadata": {
@@ -32656,7 +32602,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L227",
+      "source_location": "L215",
       "weight": 1.0,
       "context": "return_type",
       "metadata": {
@@ -32671,22 +32617,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L132",
-      "weight": 1.0,
-      "context": "return_type",
-      "metadata": {
-        "ref_token": "Task"
-      },
-      "_origin": "ast",
-      "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice_appendfundresultasync",
-      "target": "discordsupportbot_interaction_fund_service_fundservice_cs_task",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L269",
+      "source_location": "L257",
       "weight": 1.0,
       "context": "return_type",
       "metadata": {
@@ -32701,7 +32632,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L86",
+      "source_location": "L84",
       "weight": 1.0,
       "context": "return_type",
       "metadata": {
@@ -32716,7 +32647,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L300",
+      "source_location": "L288",
       "weight": 1.0,
       "context": "return_type",
       "metadata": {
@@ -32731,7 +32662,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L86",
+      "source_location": "L84",
       "weight": 1.0,
       "context": "parameter_type",
       "metadata": {
@@ -32747,11 +32678,11 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L117",
+      "source_location": "L111",
       "weight": 1.0,
       "_origin": "ast",
       "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice_handleaddonebuttonasync",
-      "target": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice_addfundasync",
+      "target": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice_addfundandrespondasync",
       "confidence_score": 1.0
     },
     {
@@ -32759,31 +32690,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L118",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice_handleaddonebuttonasync",
-      "target": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice_appendfundresultasync",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L116",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice_handleaddonebuttonasync",
-      "target": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice_checkisaddowner",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L101",
+      "source_location": "L99",
       "weight": 1.0,
       "_origin": "ast",
       "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice_handleaddonebuttonasync",
@@ -32795,7 +32702,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L95",
+      "source_location": "L93",
       "weight": 1.0,
       "_origin": "ast",
       "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice_handleaddonebuttonasync",
@@ -32806,22 +32713,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L132",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "metadata": {
-        "ref_token": "SocketMessageComponent"
-      },
-      "_origin": "ast",
-      "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice_appendfundresultasync",
-      "target": "discordsupportbot_interaction_fund_service_fundservice_cs_socketmessagecomponent",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L147",
+      "source_location": "L127",
       "weight": 1.0,
       "context": "parameter_type",
       "metadata": {
@@ -32837,7 +32729,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L165",
+      "source_location": "L149",
       "weight": 1.0,
       "_origin": "ast",
       "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice_addfundandrespondasync",
@@ -32849,7 +32741,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L164",
+      "source_location": "L148",
       "weight": 1.0,
       "_origin": "ast",
       "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice_addfundandrespondasync",
@@ -32861,7 +32753,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L158",
+      "source_location": "L141",
       "weight": 1.0,
       "_origin": "ast",
       "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice_addfundandrespondasync",
@@ -32873,10 +32765,22 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L206",
+      "source_location": "L194",
       "weight": 1.0,
       "_origin": "ast",
       "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice_checkisaddowner",
+      "target": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice_getfundleaderboardrediskey",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
+      "source_location": "L218",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice_addfundasync",
       "target": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice_getfundleaderboardrediskey",
       "confidence_score": 1.0
     },
@@ -32889,18 +32793,6 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice_addfundasync",
-      "target": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice_getfundleaderboardrediskey",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L242",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice_addfundasync",
       "target": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice_getfundtypename",
       "confidence_score": 1.0
     },
@@ -32908,7 +32800,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L269",
+      "source_location": "L257",
       "weight": 1.0,
       "context": "generic_arg",
       "metadata": {
@@ -32923,7 +32815,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L269",
+      "source_location": "L257",
       "weight": 1.0,
       "context": "generic_arg",
       "metadata": {
@@ -32939,7 +32831,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L271",
+      "source_location": "L259",
       "weight": 1.0,
       "_origin": "ast",
       "source": "discordsupportbot_interaction_fund_service_fundservice_discordsupportbot_interaction_fund_service_fundservice_gettopfundasync",
@@ -32950,7 +32842,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L269",
+      "source_location": "L257",
       "weight": 1.0,
       "context": "generic_arg",
       "metadata": {
@@ -32965,7 +32857,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L300",
+      "source_location": "L288",
       "weight": 1.0,
       "context": "generic_arg",
       "metadata": {
@@ -32980,7 +32872,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L300",
+      "source_location": "L288",
       "weight": 1.0,
       "context": "generic_arg",
       "metadata": {
@@ -32995,7 +32887,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "DiscordSupportBot/Interaction/Fund/Service/FundService.cs",
-      "source_location": "L300",
+      "source_location": "L288",
       "weight": 1.0,
       "context": "generic_arg",
       "metadata": {
@@ -39644,5 +39536,5 @@
       "source_file": "docker-compose.yml"
     }
   ],
-  "built_at_commit": "4d03f41582ad60f3f1f6012cedb1bf6e1597947d"
+  "built_at_commit": "5be96863dccd5b135b1fcf886cb1d871a52d7d36"
 }

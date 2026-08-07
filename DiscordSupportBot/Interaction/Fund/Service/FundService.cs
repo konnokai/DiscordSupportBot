@@ -38,6 +38,8 @@ namespace DiscordSupportBot.Interaction.Fund.Service
         }
 
         private readonly DiscordSocketClient _client;
+        // ponytail: one lock keeps message edits ordered; split per message only if this becomes a bottleneck.
+        private readonly SemaphoreSlim _addOneMessageLock = new(1, 1);
 
         public FundService(DiscordSocketClient client)
         {
@@ -108,20 +110,38 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                     return;
                 }
 
-                await AddFundAndRespondAsync(
-                    arg,
-                    fundType,
-                    arg.GuildId.Value,
-                    arg.Channel.Id,
-                    arg.User.Id,
-                    targetUserId,
-                    includeAddOneButton: false);
+                await _addOneMessageLock.WaitAsync();
+                try
+                {
+                    var message = CheckIsAddOwner(fundType, arg.GuildId.Value, arg.User.Id, targetUserId, out var needAddUserId);
+                    message += await AddFundAsync(fundType, arg.GuildId.Value, arg.Channel.Id, arg.User.Id, needAddUserId);
+                    await AppendFundResultAsync(arg, message);
+                }
+                finally
+                {
+                    _addOneMessageLock.Release();
+                }
             }
             catch (Exception ex)
             {
                 Log.Error(ex, $"FundService-AddOneButton: {arg.GuildId} | {arg.User.Id} | {arg.Data.CustomId}");
                 await arg.SendErrorAsync($"處理過程發生錯誤: {ex.Message}", true);
             }
+        }
+
+        private async Task AppendFundResultAsync(SocketMessageComponent interaction, string message)
+        {
+            var channel = interaction.InteractionChannel ?? throw new InvalidOperationException("無法取得基金訊息頻道");
+            var originalMessage = await channel.GetMessageAsync(interaction.Message.Id) as IUserMessage
+                ?? throw new InvalidOperationException("無法取得基金原始訊息");
+
+            var description = $"{originalMessage.Embeds.FirstOrDefault()?.Description}\n{message}";
+            description = description[^Math.Min(description.Length, EmbedBuilder.MaxDescriptionLength)..];
+
+            await originalMessage.ModifyAsync(properties => properties.Embed = new EmbedBuilder()
+                .WithOkColor()
+                .WithDescription(description)
+                .Build());
         }
 
         internal static async Task AddFundAndRespondAsync(
@@ -131,30 +151,22 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             ulong channelId,
             ulong executeUserId,
             ulong targetUserId,
-            string messagePrefix = "",
-            bool includeAddOneButton = true)
+            string messagePrefix = "")
         {
             var cooldownScopeId = interaction.Id;
-            if (includeAddOneButton)
-            {
-                await RedisConnection.RedisDb.StringSetAsync(
-                    GetAddOneCooldownKey(cooldownScopeId, executeUserId),
-                    1,
-                    expiry: TimeSpan.FromHours(1),
-                    when: When.NotExists);
-            }
+            await RedisConnection.RedisDb.StringSetAsync(
+                GetAddOneCooldownKey(cooldownScopeId, executeUserId),
+                1,
+                expiry: TimeSpan.FromHours(1),
+                when: When.NotExists);
 
             var message = messagePrefix;
             message += CheckIsAddOwner(fundType, guildId, executeUserId, targetUserId, out var needAddUserId);
             message += await AddFundAsync(fundType, guildId, channelId, executeUserId, needAddUserId);
 
-            MessageComponent components = null;
-            if (includeAddOneButton)
-            {
-                components = new ComponentBuilder()
-                    .WithButton("讓他飛", $"{AddOneCustomIdPrefix}{(int)fundType}:{targetUserId}:{cooldownScopeId}", ButtonStyle.Success)
-                    .Build();
-            }
+            var components = new ComponentBuilder()
+                .WithButton("讓他飛", $"{AddOneCustomIdPrefix}{(int)fundType}:{targetUserId}:{cooldownScopeId}", ButtonStyle.Success)
+                .Build();
 
             await interaction.SendConfirmAsync(message, true, components: components);
         }

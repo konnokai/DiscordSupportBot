@@ -1,22 +1,22 @@
-# Graph Report - DiscordSupportBot  (2026-08-08)
+# Graph Report - DiscordSupportBot  (2026-08-07)
 
 ## Corpus Check
-- 116 files · ~28,061 words
+- 116 files · ~27,986 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1094 nodes · 1848 edges · 80 communities (59 shown, 21 thin omitted)
+- 1092 nodes · 1842 edges · 68 communities (50 shown, 18 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 20 edges (avg confidence: 0.82)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `4d03f415`
+- Built from commit: `5be96863`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - FoodWheelService
-- SmartEmbedTextBase
+- DiscordSupportBot.Common
 - AutoVoiceChannelService
 - .HandleCommandAsync
 - .GenerateSuggestionsAsync
@@ -41,9 +41,9 @@
 - .Info
 - DiscordSupportBot.DataBase
 - .SetAutoVoiceChannelAsync
-- .FormatColorWrite
+- Log
 - .ToggleStreamingStatusAsync
-- AdministraionService
+- .FormatColorWrite
 - .Warn
 - Migration
 - DiscordSupportBot.Migrations
@@ -60,7 +60,7 @@
 - .CheckPermissionsAsync
 - .CheckRequirementsAsync
 - .CheckRequirementsAsync
-- DiscordSupportBot.Common
+- Utility
 - DiscordWebhookClient
 - DeleteTimeChannel
 - AddChannelNitroInfo
@@ -77,32 +77,20 @@
 - 20220813051631_RenameLottery.Designer.cs
 - 20231024080730_Misc.Designer.cs
 - 20231024084646_RemoveTwitter.Designer.cs
-- Activity
+- 20250825091521_AddHoneyPotChannel.Designer.cs
 - 20260323025714_AddLinkFix.Designer.cs
 - 20260620112334_AddStreamingStatus.Designer.cs
 - Discord Terms of Service
 - .SetHoneyPotAsync
 - StreamingStatusService
-- SmartText
-- DiscordSupportBot.DataBase.Activity
-- .SendAsync
-- .GetActivityAsync
-- UserActivity
-- TopLevelModule
-- HelpService
-- MessageChannelExtensions
-- ArrayExtensions
-- Replacer
-- ._client_ModalSubmitted
-- 20220809155244_NCChannel.Designer.cs
 
 ## God Nodes (most connected - your core abstractions)
 1. `FoodWheelService` - 37 edges
 2. `AutoCreatePrivateThreadService` - 27 edges
 3. `Administration` - 26 edges
 4. `DiscordSupportBot.Migrations` - 23 edges
-5. `FundService` - 20 edges
-6. `Extensions` - 18 edges
+5. `Extensions` - 18 edges
+6. `FundService` - 18 edges
 7. `StreamingStatusService` - 17 edges
 8. `Extensions` - 15 edges
 9. `ReplacementBuilder` - 14 edges
@@ -117,8 +105,8 @@
   DiscordSupportBot/Data/HelpDescription.txt → Data/HelpDescription.txt
 - `Docker Compose Deployment` --references--> `discord-support-bot Service`  [EXTRACTED]
   README.md → docker-compose.yml
-- `SmartEmbedTextBase` --references--> `SmartTextEmbedAuthor`  [EXTRACTED]
-  DiscordSupportBot/Common/SmartText/SmartEmbedText.cs → DiscordSupportBot/Common/SmartText/SmartTextEmbedAuthor.cs
+- `Discord Support Bot` --references--> `Discord Support Bot`  [EXTRACTED]
+  README.md → PRIVACY_POLICY.md
 
 ## Import Cycles
 - None detected.
@@ -127,23 +115,23 @@
 - **Privacy Policy Privileged Intent Set** — privacy_policy_message_content_intent, privacy_policy_server_members_intent, privacy_policy_presence_intent [EXTRACTED 1.00]
 - **Docker Compose Service Runtime Configuration** — docker_compose_discord_support_bot_service, docker_compose_data_volume, docker_compose_environment_file, docker_compose_restart_policy, docker_compose_host_gateway, docker_compose_bridge_network [EXTRACTED 1.00]
 
-## Communities (80 total, 21 thin omitted)
+## Communities (68 total, 18 thin omitted)
 
 ### Community 0 - "FoodWheelService"
 Cohesion: 0.06
 Nodes (43): DiscordSupportBot.Interaction.FoodWheel.Service, DiscordSupportBot.Interaction.FoodWheel, IInteractionContext, SlashCommand, Task, BlacklistModule, CustomModule, DrinkWheelModule (+35 more)
 
-### Community 1 - "SmartEmbedTextBase"
-Cohesion: 0.29
-Nodes (5): EmbedBuilder, SmartEmbedArrayElementText, SmartEmbedText, SmartEmbedTextBase, IEmbed
+### Community 1 - "DiscordSupportBot.Common"
+Cohesion: 0.05
+Nodes (26): DiscordSupportBot.Common, DiscordSupportBot.Extensions, Func, IReadOnlyCollection, ArrayExtensions, IMessageChannel, IReadOnlyCollection, IUserMessage (+18 more)
 
 ### Community 2 - "AutoVoiceChannelService"
 Cohesion: 0.12
 Nodes (16): ChannelEvent, DiscordSupportBot.Interaction.AutoVoiceChannel.Services, ConcurrentDictionary, DiscordSocketClient, HashSet, int, IVoiceChannel, SocketUser (+8 more)
 
 ### Community 3 - ".HandleCommandAsync"
-Cohesion: 0.16
-Nodes (8): DiscordSupportBot.Command, CommandService, DiscordSocketClient, IServiceProvider, SocketMessage, Task, CommandHandler, ICommandService
+Cohesion: 0.06
+Nodes (27): DiscordSupportBot.Interaction.Activity, DiscordSupportBot.Command, DiscordSupportBot.DataBase.Activity, CommandService, DiscordSocketClient, IServiceProvider, SocketMessage, Task (+19 more)
 
 ### Community 4 - ".GenerateSuggestionsAsync"
 Cohesion: 0.09
@@ -155,11 +143,11 @@ Nodes (22): Action, ButtonLockState, ChannelId, Dictionary, AutoCreatePrivateThr
 
 ### Community 6 - "IInteractionService"
 Cohesion: 0.07
-Nodes (26): Attachment, DiscordSupportBot.Interaction.Utility, DiscordSupportBot.Interaction.Admin, DiscordSupportBot.Interaction.Admin.Service, DefaultMemberPermissions, RequireBotPermission, RequireContext, RequireUserPermission (+18 more)
+Nodes (25): Attachment, DiscordSupportBot.Interaction.Admin, DiscordSupportBot.Interaction.Admin.Service, DefaultMemberPermissions, RequireBotPermission, RequireContext, RequireUserPermission, SlashCommand (+17 more)
 
 ### Community 7 - "FundService"
 Cohesion: 0.10
-Nodes (25): ChannelIds, DiscordSupportBot.Interaction.Fund.Service, DiscordSupportBot.Interaction.Fund, DeletedCount, IMessage, IUser, RequireContext, SlashCommand (+17 more)
+Nodes (24): ChannelIds, DiscordSupportBot.Interaction.Fund.Service, DiscordSupportBot.Interaction.Fund, DeletedCount, IMessage, IUser, RequireContext, SlashCommand (+16 more)
 
 ### Community 8 - "Administration"
 Cohesion: 0.20
@@ -227,23 +215,23 @@ Nodes (7): DiscordSupportBot, BotConfig, NotRequirementAttribute, Main(), string
 
 ### Community 24 - "DiscordSupportBot.DataBase"
 Cohesion: 0.14
-Nodes (7): DiscordSupportBot.DataBase, ModelBuilder, AddHoneyPotChannel, ModelBuilder, AddFoodWheelEntry, ModelBuilder, AddAutoCreatePrivateThreadMentions
+Nodes (7): DiscordSupportBot.DataBase, ModelBuilder, DeleteTimeChannel, ModelBuilder, NCChannel, ModelBuilder, AddFoodWheelEntry
 
 ### Community 25 - ".SetAutoVoiceChannelAsync"
 Cohesion: 0.22
 Nodes (10): AutoVoiceChannelService, DiscordSupportBot.Interaction.AutoVoiceChannel, DefaultMemberPermissions, IVoiceChannel, RequireBotPermission, RequireContext, RequireUserPermission, SlashCommand (+2 more)
 
-### Community 26 - ".FormatColorWrite"
-Cohesion: 0.24
-Nodes (6): ConsoleColor, object, Task, Log, Exception, LogMessage
+### Community 26 - "Log"
+Cohesion: 0.22
+Nodes (5): object, Task, Log, Exception, LogMessage
 
 ### Community 27 - ".ToggleStreamingStatusAsync"
 Cohesion: 0.24
 Nodes (9): DiscordSupportBot.Interaction.StreamingStatus, DefaultMemberPermissions, RequireBotPermission, RequireContext, RequireUserPermission, SlashCommand, Task, StreamingStatus (+1 more)
 
-### Community 28 - "AdministraionService"
-Cohesion: 0.27
-Nodes (6): DiscordSupportBot.Command.Administration, DiscordSocketClient, ITextChannel, SocketCommandContext, Task, AdministraionService
+### Community 28 - ".FormatColorWrite"
+Cohesion: 0.23
+Nodes (7): ConsoleColor, DiscordSupportBot.Command.Administration, DiscordSocketClient, ITextChannel, SocketCommandContext, Task, AdministraionService
 
 ### Community 29 - ".Warn"
 Cohesion: 0.27
@@ -255,7 +243,7 @@ Nodes (6): Discord_Support_Bot.Migrations, MigrationBuilder, ModelBuilder, Initi
 
 ### Community 31 - "DiscordSupportBot.Migrations"
 Cohesion: 0.20
-Nodes (6): DiscordSupportBot.Migrations, ModelBuilder, DeleteTimeChannel, ModelBuilder, SupportContextModelSnapshot, ModelSnapshot
+Nodes (6): DiscordSupportBot.Migrations, ModelBuilder, AddAutoCreatePrivateThreadMentions, ModelBuilder, SupportContextModelSnapshot, ModelSnapshot
 
 ### Community 32 - "UptimeKumaClient"
 Cohesion: 0.22
@@ -266,7 +254,7 @@ Cohesion: 0.20
 Nodes (10): Message Content Intent, Message Content Non-retention, Presence Intent, Discord Privileged Intents, Server Members Intent, Message Content Intent, No Regular Message Content Storage, Presence Intent (+2 more)
 
 ### Community 34 - "DiscordSupportBot.Interaction.Attribute"
-Cohesion: 0.20
+Cohesion: 0.22
 Nodes (7): Attribute, DiscordSupportBot.Interaction.Attribute, DiscordSupportBot.Interaction.Help.Service, string, CommandExampleAttribute, string, CommandSummaryAttribute
 
 ### Community 35 - "RedisConnection"
@@ -298,8 +286,8 @@ Cohesion: 0.40
 Nodes (6): Bot Invitation, Jun112561, Administration Features, Discord Support Bot, Emote Usage Statistics, Message Activity Statistics
 
 ### Community 42 - ".CheckPermissionsAsync"
-Cohesion: 0.25
-Nodes (6): CommandInfo, ICommandContext, IServiceProvider, PreconditionResult, Task, RequireGuildAttribute
+Cohesion: 0.22
+Nodes (7): CommandInfo, ICommandContext, IServiceProvider, PreconditionResult, Task, RequireGuildAttribute, PreconditionAttribute
 
 ### Community 43 - ".CheckRequirementsAsync"
 Cohesion: 0.25
@@ -307,19 +295,15 @@ Nodes (6): ICommandInfo, IInteractionContext, IServiceProvider, PreconditionResu
 
 ### Community 44 - ".CheckRequirementsAsync"
 Cohesion: 0.25
-Nodes (7): ICommandInfo, IInteractionContext, IServiceProvider, PreconditionResult, Task, RequireGuildMemberCountAttribute, PreconditionAttribute
+Nodes (6): ICommandInfo, IInteractionContext, IServiceProvider, PreconditionResult, Task, RequireGuildMemberCountAttribute
 
-### Community 45 - "DiscordSupportBot.Common"
-Cohesion: 0.20
-Nodes (4): DiscordSupportBot.Common, SmartTextEmbedAuthor, SmartTextEmbedField, SmartTextEmbedFooter
+### Community 45 - "Utility"
+Cohesion: 0.27
+Nodes (6): DiscordSupportBot.Interaction.Utility, DiscordSocketClient, SlashCommand, Task, Utility, UtilityService
 
 ### Community 46 - "DiscordWebhookClient"
 Cohesion: 0.33
 Nodes (5): DiscordSupportBot.HttpClients, DiscordSocketClient, HttpClient, DiscordWebhookClient, Message
-
-### Community 62 - "Activity"
-Cohesion: 0.39
-Nodes (5): DiscordSupportBot.Interaction.Activity, RequireContext, SlashCommand, Task, Activity
 
 ### Community 65 - "Discord Terms of Service"
 Cohesion: 0.50
@@ -333,57 +317,25 @@ Nodes (8): DefaultMemberPermissions, ITextChannel, RequireBotPermission, Require
 Cohesion: 0.15
 Nodes (8): DiscordSupportBot.Interaction.StreamingStatus.Services, DiscordSocketClient, HashSet, HttpClient, int, string, Timer, StreamingStatusService
 
-### Community 68 - "SmartText"
-Cohesion: 0.28
-Nodes (4): EmbedBuilder, SmartEmbedTextArray, SmartPlainText, SmartText
-
-### Community 69 - "DiscordSupportBot.DataBase.Activity"
-Cohesion: 0.25
-Nodes (3): DiscordSupportBot.DataBase.Activity, EmoteTable, UserTable
-
-### Community 70 - ".SendAsync"
-Cohesion: 0.36
-Nodes (6): IMessageChannel, IReadOnlyCollection, IUserMessage, MessageComponent, Task, Embed
-
-### Community 71 - ".GetActivityAsync"
-Cohesion: 0.46
-Nodes (3): List, Task, EmoteActivity
-
-### Community 72 - "UserActivity"
-Cohesion: 0.43
-Nodes (3): List, Task, UserActivity
-
-### Community 73 - "TopLevelModule"
-Cohesion: 0.43
-Nodes (5): EmbedBuilder, SocketCommandContext, Task, TopLevelModule, ModuleBase
-
-### Community 74 - "HelpService"
-Cohesion: 0.57
-Nodes (3): EmbedBuilder, SlashCommandInfo, HelpService
-
-### Community 76 - "ArrayExtensions"
-Cohesion: 0.33
-Nodes (3): Func, IReadOnlyCollection, ArrayExtensions
-
 ## Knowledge Gaps
 - **62 isolated node(s):** `Guild`, `net8.0`, `Ben.Demystifier (0.4.1)`, `Dapper (2.1.66)`, `Discord.Net (3.19.1)` (+57 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **21 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **18 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `DiscordSupportBot.DataBase` connect `DiscordSupportBot.DataBase` to `20260620112334_AddStreamingStatus.Designer.cs`, `DiscordSupportBot.DataBase.Activity`, `20220809155244_NCChannel.Designer.cs`, `20260323025714_AddLinkFix.Designer.cs`, `20210611152100_AddChannelNitroInfo.Designer.cs`, `20220813051631_RenameLottery.Designer.cs`, `20231024080730_Misc.Designer.cs`, `20231024084646_RemoveTwitter.Designer.cs`, `DiscordSupportBot.Migrations`?**
-  _High betweenness centrality (0.150) - this node is a cross-community bridge._
-- **Why does `SendMessageService` connect `IInteractionService` to `._client_ModalSubmitted`?**
-  _High betweenness centrality (0.126) - this node is a cross-community bridge._
+- **Why does `DiscordSupportBot.DataBase` connect `DiscordSupportBot.DataBase` to `20260620112334_AddStreamingStatus.Designer.cs`, `.HandleCommandAsync`, `DiscordSupportBot.Migrations`, `20210611152100_AddChannelNitroInfo.Designer.cs`, `20220813051631_RenameLottery.Designer.cs`, `20231024080730_Misc.Designer.cs`, `20231024084646_RemoveTwitter.Designer.cs`, `20250825091521_AddHoneyPotChannel.Designer.cs`, `20260323025714_AddLinkFix.Designer.cs`?**
+  _High betweenness centrality (0.156) - this node is a cross-community bridge._
 - **Why does `SupportContext` connect `SupportContext` to `DiscordSupportBot.DataBase`, `StreamingStatusService`?**
-  _High betweenness centrality (0.116) - this node is a cross-community bridge._
+  _High betweenness centrality (0.124) - this node is a cross-community bridge._
 - **What connects `Guild`, `net8.0`, `Ben.Demystifier (0.4.1)` to the rest of the system?**
   _62 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `FoodWheelService` be split into smaller, more focused modules?**
   _Cohesion score 0.06460206460206461 - nodes in this community are weakly interconnected._
+- **Should `DiscordSupportBot.Common` be split into smaller, more focused modules?**
+  _Cohesion score 0.0531986531986532 - nodes in this community are weakly interconnected._
 - **Should `AutoVoiceChannelService` be split into smaller, more focused modules?**
   _Cohesion score 0.12121212121212122 - nodes in this community are weakly interconnected._
-- **Should `.GenerateSuggestionsAsync` be split into smaller, more focused modules?**
-  _Cohesion score 0.08562367864693446 - nodes in this community are weakly interconnected._
+- **Should `.HandleCommandAsync` be split into smaller, more focused modules?**
+  _Cohesion score 0.05589225589225589 - nodes in this community are weakly interconnected._
