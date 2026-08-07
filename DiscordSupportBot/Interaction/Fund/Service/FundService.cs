@@ -90,13 +90,13 @@ namespace DiscordSupportBot.Interaction.Fund.Service
 
             try
             {
-                if (arg.GuildId == null || !TryParseAddOneCustomId(arg.Data.CustomId, out var fundType, out var targetUserId))
+                if (arg.GuildId == null || !TryParseAddOneCustomId(arg.Data.CustomId, out var fundType, out var targetUserId, out var cooldownScopeId))
                 {
                     await arg.SendErrorAsync("基金按鈕資料無效", true);
                     return;
                 }
 
-                var cooldownKey = $"{AddOneCooldownKeyPrefix}:{arg.Message.Id}:{arg.User.Id}";
+                var cooldownKey = GetAddOneCooldownKey(cooldownScopeId == 0 ? arg.Message.Id : cooldownScopeId, arg.User.Id);
                 var canUseButton = await RedisConnection.RedisDb.StringSetAsync(
                     cooldownKey,
                     1,
@@ -134,6 +134,16 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             string messagePrefix = "",
             bool includeAddOneButton = true)
         {
+            var cooldownScopeId = interaction.Id;
+            if (includeAddOneButton)
+            {
+                await RedisConnection.RedisDb.StringSetAsync(
+                    GetAddOneCooldownKey(cooldownScopeId, executeUserId),
+                    1,
+                    expiry: TimeSpan.FromHours(1),
+                    when: When.NotExists);
+            }
+
             var message = messagePrefix;
             message += CheckIsAddOwner(fundType, guildId, executeUserId, targetUserId, out var needAddUserId);
             message += await AddFundAsync(fundType, guildId, channelId, executeUserId, needAddUserId);
@@ -142,23 +152,25 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             if (includeAddOneButton)
             {
                 components = new ComponentBuilder()
-                    .WithButton("讓他飛", $"{AddOneCustomIdPrefix}{(int)fundType}:{targetUserId}", ButtonStyle.Success)
+                    .WithButton("讓他飛", $"{AddOneCustomIdPrefix}{(int)fundType}:{targetUserId}:{cooldownScopeId}", ButtonStyle.Success)
                     .Build();
             }
 
             await interaction.SendConfirmAsync(message, true, components: components);
         }
 
-        private static bool TryParseAddOneCustomId(string customId, out FundType fundType, out ulong targetUserId)
+        private static bool TryParseAddOneCustomId(string customId, out FundType fundType, out ulong targetUserId, out ulong cooldownScopeId)
         {
             fundType = default;
             targetUserId = default;
+            cooldownScopeId = default;
 
             var values = customId[AddOneCustomIdPrefix.Length..].Split(':');
-            if (values.Length != 2 ||
+            if ((values.Length != 2 && values.Length != 3) ||
                 !int.TryParse(values[0], out var fundTypeValue) ||
                 !Enum.IsDefined(typeof(FundType), fundTypeValue) ||
-                !ulong.TryParse(values[1], out targetUserId))
+                !ulong.TryParse(values[1], out targetUserId) ||
+                (values.Length == 3 && !ulong.TryParse(values[2], out cooldownScopeId)))
             {
                 return false;
             }
@@ -166,6 +178,9 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             fundType = (FundType)fundTypeValue;
             return true;
         }
+
+        private static string GetAddOneCooldownKey(ulong scopeId, ulong userId)
+            => $"{AddOneCooldownKeyPrefix}:{scopeId}:{userId}";
 
         internal static string CheckIsAddOwner(FundType fundType, ulong guildId, ulong executeUserId, ulong targetUserId, out ulong resultUserId)
         {

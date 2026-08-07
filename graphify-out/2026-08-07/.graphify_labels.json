@@ -25,9 +25,9 @@
   "23": ".Info",
   "24": "DiscordSupportBot.DataBase",
   "25": ".SetAutoVoiceChannelAsync",
-  "26": "Log",
+  "26": ".FormatColorWrite",
   "27": ".ToggleStreamingStatusAsync",
-  "28": ".FormatColorWrite",
+  "28": "AdministraionService",
   "29": ".Warn",
   "30": "Migration",
   "31": "DiscordSupportBot.Migrations",
@@ -38,7 +38,7 @@
   "36": ".CheckRequirementsAsync",
   "37": "discord-support-bot Service",
   "38": "Id",
-  "39": ".EvaluateAsync",
+  "39": "StreamingStatusService",
   "40": "SupportContext",
   "41": "Discord Support Bot",
   "42": ".CheckPermissionsAsync",
@@ -66,5 +66,6 @@
   "64": "20260620112334_AddStreamingStatus.Designer.cs",
   "65": "Discord Terms of Service",
   "66": ".SetHoneyPotAsync",
-  "67": "StreamingStatusService"
+  "67": ".GetDbContext",
+  "68": "StreamingStatusService.cs"
 }
