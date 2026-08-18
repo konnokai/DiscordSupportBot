@@ -61,31 +61,37 @@ namespace DiscordSupportBot.Interaction.Fund
             try
             {
                 var fundTypes = Enum.GetValues(typeof(FundType)).Cast<FundType>();
-                var embed = new EmbedBuilder()
-                    .WithTitle($"`{Context.Guild.Name}` 所有基金前三名排行榜")
-                    .WithOkColor();
+                var components = new ComponentBuilderV2();
+                components.AddComponent(new TextDisplayBuilder(
+                    $"# `{Context.Guild.Name}`\n## 所有基金前三名排行榜"));
+                components.AddComponent(new SeparatorBuilder(true, SeparatorSpacingSize.Small));
 
-                var descriptionLines = new List<string>();
                 var rankIcons = new[] { "🥇", "🥈", "🥉" };
+                var hasAny = false;
                 foreach (var fundType in fundTypes)
                 {
                     var top3 = await FundService.GetTopFundAsync(fundType, Context.Guild.Id, 3);
                     if (top3.Count > 0)
                     {
+                        hasAny = true;
                         var rankings = string.Join("  ", top3.Select((x, idx) =>
                             $"{rankIcons[idx]} <@{x.UserId}> `{x.Score:N0}`"));
-                        descriptionLines.Add($"**{FundService.GetFundTypeName(fundType)}**  {rankings}");
+                        components.AddComponent(new SeparatorBuilder(true, SeparatorSpacingSize.Small));
+                        components.AddComponent(new ContainerBuilder()
+                            .WithAccentColor(new Color(0, 229, 132))
+                            .WithTextDisplay($"### {FundService.GetFundTypeName(fundType)}\n{rankings}"));
                     }
                 }
 
-                if (descriptionLines.Count == 0)
+                if (!hasAny)
                 {
                     await Context.Interaction.SendErrorAsync("目前沒有任何人有基金", true);
                 }
                 else
                 {
-                    embed.WithDescription(string.Join('\n', descriptionLines));
-                    await Context.Interaction.FollowupAsync(embed: embed.Build());
+                    await Context.Interaction.FollowupAsync(
+                        components: components.Build(),
+                        flags: MessageFlags.ComponentsV2);
                 }
             }
             catch (Exception ex)
