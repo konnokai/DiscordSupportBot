@@ -140,13 +140,14 @@ namespace DiscordSupportBot.Interaction.Fund
             IReadOnlyList<(string FundName, List<(string UserName, long Score, byte[] AvatarBytes)> Rankings)> leaderboard)
         {
             const int imageWidth = 1200;
-            const int horizontalPadding = 48;
-            const int columnGap = 24;
+            const int horizontalPadding = 36;
+            const int columnGap = 18;
             const int cardHeight = 178;
             const int rowGap = 24;
-            const int columnCount = 2;
-            const int scoreColumnWidth = 132;
-            const int avatarSize = 34;
+            const int columnCount = 3;
+            const int scoreColumnWidth = 120;
+            const int avatarSize = 30;
+            const int contentOffsetY = 8;
 
             var cardWidth = (imageWidth - horizontalPadding * 2 - columnGap) / columnCount;
             var rowCount = (leaderboard.Count + columnCount - 1) / columnCount;
@@ -156,7 +157,19 @@ namespace DiscordSupportBot.Interaction.Fund
             using var canvas = new SKCanvas(bitmap);
             using var typeface = CreateLeaderboardTypeface();
             using var emojiTypeface = CreateLeaderboardEmojiTypeface();
-            canvas.Clear(SKColors.Transparent);
+            canvas.Clear(new SKColor(20, 24, 34));
+            using var cellPaint = new SKPaint
+            {
+                Color = new SKColor(31, 38, 52),
+                IsAntialias = true
+            };
+            using var borderPaint = new SKPaint
+            {
+                Color = new SKColor(91, 103, 126),
+                IsAntialias = true,
+                Style = SKPaintStyle.Stroke,
+                StrokeWidth = 2
+            };
             using var fundFont = new SKFont(typeface, 28) { Embolden = true };
             using var scoreFont = new SKFont(typeface, 23);
             using var rankFont = new SKFont(emojiTypeface, 30);
@@ -188,29 +201,40 @@ namespace DiscordSupportBot.Interaction.Fund
                 var row = index / columnCount;
                 var x = horizontalPadding + column * (cardWidth + columnGap);
                 var y = horizontalPadding + row * (cardHeight + rowGap);
+                var cellRect = new SKRect(x, y, x + cardWidth, y + cardHeight);
 
-                canvas.DrawText(leaderboard[index].FundName, x + 28, y + 36, fundFont, fundPaint);
+                canvas.DrawRect(cellRect, cellPaint);
+                canvas.DrawRect(cellRect, borderPaint);
+                canvas.DrawText(leaderboard[index].FundName, x + 18, y + 31 + contentOffsetY, fundFont, fundPaint);
 
                 for (var rank = 0; rank < leaderboard[index].Rankings.Count; rank++)
                 {
                     var ranking = leaderboard[index].Rankings[rank];
-                    var lineY = y + 86 + rank * 38;
+                    var lineY = y + 78 + contentOffsetY + rank * 34;
                     var scoreText = ranking.Score.ToString("N0");
                     var scoreWidth = scoreFont.MeasureText(scoreText, scorePaint);
-                    var scoreRight = x + cardWidth - 24;
+                    var scoreRight = x + cardWidth - 18;
                     var scoreLeft = x + cardWidth - scoreColumnWidth;
-                    var nameLeft = x + 68;
-                    var nameWidth = scoreLeft - nameLeft - 16;
+                    var nameLeft = x + 56;
+                    var nameDrawLeft = nameLeft + avatarSize + 12;
+                    var nameWidth = scoreLeft - nameDrawLeft - 10;
 
-                    canvas.DrawText(rankEmojis[rank], x + 28, lineY, rankFont, rankTextPaint);
+                    canvas.DrawText(rankEmojis[rank], x + 18, lineY, rankFont, rankTextPaint);
 
-                    var nameDrawLeft = nameLeft;
-                    if (ranking.AvatarBytes != null && DrawLeaderboardAvatar(canvas, ranking.AvatarBytes, nameDrawLeft, lineY - avatarSize + 5, avatarSize))
-                        nameDrawLeft += avatarSize + 12;
+                    if (ranking.AvatarBytes != null)
+                        DrawLeaderboardAvatar(canvas, ranking.AvatarBytes, nameLeft, lineY - avatarSize + 5, avatarSize);
 
-                    var userText = $"@{ranking.UserName}";
-                    using var userFont = CreateFittedLeaderboardFont(typeface, userPaint, userText, nameWidth - (nameDrawLeft - nameLeft));
-                    canvas.DrawText(userText, nameDrawLeft, lineY, userFont, userPaint);
+                    var userText = LimitLeaderboardName(ranking.UserName);
+                    var userFontSize = GetLeaderboardNameFontSize(
+                        typeface,
+                        emojiTypeface,
+                        userPaint,
+                        nameWidth);
+                    var nameBaseline = GetLeaderboardTextBaseline(
+                        typeface,
+                        userFontSize,
+                        lineY - avatarSize / 2f + 5);
+                    DrawLeaderboardText(canvas, userText, nameDrawLeft, nameBaseline, userFontSize, typeface, emojiTypeface, userPaint);
                     canvas.DrawText(scoreText, scoreRight - scoreWidth, lineY, scoreFont, scorePaint);
                 }
             }
@@ -257,15 +281,79 @@ namespace DiscordSupportBot.Interaction.Fund
             }
         }
 
-        private static SKFont CreateFittedLeaderboardFont(SKTypeface typeface, SKPaint paint, string text, float maxWidth)
+        private static float GetLeaderboardNameFontSize(
+            SKTypeface typeface,
+            SKTypeface emojiTypeface,
+            SKPaint paint,
+            float maxWidth)
         {
             const float defaultSize = 25;
-            var font = new SKFont(typeface, defaultSize);
-            var measuredWidth = font.MeasureText(text, paint);
+            const string widthSample = "一一一一一一一一一";
+            var measuredWidth = MeasureLeaderboardText(widthSample, defaultSize, typeface, emojiTypeface, paint);
             if (measuredWidth > maxWidth && measuredWidth > 0)
-                font.Size = Math.Max(10, defaultSize * maxWidth / measuredWidth);
+                return Math.Max(10, defaultSize * maxWidth / measuredWidth);
 
-            return font;
+            return defaultSize;
+        }
+
+        private static float GetLeaderboardTextBaseline(SKTypeface typeface, float fontSize, float centerY)
+        {
+            using var font = new SKFont(typeface, fontSize);
+            var metrics = font.Metrics;
+            return centerY - (metrics.Ascent + metrics.Descent) / 2;
+        }
+
+        private static string LimitLeaderboardName(string userName)
+            => string.Concat(userName.EnumerateRunes().Take(9));
+
+        private static float MeasureLeaderboardText(
+            string text,
+            float fontSize,
+            SKTypeface typeface,
+            SKTypeface emojiTypeface,
+            SKPaint paint)
+        {
+            using var font = new SKFont(typeface, fontSize);
+            using var emojiFont = new SKFont(emojiTypeface, fontSize);
+            var width = 0f;
+
+            foreach (var rune in text.EnumerateRunes())
+            {
+                var runeText = rune.ToString();
+                var selectedFont = IsLeaderboardEmoji(rune.Value) ? emojiFont : font;
+                width += selectedFont.MeasureText(runeText, paint);
+            }
+
+            return width;
+        }
+
+        private static void DrawLeaderboardText(
+            SKCanvas canvas,
+            string text,
+            float x,
+            float baseline,
+            float fontSize,
+            SKTypeface typeface,
+            SKTypeface emojiTypeface,
+            SKPaint paint)
+        {
+            using var font = new SKFont(typeface, fontSize);
+            using var emojiFont = new SKFont(emojiTypeface, fontSize);
+
+            foreach (var rune in text.EnumerateRunes())
+            {
+                var runeText = rune.ToString();
+                var selectedFont = IsLeaderboardEmoji(rune.Value) ? emojiFont : font;
+                canvas.DrawText(runeText, x, baseline, selectedFont, paint);
+                x += selectedFont.MeasureText(runeText, paint);
+            }
+        }
+
+        private static bool IsLeaderboardEmoji(int codePoint)
+        {
+            return codePoint is 0x200D or 0xFE0E or 0xFE0F
+                || codePoint is >= 0x1F000 and <= 0x1FAFF
+                || codePoint is >= 0x2600 and <= 0x27BF;
         }
 
         private static SKTypeface CreateLeaderboardTypeface()
