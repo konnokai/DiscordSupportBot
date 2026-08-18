@@ -8,6 +8,8 @@ namespace DiscordSupportBot.Interaction.Fund
 {
     public class Fund : TopLevelModule<FundService>
     {
+        private static readonly HttpClient LeaderboardHttpClient = new();
+
         [RequireContext(ContextType.Guild)]
         [SlashCommand("add-fund", "對某人添加基金")]
         public async Task AddFundAsync([Summary("基金類型")] FundType fundType, [Summary("目標使用者")] IUser user)
@@ -62,8 +64,11 @@ namespace DiscordSupportBot.Interaction.Fund
             try
             {
                 var fundTypes = Enum.GetValues(typeof(FundType)).Cast<FundType>();
-                var leaderboard = new List<(string FundName, List<(string UserName, long Score)> Rankings)>();
+                var leaderboard = new List<(string FundName, List<(string UserName, long Score, byte[] AvatarBytes)> Rankings)>();
+                var users = new Dictionary<ulong, IUser>();
                 var userNames = new Dictionary<ulong, string>();
+                var avatarBytesByUser = new Dictionary<ulong, byte[]>();
+                var avatarAttempts = new HashSet<ulong>();
 
                 foreach (var fundType in fundTypes)
                 {
@@ -71,24 +76,37 @@ namespace DiscordSupportBot.Interaction.Fund
                     if (top3.Count == 0)
                         continue;
 
-                    var rankings = new List<(string UserName, long Score)>();
+                    var rankings = new List<(string UserName, long Score, byte[] AvatarBytes)>();
                     foreach (var entry in top3)
                     {
-                        if (!userNames.TryGetValue(entry.UserId, out var userName))
+                        if (!users.TryGetValue(entry.UserId, out var user))
                         {
-                            IUser user = Context.Guild.GetUser(entry.UserId) ?? Program.Client.GetUser(entry.UserId);
+                            user = Context.Guild.GetUser(entry.UserId) ?? Program.Client.GetUser(entry.UserId);
                             if (user == null)
                             {
                                 try { user = await Program.Client.Rest.GetUserAsync(entry.UserId); }
                                 catch { }
                             }
 
+                            users[entry.UserId] = user;
+                        }
+
+                        if (!userNames.TryGetValue(entry.UserId, out var userName))
+                        {
                             userName = user is IGuildUser guildUser ? guildUser.DisplayName : user?.Username;
                             userName = string.IsNullOrWhiteSpace(userName) ? $"使用者 {entry.UserId}" : userName;
                             userNames[entry.UserId] = userName;
                         }
 
-                        rankings.Add((userName, entry.Score));
+                        if (avatarAttempts.Add(entry.UserId) && user != null)
+                        {
+                            var avatarBytes = await DownloadLeaderboardAvatarAsync(user);
+                            if (avatarBytes != null)
+                                avatarBytesByUser[entry.UserId] = avatarBytes;
+                        }
+
+                        avatarBytesByUser.TryGetValue(entry.UserId, out var avatarBytesForEntry);
+                        rankings.Add((userName, entry.Score, avatarBytesForEntry));
                     }
 
                     leaderboard.Add((FundService.GetFundTypeName(fundType), rankings));
@@ -119,14 +137,16 @@ namespace DiscordSupportBot.Interaction.Fund
         }
 
         private static byte[] BuildLeaderboardImage(
-            IReadOnlyList<(string FundName, List<(string UserName, long Score)> Rankings)> leaderboard)
+            IReadOnlyList<(string FundName, List<(string UserName, long Score, byte[] AvatarBytes)> Rankings)> leaderboard)
         {
             const int imageWidth = 1200;
             const int horizontalPadding = 48;
             const int columnGap = 24;
-            const int cardHeight = 156;
+            const int cardHeight = 178;
             const int rowGap = 24;
             const int columnCount = 2;
+            const int scoreColumnWidth = 132;
+            const int avatarSize = 34;
 
             var cardWidth = (imageWidth - horizontalPadding * 2 - columnGap) / columnCount;
             var rowCount = (leaderboard.Count + columnCount - 1) / columnCount;
@@ -135,20 +155,11 @@ namespace DiscordSupportBot.Interaction.Fund
             using var bitmap = new SKBitmap(imageWidth, imageHeight, SKColorType.Rgba8888, SKAlphaType.Premul);
             using var canvas = new SKCanvas(bitmap);
             using var typeface = CreateLeaderboardTypeface();
-            using var backgroundPaint = new SKPaint { Color = new SKColor(24, 27, 38), IsAntialias = true };
-            using var cardPaint = new SKPaint { Color = new SKColor(31, 36, 52), IsAntialias = true };
-            using var borderPaint = new SKPaint
-            {
-                Color = new SKColor(58, 67, 91),
-                IsAntialias = true,
-                Style = SKPaintStyle.Stroke,
-                StrokeWidth = 2
-            };
-            using var accentPaint = new SKPaint { Color = new SKColor(0, 229, 132), IsAntialias = true };
+            using var emojiTypeface = CreateLeaderboardEmojiTypeface();
+            canvas.Clear(SKColors.Transparent);
             using var fundFont = new SKFont(typeface, 28) { Embolden = true };
-            using var userFont = new SKFont(typeface, 25);
             using var scoreFont = new SKFont(typeface, 23);
-            using var rankFont = new SKFont(typeface, 17);
+            using var rankFont = new SKFont(emojiTypeface, 30);
             using var fundPaint = new SKPaint
             {
                 Color = new SKColor(241, 245, 249),
@@ -164,22 +175,12 @@ namespace DiscordSupportBot.Interaction.Fund
                 Color = new SKColor(191, 219, 254),
                 IsAntialias = true
             };
-            using var scorePillPaint = new SKPaint { Color = new SKColor(15, 20, 32), IsAntialias = true };
-            using var rankPaint = new SKPaint { IsAntialias = true };
             using var rankTextPaint = new SKPaint
             {
                 Color = SKColors.White,
                 IsAntialias = true
             };
-
-            var rankColors = new[]
-            {
-                new SKColor(245, 180, 74),
-                new SKColor(170, 190, 210),
-                new SKColor(194, 126, 76)
-            };
-
-            canvas.DrawRect(0, 0, imageWidth, imageHeight, backgroundPaint);
+            var rankEmojis = new[] { "🥇", "🥈", "🥉" };
 
             for (var index = 0; index < leaderboard.Count; index++)
             {
@@ -187,37 +188,84 @@ namespace DiscordSupportBot.Interaction.Fund
                 var row = index / columnCount;
                 var x = horizontalPadding + column * (cardWidth + columnGap);
                 var y = horizontalPadding + row * (cardHeight + rowGap);
-                var cardRect = new SKRect(x, y, x + cardWidth, y + cardHeight);
 
-                canvas.DrawRoundRect(cardRect, 18, 18, cardPaint);
-                canvas.DrawRoundRect(cardRect, 18, 18, borderPaint);
-                canvas.DrawRoundRect(new SKRect(x, y, x + 7, y + cardHeight), 4, 4, accentPaint);
                 canvas.DrawText(leaderboard[index].FundName, x + 28, y + 36, fundFont, fundPaint);
 
                 for (var rank = 0; rank < leaderboard[index].Rankings.Count; rank++)
                 {
                     var ranking = leaderboard[index].Rankings[rank];
-                    var lineY = y + 82 + rank * 34;
+                    var lineY = y + 86 + rank * 38;
                     var scoreText = ranking.Score.ToString("N0");
                     var scoreWidth = scoreFont.MeasureText(scoreText, scorePaint);
                     var scoreRight = x + cardWidth - 24;
-                    var scoreLeft = scoreRight - scoreWidth - 24;
+                    var scoreLeft = x + cardWidth - scoreColumnWidth;
+                    var nameLeft = x + 68;
+                    var nameWidth = scoreLeft - nameLeft - 16;
 
-                    rankPaint.Color = rankColors[rank];
-                    canvas.DrawCircle(x + 40, lineY - 9, 14, rankPaint);
-                    canvas.DrawText((rank + 1).ToString(), x + 40, lineY - 3, SKTextAlign.Center, rankFont, rankTextPaint);
+                    canvas.DrawText(rankEmojis[rank], x + 28, lineY, rankFont, rankTextPaint);
 
-                    canvas.DrawRoundRect(scoreLeft, lineY - 25, scoreRight, lineY + 7, 9, 9, scorePillPaint);
-                    canvas.DrawText(scoreText, scoreLeft + 12, lineY - 3, scoreFont, scorePaint);
+                    var nameDrawLeft = nameLeft;
+                    if (ranking.AvatarBytes != null && DrawLeaderboardAvatar(canvas, ranking.AvatarBytes, nameDrawLeft, lineY - avatarSize + 5, avatarSize))
+                        nameDrawLeft += avatarSize + 12;
 
-                    var availableUserWidth = scoreLeft - x - 84;
-                    var userText = FitLeaderboardText(userFont, userPaint, $"@{ranking.UserName}", availableUserWidth);
-                    canvas.DrawText(userText, x + 68, lineY - 3, userFont, userPaint);
+                    var userText = $"@{ranking.UserName}";
+                    using var userFont = CreateFittedLeaderboardFont(typeface, userPaint, userText, nameWidth - (nameDrawLeft - nameLeft));
+                    canvas.DrawText(userText, nameDrawLeft, lineY, userFont, userPaint);
+                    canvas.DrawText(scoreText, scoreRight - scoreWidth, lineY, scoreFont, scorePaint);
                 }
             }
 
             using var encodedImage = bitmap.Encode(SKEncodedImageFormat.Png, 100);
             return encodedImage.ToArray();
+        }
+
+        private static async Task<byte[]> DownloadLeaderboardAvatarAsync(IUser user)
+        {
+            var avatarUrl = user.GetAvatarUrl(ImageFormat.Png, 64);
+            if (string.IsNullOrWhiteSpace(avatarUrl))
+                return null;
+
+            try
+            {
+                return await LeaderboardHttpClient.GetByteArrayAsync(avatarUrl);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static bool DrawLeaderboardAvatar(SKCanvas canvas, byte[] avatarBytes, float x, float y, float size)
+        {
+            try
+            {
+                using var avatar = SKBitmap.Decode(avatarBytes);
+                if (avatar == null)
+                    return false;
+
+                using var clipPath = new SKPath();
+                clipPath.AddCircle(x + size / 2, y + size / 2, size / 2);
+                canvas.Save();
+                canvas.ClipPath(clipPath, SKClipOperation.Intersect, true);
+                canvas.DrawBitmap(avatar, new SKRect(x, y, x + size, y + size));
+                canvas.Restore();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static SKFont CreateFittedLeaderboardFont(SKTypeface typeface, SKPaint paint, string text, float maxWidth)
+        {
+            const float defaultSize = 25;
+            var font = new SKFont(typeface, defaultSize);
+            var measuredWidth = font.MeasureText(text, paint);
+            if (measuredWidth > maxWidth && measuredWidth > 0)
+                font.Size = Math.Max(10, defaultSize * maxWidth / measuredWidth);
+
+            return font;
         }
 
         private static SKTypeface CreateLeaderboardTypeface()
@@ -257,17 +305,24 @@ namespace DiscordSupportBot.Interaction.Fund
                 : SKFontManager.Default.MatchFamily(family);
         }
 
-        private static string FitLeaderboardText(SKFont font, SKPaint paint, string text, float maxWidth)
+        private static SKTypeface CreateLeaderboardEmojiTypeface()
         {
-            const string suffix = "...";
-            if (font.MeasureText(text, paint) <= maxWidth)
-                return text;
+            var fontFile = "/usr/share/fonts/truetype/noto/NotoColorEmoji.ttf";
+            if (File.Exists(fontFile))
+            {
+                var typeface = SKTypeface.FromFile(fontFile);
+                if (typeface != null)
+                    return typeface;
+            }
 
-            var length = text.Length;
-            while (length > 0 && font.MeasureText(text[..length] + suffix, paint) > maxWidth)
-                length--;
+            var preferredFamilies = new[] { "Segoe UI Emoji", "Noto Color Emoji", "Apple Color Emoji" };
+            var installedFamilies = SKFontManager.Default.GetFontFamilies();
+            var family = preferredFamilies.FirstOrDefault(preferred =>
+                installedFamilies.Any(installed => string.Equals(installed, preferred, StringComparison.OrdinalIgnoreCase)));
 
-            return length == 0 ? suffix : text[..length] + suffix;
+            return family == null
+                ? SKTypeface.Default
+                : SKFontManager.Default.MatchFamily(family);
         }
 
         [RequireContext(ContextType.Guild)]
