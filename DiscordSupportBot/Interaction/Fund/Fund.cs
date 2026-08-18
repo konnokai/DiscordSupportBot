@@ -65,23 +65,26 @@ namespace DiscordSupportBot.Interaction.Fund
                     .WithTitle($"`{Context.Guild.Name}` 所有基金前三名排行榜")
                     .WithOkColor();
 
-                bool hasAny = false;
+                var descriptionLines = new List<string>();
+                var rankIcons = new[] { "🥇", "🥈", "🥉" };
                 foreach (var fundType in fundTypes)
                 {
                     var top3 = await FundService.GetTopFundAsync(fundType, Context.Guild.Id, 3);
                     if (top3.Count > 0)
                     {
-                        hasAny = true;
-                        embed.AddField(FundService.GetFundTypeName(fundType), string.Join('\n', top3.Select((x, idx) => $"{idx + 1}. <@{x.UserId}>: {x.Score}")), true);
+                        var rankings = string.Join("  ", top3.Select((x, idx) =>
+                            $"{rankIcons[idx]} <@{x.UserId}> `{x.Score:N0}`"));
+                        descriptionLines.Add($"**{FundService.GetFundTypeName(fundType)}**  {rankings}");
                     }
                 }
 
-                if (!hasAny)
+                if (descriptionLines.Count == 0)
                 {
                     await Context.Interaction.SendErrorAsync("目前沒有任何人有基金", true);
                 }
                 else
                 {
+                    embed.WithDescription(string.Join('\n', descriptionLines));
                     await Context.Interaction.FollowupAsync(embed: embed.Build());
                 }
             }
