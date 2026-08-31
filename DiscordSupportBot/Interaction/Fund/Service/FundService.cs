@@ -52,7 +52,8 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             long? PreviousRank,
             long? NewRank,
             bool IsSunday,
-            bool WasOwnerRedirected)
+            bool WasOwnerRedirected,
+            IReadOnlyList<ulong> OvertakenUserIds)
         {
             public bool RankImproved => PreviousRank.HasValue && NewRank.HasValue && NewRank < PreviousRank;
         }
@@ -358,7 +359,9 @@ namespace DiscordSupportBot.Interaction.Fund.Service
 
         private static string FormatSingleRecipientTransaction(FundAddResult result)
         {
-            var rank = result.RankImproved ? $"  🏆 升至第 {result.NewRank + 1:N0} 名" : string.Empty;
+            var rank = result.RankImproved
+                ? $"  🏆 升至第 {result.NewRank + 1:N0} 名{FormatOvertakenUsers(result)}"
+                : string.Empty;
             var sunday = result.IsSunday ? "  ☀️ 星期日加倍" : string.Empty;
             return $"<@{result.ExecuteUserId}>      +{result.IncrementAmount:N0}{rank}{sunday}";
         }
@@ -367,12 +370,17 @@ namespace DiscordSupportBot.Interaction.Fund.Service
         {
             var rank = result.PreviousRank.HasValue && result.NewRank.HasValue
                 ? result.RankImproved
-                    ? $"｜排名：{result.PreviousRank + 1:N0} → {result.NewRank + 1:N0} 🏆"
+                    ? $"｜🏆 排名：{result.PreviousRank + 1:N0} → {result.NewRank + 1:N0}{FormatOvertakenUsers(result)}"
                     : $"｜排名：第 {result.NewRank + 1:N0} 名"
                 : string.Empty;
             var sunday = result.IsSunday ? "｜☀️ 星期日加倍" : string.Empty;
             return $"<@{result.ExecuteUserId}> +{result.IncrementAmount:N0} → <@{result.RecipientUserId}>\n　餘額：{result.PreviousAmount:N0} → {result.NewAmount:N0}{rank}{sunday}";
         }
+
+        private static string FormatOvertakenUsers(FundAddResult result)
+            => result.OvertakenUserIds.Count == 0
+                ? string.Empty
+                : $"，超過 {string.Join("、", result.OvertakenUserIds.Select(userId => $"<@{userId}>"))}";
 
         private static long ParseSummaryNumber(string text, string prefix, string suffix)
         {
@@ -465,6 +473,20 @@ namespace DiscordSupportBot.Interaction.Fund.Service
 
             // 獲取增加後的排名
             var newRank = await RedisConnection.RedisDb.SortedSetRankAsync(key, userId.ToString(), Order.Descending);
+            var overtakenUserIds = new List<ulong>();
+            if (oldRank.HasValue && newRank.HasValue && newRank < oldRank)
+            {
+                var overtakenUsers = await RedisConnection.RedisDb.SortedSetRangeByRankAsync(
+                    key,
+                    newRank.Value + 1,
+                    oldRank.Value,
+                    Order.Descending);
+                foreach (var overtakenUser in overtakenUsers)
+                {
+                    if (ulong.TryParse(overtakenUser.ToString(), out var overtakenUserId))
+                        overtakenUserIds.Add(overtakenUserId);
+                }
+            }
 
             return new FundAddResult(
                 fundType,
@@ -476,7 +498,8 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                 oldRank,
                 newRank,
                 isSunday,
-                wasOwnerRedirected);
+                wasOwnerRedirected,
+                overtakenUserIds);
         }
 
         // 取得某基金前 N 名 (依 score 降冪)

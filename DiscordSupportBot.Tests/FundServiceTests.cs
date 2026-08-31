@@ -42,11 +42,12 @@ public class FundServiceTests
             20,
             19,
             false,
-            false);
+            false,
+            [88]);
 
         var description = FundService.AppendSingleRecipientDescription(before, result);
 
-        Assert.Contains("<@2>      +600  🏆 升至第 20 名", description);
+        Assert.Contains("<@2>      +600  🏆 升至第 20 名，超過 <@88>", description);
         Assert.Contains("🏆 排名變動：第 21 名 → 第 20 名（↑1）", description);
         Assert.Contains("本次入帳：2 筆，共 +1,100", description);
         Assert.Contains("基金餘額：130,800 → 131,900", description);
@@ -73,7 +74,8 @@ public class FundServiceTests
             19,
             18,
             false,
-            false);
+            false,
+            Array.Empty<ulong>());
 
         var description = FundService.AppendSingleRecipientDescription(before, result);
 
@@ -105,13 +107,14 @@ public class FundServiceTests
             20,
             19,
             false,
-            true);
+            true,
+            [77]);
 
         var description = FundService.AppendOwnerRedirectDescription(before, result);
 
         Assert.Contains("<@1>      +500 → <@98>", description);
         Assert.Contains("<@2> +600 → <@99>", description);
-        Assert.Contains("餘額：131,300 → 131,900｜排名：21 → 20 🏆", description);
+        Assert.Contains("餘額：131,300 → 131,900｜🏆 排名：21 → 20，超過 <@77>", description);
         Assert.Contains("亂彈紀錄：2 次｜命中：2 人｜累計 +1,100", description);
         Assert.DoesNotContain("本次入帳", description);
         Assert.DoesNotContain("基金餘額", description);
