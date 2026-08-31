@@ -5,9 +5,9 @@ namespace DiscordSupportBot.Tests;
 public class FundServiceTests
 {
     [Fact]
-    public void BuildFundDescription_WithoutRankChange_OmitsRankSummary()
+    public void BuildSingleRecipientDescription_WithoutRankChange_OmitsRankSummary()
     {
-        var description = FundService.BuildFundDescription(
+        var description = FundService.BuildSingleRecipientDescription(
             "<@1>      +500",
             1,
             500,
@@ -22,9 +22,9 @@ public class FundServiceTests
     }
 
     [Fact]
-    public void AppendFundDescription_FirstRankChange_AddsSummary()
+    public void AppendSingleRecipientDescription_FirstRankChange_AddsSummary()
     {
-        var before = FundService.BuildFundDescription(
+        var before = FundService.BuildSingleRecipientDescription(
             "<@1>      +500",
             1,
             500,
@@ -44,7 +44,7 @@ public class FundServiceTests
             false,
             false);
 
-        var description = FundService.AppendFundDescription(before, result);
+        var description = FundService.AppendSingleRecipientDescription(before, result);
 
         Assert.Contains("<@2>      +600  🏆 升至第 20 名", description);
         Assert.Contains("🏆 排名變動：第 21 名 → 第 20 名（↑1）", description);
@@ -53,9 +53,9 @@ public class FundServiceTests
     }
 
     [Fact]
-    public void AppendFundDescription_MultipleRankChanges_UpdatesSingleSummary()
+    public void AppendSingleRecipientDescription_MultipleRankChanges_UpdatesSingleSummary()
     {
-        var before = FundService.BuildFundDescription(
+        var before = FundService.BuildSingleRecipientDescription(
             "<@1>      +500\n<@2>      +600  🏆 升至第 20 名",
             2,
             1_100,
@@ -75,7 +75,7 @@ public class FundServiceTests
             false,
             false);
 
-        var description = FundService.AppendFundDescription(before, result);
+        var description = FundService.AppendSingleRecipientDescription(before, result);
 
         Assert.Equal(1, description.Split("🏆 排名變動：").Length - 1);
         Assert.Contains("<@3>      +700  🏆 升至第 19 名", description);
@@ -85,9 +85,9 @@ public class FundServiceTests
     }
 
     [Fact]
-    public void AppendFundDescription_OwnerRedirect_ShowsRecipientInHistory()
+    public void AppendOwnerRedirectDescription_ReplacesSingleRecipientSummary()
     {
-        var before = FundService.BuildFundDescription(
+        var before = FundService.BuildSingleRecipientDescription(
             "<@1>      +500 → <@98>",
             1,
             500,
@@ -102,15 +102,30 @@ public class FundServiceTests
             600,
             131_300,
             131_900,
-            null,
-            null,
+            20,
+            19,
             false,
             true);
 
-        var description = FundService.AppendFundDescription(before, result);
+        var description = FundService.AppendOwnerRedirectDescription(before, result);
 
         Assert.Contains("<@1>      +500 → <@98>", description);
-        Assert.Contains("<@2>      +600 → <@99>", description);
+        Assert.Contains("<@2> +600 → <@99>", description);
+        Assert.Contains("餘額：131,300 → 131,900｜排名：21 → 20 🏆", description);
+        Assert.Contains("亂彈紀錄：2 次｜命中：2 人｜累計 +1,100", description);
+        Assert.DoesNotContain("本次入帳", description);
+        Assert.DoesNotContain("基金餘額", description);
+    }
+
+    [Fact]
+    public void BuildOwnerRedirectDescription_RepeatedRecipient_CountsOnce()
+    {
+        var description = FundService.BuildOwnerRedirectDescription(
+            "<@1> +500 → <@99>\n　餘額：0 → 500\n<@2> +600 → <@99>\n　餘額：500 → 1,100",
+            2,
+            1_100);
+
+        Assert.Contains("亂彈紀錄：2 次｜命中：1 人｜累計 +1,100", description);
     }
 
     [Theory]

@@ -1,6 +1,7 @@
 ﻿using Discord.Interactions;
 using StackExchange.Redis;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace DiscordSupportBot.Interaction.Fund.Service
 {
@@ -155,14 +156,16 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                 : originalEmbed?.Title ?? FormatFundTitle(
                     result.FundType,
                     await GetUserDisplayNameAsync(interaction.GuildId ?? throw new InvalidOperationException("無法取得基金所屬伺服器"), result.RecipientUserId));
-            var description = AppendFundDescription(originalEmbed?.Description ?? string.Empty, result);
+            var description = result.WasOwnerRedirected
+                ? AppendOwnerRedirectDescription(originalEmbed?.Description ?? string.Empty, result)
+                : AppendSingleRecipientDescription(originalEmbed?.Description ?? string.Empty, result);
             description = description[^Math.Min(description.Length, EmbedBuilder.MaxDescriptionLength)..];
 
             var embed = new EmbedBuilder()
                 .WithTitle(title)
                 .WithDescription(description);
 
-            if (description.Contains("\n\n🏆 排名變動：", StringComparison.Ordinal))
+            if (description.Contains("🏆", StringComparison.Ordinal))
                 embed.WithColor(Color.Gold);
             else
                 embed.WithOkColor();
@@ -191,16 +194,23 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             var recipientDisplayName = wasOwnerRedirected
                 ? string.Empty
                 : await GetUserDisplayNameAsync(guildId, targetUserId);
-            var description = BuildFundDescription(
-                string.IsNullOrWhiteSpace(messagePrefix)
-                    ? FormatTransaction(result, result.WasOwnerRedirected)
-                    : $"{messagePrefix.TrimEnd()}\n\n{FormatTransaction(result, result.WasOwnerRedirected)}",
-                1,
-                result.IncrementAmount,
-                result.PreviousAmount,
-                result.NewAmount,
-                result.RankImproved ? result.PreviousRank + 1 : null,
-                result.RankImproved ? result.NewRank + 1 : null);
+            var description = wasOwnerRedirected
+                ? BuildOwnerRedirectDescription(
+                    string.IsNullOrWhiteSpace(messagePrefix)
+                        ? FormatOwnerRedirectTransaction(result)
+                        : $"{messagePrefix.TrimEnd()}\n\n{FormatOwnerRedirectTransaction(result)}",
+                    1,
+                    result.IncrementAmount)
+                : BuildSingleRecipientDescription(
+                    string.IsNullOrWhiteSpace(messagePrefix)
+                        ? FormatSingleRecipientTransaction(result)
+                        : $"{messagePrefix.TrimEnd()}\n\n{FormatSingleRecipientTransaction(result)}",
+                    1,
+                    result.IncrementAmount,
+                    result.PreviousAmount,
+                    result.NewAmount,
+                    result.RankImproved ? result.PreviousRank + 1 : null,
+                    result.RankImproved ? result.NewRank + 1 : null);
 
             var components = new ComponentBuilder()
                 .WithButton("讓他飛", $"{AddOneCustomIdPrefix}{(int)fundType}:{targetUserId}:{cooldownScopeId}", ButtonStyle.Success)
@@ -223,7 +233,7 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                 ? $"🎲 {GetFundTypeName(fundType)}基金 Owner 亂彈"
                 : $"💰 {GetFundTypeName(fundType)}基金入帳｜{recipientDisplayName}";
 
-        internal static string AppendFundDescription(string description, FundAddResult result)
+        internal static string AppendSingleRecipientDescription(string description, FundAddResult result)
         {
             var summaryIndex = description.IndexOf("\n\n本次入帳：", StringComparison.Ordinal);
             var rankIndex = description.IndexOf("\n\n🏆 排名變動：", StringComparison.Ordinal);
@@ -233,9 +243,9 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             if (summaryIndex < 0)
             {
                 var details = string.IsNullOrWhiteSpace(description)
-                    ? FormatTransaction(result, result.WasOwnerRedirected)
-                    : $"{description.TrimEnd()}\n\n{FormatTransaction(result, result.WasOwnerRedirected)}";
-                return BuildFundDescription(
+                    ? FormatSingleRecipientTransaction(result)
+                    : $"{description.TrimEnd()}\n\n{FormatSingleRecipientTransaction(result)}";
+                return BuildSingleRecipientDescription(
                     details,
                     1,
                     result.IncrementAmount,
@@ -254,9 +264,9 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             var finalRank = result.RankImproved
                 ? result.NewRank + 1
                 : rankIndex >= 0 ? ParseSummaryNumber(description, " → 第 ", " 名") : null;
-            var transaction = FormatTransaction(result, result.WasOwnerRedirected);
+            var transaction = FormatSingleRecipientTransaction(result);
 
-            return BuildFundDescription(
+            return BuildSingleRecipientDescription(
                 $"{description[..detailEnd].TrimEnd()}\n{transaction}",
                 count,
                 total,
@@ -264,6 +274,39 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                 result.NewAmount,
                 initialRank,
                 finalRank);
+        }
+
+        internal static string AppendOwnerRedirectDescription(string description, FundAddResult result)
+        {
+            var ownerSummaryIndex = description.IndexOf("\n\n亂彈紀錄：", StringComparison.Ordinal);
+            var singleSummaryIndex = description.IndexOf("\n\n本次入帳：", StringComparison.Ordinal);
+            var singleRankIndex = description.IndexOf("\n\n🏆 排名變動：", StringComparison.Ordinal);
+            var detailEnd = ownerSummaryIndex >= 0
+                ? ownerSummaryIndex
+                : singleRankIndex >= 0 ? singleRankIndex : singleSummaryIndex;
+            var transaction = FormatOwnerRedirectTransaction(result);
+
+            if (detailEnd < 0)
+            {
+                var details = string.IsNullOrWhiteSpace(description)
+                    ? transaction
+                    : $"{description.TrimEnd()}\n\n{transaction}";
+                return BuildOwnerRedirectDescription(details, 1, result.IncrementAmount);
+            }
+
+            var count = ParseSummaryNumber(
+                description,
+                ownerSummaryIndex >= 0 ? "亂彈紀錄：" : "本次入帳：",
+                ownerSummaryIndex >= 0 ? " 次" : " 筆") + 1;
+            var total = ParseSummaryNumber(
+                description,
+                ownerSummaryIndex >= 0 ? "累計 +" : "共 +",
+                ownerSummaryIndex >= 0 ? string.Empty : "\n") + result.IncrementAmount;
+
+            return BuildOwnerRedirectDescription(
+                $"{description[..detailEnd].TrimEnd()}\n{transaction}",
+                count,
+                total);
         }
 
         private async Task<string> GetUserDisplayNameAsync(ulong guildId, ulong userId)
@@ -285,7 +328,7 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             return _client.GetUser(userId)?.Username ?? $"使用者 {userId}";
         }
 
-        internal static string BuildFundDescription(
+        internal static string BuildSingleRecipientDescription(
             string details,
             long count,
             long total,
@@ -301,12 +344,34 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             return $"{details}{rankSummary}\n\n本次入帳：{count:N0} 筆，共 +{total:N0}\n基金餘額：{initialAmount:N0} → {finalAmount:N0}";
         }
 
-        private static string FormatTransaction(FundAddResult result, bool showRecipient)
+        internal static string BuildOwnerRedirectDescription(string details, long count, long total)
+        {
+            // ponytail: this counts visible history; persist recipient IDs only if counts must survive embed truncation.
+            var recipientCount = Regex.Matches(details, @"→ <@(\d+)>")
+                .Cast<Match>()
+                .Select(match => match.Groups[1].Value)
+                .Distinct()
+                .Count();
+
+            return $"{details}\n\n亂彈紀錄：{count:N0} 次｜命中：{recipientCount:N0} 人｜累計 +{total:N0}";
+        }
+
+        private static string FormatSingleRecipientTransaction(FundAddResult result)
         {
             var rank = result.RankImproved ? $"  🏆 升至第 {result.NewRank + 1:N0} 名" : string.Empty;
             var sunday = result.IsSunday ? "  ☀️ 星期日加倍" : string.Empty;
-            var recipient = showRecipient ? $" → <@{result.RecipientUserId}>" : string.Empty;
-            return $"<@{result.ExecuteUserId}>      +{result.IncrementAmount:N0}{recipient}{rank}{sunday}";
+            return $"<@{result.ExecuteUserId}>      +{result.IncrementAmount:N0}{rank}{sunday}";
+        }
+
+        private static string FormatOwnerRedirectTransaction(FundAddResult result)
+        {
+            var rank = result.PreviousRank.HasValue && result.NewRank.HasValue
+                ? result.RankImproved
+                    ? $"｜排名：{result.PreviousRank + 1:N0} → {result.NewRank + 1:N0} 🏆"
+                    : $"｜排名：第 {result.NewRank + 1:N0} 名"
+                : string.Empty;
+            var sunday = result.IsSunday ? "｜☀️ 星期日加倍" : string.Empty;
+            return $"<@{result.ExecuteUserId}> +{result.IncrementAmount:N0} → <@{result.RecipientUserId}>\n　餘額：{result.PreviousAmount:N0} → {result.NewAmount:N0}{rank}{sunday}";
         }
 
         private static long ParseSummaryNumber(string text, string prefix, string suffix)
@@ -316,7 +381,9 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                 throw new InvalidOperationException("基金訊息摘要格式無效");
 
             start += prefix.Length;
-            var end = text.IndexOf(suffix, start, StringComparison.Ordinal);
+            var end = string.IsNullOrEmpty(suffix)
+                ? text.Length
+                : text.IndexOf(suffix, start, StringComparison.Ordinal);
             if (end < 0 || !long.TryParse(text[start..end].Replace(",", string.Empty), out var value))
                 throw new InvalidOperationException("基金訊息摘要數值無效");
 
