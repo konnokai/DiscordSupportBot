@@ -41,6 +41,21 @@ namespace DiscordSupportBot.Interaction.Fund.Service
         // ponytail: one lock keeps message edits ordered; split per message only if this becomes a bottleneck.
         private readonly SemaphoreSlim _addOneMessageLock = new(1, 1);
 
+        internal sealed record FundAddResult(
+            FundType FundType,
+            ulong ExecuteUserId,
+            ulong RecipientUserId,
+            long IncrementAmount,
+            long PreviousAmount,
+            long NewAmount,
+            long? PreviousRank,
+            long? NewRank,
+            bool IsSunday,
+            bool WasOwnerRedirected)
+        {
+            public bool RankImproved => PreviousRank.HasValue && NewRank.HasValue && NewRank < PreviousRank;
+        }
+
         public FundService(DiscordSocketClient client)
         {
             _client = client;
@@ -113,9 +128,9 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                 await _addOneMessageLock.WaitAsync();
                 try
                 {
-                    var message = CheckIsAddOwner(fundType, arg.GuildId.Value, arg.User.Id, targetUserId, out var needAddUserId);
-                    message += await AddFundAsync(fundType, arg.GuildId.Value, arg.Channel.Id, arg.User.Id, needAddUserId);
-                    await AppendFundResultAsync(arg, message);
+                    var wasOwnerRedirected = CheckIsAddOwner(fundType, arg.GuildId.Value, arg.User.Id, targetUserId, out var needAddUserId);
+                    var result = await AddFundAsync(fundType, arg.GuildId.Value, arg.Channel.Id, arg.User.Id, needAddUserId, wasOwnerRedirected);
+                    await AppendFundResultAsync(arg, result);
                 }
                 finally
                 {
@@ -129,19 +144,26 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             }
         }
 
-        private async Task AppendFundResultAsync(SocketMessageComponent interaction, string message)
+        private async Task AppendFundResultAsync(SocketMessageComponent interaction, FundAddResult result)
         {
             var channel = interaction.InteractionChannel ?? throw new InvalidOperationException("無法取得基金訊息頻道");
             var originalMessage = await channel.GetMessageAsync(interaction.Message.Id) as IUserMessage
                 ?? throw new InvalidOperationException("無法取得基金原始訊息");
-
-            var description = $"{originalMessage.Embeds.FirstOrDefault()?.Description}\n{message}";
+            var originalEmbed = originalMessage.Embeds.FirstOrDefault();
+            var title = originalEmbed?.Title ?? FormatFundTitle(result.FundType, result.RecipientUserId);
+            var description = AppendFundDescription(originalEmbed?.Description ?? string.Empty, title, result);
             description = description[^Math.Min(description.Length, EmbedBuilder.MaxDescriptionLength)..];
 
-            await originalMessage.ModifyAsync(properties => properties.Embed = new EmbedBuilder()
-                .WithOkColor()
-                .WithDescription(description)
-                .Build());
+            var embed = new EmbedBuilder()
+                .WithTitle(title)
+                .WithDescription(description);
+
+            if (description.Contains("\n\n🏆 排名變動：", StringComparison.Ordinal))
+                embed.WithColor(Color.Gold);
+            else
+                embed.WithOkColor();
+
+            await originalMessage.ModifyAsync(properties => properties.Embed = embed.Build());
         }
 
         internal static async Task AddFundAndRespondAsync(
@@ -160,18 +182,121 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                 expiry: TimeSpan.FromHours(1),
                 when: When.NotExists);
 
-            var message = messagePrefix;
-            message += CheckIsAddOwner(fundType, guildId, executeUserId, targetUserId, out var needAddUserId);
-            message += await AddFundAsync(fundType, guildId, channelId, executeUserId, needAddUserId);
+            var wasOwnerRedirected = CheckIsAddOwner(fundType, guildId, executeUserId, targetUserId, out var needAddUserId);
+            var result = await AddFundAsync(fundType, guildId, channelId, executeUserId, needAddUserId, wasOwnerRedirected);
+            var description = BuildFundDescription(
+                string.IsNullOrWhiteSpace(messagePrefix)
+                    ? FormatTransaction(result, false)
+                    : $"{messagePrefix.TrimEnd()}\n\n{FormatTransaction(result, false)}",
+                1,
+                result.IncrementAmount,
+                result.PreviousAmount,
+                result.NewAmount,
+                result.RankImproved ? result.PreviousRank + 1 : null,
+                result.RankImproved ? result.NewRank + 1 : null);
 
             var components = new ComponentBuilder()
                 .WithButton("讓他飛", $"{AddOneCustomIdPrefix}{(int)fundType}:{targetUserId}:{cooldownScopeId}", ButtonStyle.Success)
                 .Build();
 
-            await interaction.SendConfirmAsync(message, true, components: components);
+            var embed = new EmbedBuilder()
+                .WithTitle(FormatFundTitle(fundType, needAddUserId))
+                .WithDescription(description);
+
+            if (result.RankImproved)
+                embed.WithColor(Color.Gold);
+            else
+                embed.WithOkColor();
+
+            await interaction.FollowupAsync(embed: embed.Build(), components: components);
         }
 
-        private static bool TryParseAddOneCustomId(string customId, out FundType fundType, out ulong targetUserId, out ulong cooldownScopeId)
+        internal static string FormatFundTitle(FundType fundType, ulong recipientUserId)
+            => $"💰 {GetFundTypeName(fundType)}基金入帳｜<@{recipientUserId}>";
+
+        internal static string AppendFundDescription(string description, string title, FundAddResult result)
+        {
+            var summaryIndex = description.IndexOf("\n\n本次入帳：", StringComparison.Ordinal);
+            var rankIndex = description.IndexOf("\n\n🏆 排名變動：", StringComparison.Ordinal);
+            var detailEnd = rankIndex >= 0 ? rankIndex : summaryIndex;
+
+            // Old live messages have no structured summary. Keep them and start the new format from this click.
+            if (summaryIndex < 0)
+            {
+                var details = string.IsNullOrWhiteSpace(description)
+                    ? FormatTransaction(result, !title.Contains($"<@{result.RecipientUserId}>", StringComparison.Ordinal))
+                    : $"{description.TrimEnd()}\n\n{FormatTransaction(result, !title.Contains($"<@{result.RecipientUserId}>", StringComparison.Ordinal))}";
+                return BuildFundDescription(
+                    details,
+                    1,
+                    result.IncrementAmount,
+                    result.PreviousAmount,
+                    result.NewAmount,
+                    result.RankImproved ? result.PreviousRank + 1 : null,
+                    result.RankImproved ? result.NewRank + 1 : null);
+            }
+
+            var count = ParseSummaryNumber(description, "本次入帳：", " 筆") + 1;
+            var total = ParseSummaryNumber(description, "共 +", "\n") + result.IncrementAmount;
+            var initialAmount = ParseSummaryNumber(description, "基金餘額：", " → ");
+            var initialRank = rankIndex >= 0
+                ? ParseSummaryNumber(description, "🏆 排名變動：第 ", " 名")
+                : result.RankImproved ? result.PreviousRank + 1 : null;
+            var finalRank = result.RankImproved
+                ? result.NewRank + 1
+                : rankIndex >= 0 ? ParseSummaryNumber(description, " → 第 ", " 名") : null;
+            var transaction = FormatTransaction(result, !title.Contains($"<@{result.RecipientUserId}>", StringComparison.Ordinal));
+
+            return BuildFundDescription(
+                $"{description[..detailEnd].TrimEnd()}\n{transaction}",
+                count,
+                total,
+                initialAmount,
+                result.NewAmount,
+                initialRank,
+                finalRank);
+        }
+
+        internal static string BuildFundDescription(
+            string details,
+            long count,
+            long total,
+            long initialAmount,
+            long finalAmount,
+            long? initialRank,
+            long? finalRank)
+        {
+            var rankSummary = initialRank.HasValue && finalRank.HasValue && finalRank < initialRank
+                ? $"\n\n🏆 排名變動：第 {initialRank:N0} 名 → 第 {finalRank:N0} 名（↑{initialRank - finalRank:N0}）"
+                : string.Empty;
+
+            return $"{details}{rankSummary}\n\n本次入帳：{count:N0} 筆，共 +{total:N0}\n基金餘額：{initialAmount:N0} → {finalAmount:N0}";
+        }
+
+        private static string FormatTransaction(FundAddResult result, bool showRecipient)
+        {
+            var recipient = showRecipient ? $" → <@{result.RecipientUserId}>" : string.Empty;
+            var rank = result.RankImproved ? $"  🏆 升至第 {result.NewRank + 1:N0} 名" : string.Empty;
+            var sunday = result.IsSunday ? "  ☀️ 星期日加倍" : string.Empty;
+            var ownerRedirect = result.WasOwnerRedirected ? "  ↪ Owner 亂彈" : string.Empty;
+            return $"<@{result.ExecuteUserId}>{recipient}      +{result.IncrementAmount:N0}{rank}{sunday}{ownerRedirect}";
+        }
+
+        private static long ParseSummaryNumber(string text, string prefix, string suffix)
+        {
+            var start = text.IndexOf(prefix, StringComparison.Ordinal);
+            if (start < 0)
+                throw new InvalidOperationException("基金訊息摘要格式無效");
+
+            start += prefix.Length;
+            var end = text.IndexOf(suffix, start, StringComparison.Ordinal);
+            if (end < 0 || !long.TryParse(text[start..end].Replace(",", string.Empty), out var value))
+                throw new InvalidOperationException("基金訊息摘要數值無效");
+
+            return value;
+        }
+
+        internal static bool TryParseAddOneCustomId(string customId, out FundType fundType, out ulong targetUserId, out ulong cooldownScopeId)
         {
             fundType = default;
             targetUserId = default;
@@ -194,7 +319,7 @@ namespace DiscordSupportBot.Interaction.Fund.Service
         private static string GetAddOneCooldownKey(ulong scopeId, ulong userId)
             => $"{AddOneCooldownKeyPrefix}:{scopeId}:{userId}";
 
-        internal static string CheckIsAddOwner(FundType fundType, ulong guildId, ulong executeUserId, ulong targetUserId, out ulong resultUserId)
+        internal static bool CheckIsAddOwner(FundType fundType, ulong guildId, ulong executeUserId, ulong targetUserId, out ulong resultUserId)
         {
             resultUserId = targetUserId;
 
@@ -214,55 +339,50 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                     }
                 }
 
-                return "無法對 Owner 添加基金，亂彈!\n";
+                return true;
             }
 
-            return string.Empty;
+            return false;
         }
 
         const long MinIncrementAmount = 200;
         const long MaxIncrementAmount = 1000;
         const string NotifyChannelsKey = "SupportBot:Fund:NotifyChannels";
 
-        internal static async Task<string> AddFundAsync(FundType fundType, ulong guildId, ulong channelId, ulong executeUserId, ulong userId)
+        private static async Task<FundAddResult> AddFundAsync(
+            FundType fundType,
+            ulong guildId,
+            ulong channelId,
+            ulong executeUserId,
+            ulong userId,
+            bool wasOwnerRedirected)
         {
             await RedisConnection.RedisDb.SetAddAsync(NotifyChannelsKey, channelId.ToString());
             var key = GetFundLeaderboardRedisKey(fundType, guildId);
-            var incrementAmount = Random.Shared.NextInt64(MinIncrementAmount, MaxIncrementAmount + 1);
+            var isSunday = DateTime.Now.DayOfWeek == DayOfWeek.Sunday;
+            var incrementAmount = Random.Shared.NextInt64(MinIncrementAmount, MaxIncrementAmount + 1) * (isSunday ? 2 : 1);
 
             // 獲取增加前的排名 (SortedSetRankAsync 回傳 0-based index)
             var oldRank = await RedisConnection.RedisDb.SortedSetRankAsync(key, userId.ToString(), Order.Descending);
+            var oldAmount = (long)(await RedisConnection.RedisDb.SortedSetScoreAsync(key, userId.ToString()) ?? 0);
 
             // 單純使用 ZSET 作為唯一來源（score = 總額）
-            var newAmount = await RedisConnection.RedisDb.SortedSetIncrementAsync(key, userId.ToString(), incrementAmount);
+            var newAmount = (long)await RedisConnection.RedisDb.SortedSetIncrementAsync(key, userId.ToString(), incrementAmount);
 
             // 獲取增加後的排名
             var newRank = await RedisConnection.RedisDb.SortedSetRankAsync(key, userId.ToString(), Order.Descending);
 
-            var message = $"<@{executeUserId}> 已對 <@{userId}> 增加 {incrementAmount} {GetFundTypeName(fundType)}基金，現在金額: {newAmount}";
-
-            // 檢測排名是否變更
-            if (oldRank.HasValue && newRank.HasValue && newRank < oldRank) // new 只會比 old 小 (1 < 2)
-            {
-                var beatenMemberId = string.Empty;
-                var beatenEntries = await RedisConnection.RedisDb.SortedSetRangeByRankWithScoresAsync(key, oldRank.Value, oldRank.Value, Order.Descending);
-                if (beatenEntries.Length > 0) // 原則上不會是空的
-                {
-                    beatenMemberId = beatenEntries[0].Element.ToString();
-                }
-
-                var newRankDisplay = newRank.Value + 1;
-                if (string.IsNullOrEmpty(beatenMemberId))
-                {
-                    message += $"\n\n喜報！已成為{GetFundTypeName(fundType)}基金的榜 {newRankDisplay}";
-                }
-                else
-                {
-                    message += $"\n\n喜報！已超越 <@{beatenMemberId}> 成為{GetFundTypeName(fundType)}基金的榜 {newRankDisplay}";
-                }
-            }
-
-            return message;
+            return new FundAddResult(
+                fundType,
+                executeUserId,
+                userId,
+                incrementAmount,
+                oldAmount,
+                newAmount,
+                oldRank,
+                newRank,
+                isSunday,
+                wasOwnerRedirected);
         }
 
         // 取得某基金前 N 名 (依 score 降冪)

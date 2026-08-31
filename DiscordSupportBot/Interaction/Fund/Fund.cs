@@ -205,7 +205,7 @@ namespace DiscordSupportBot.Interaction.Fund
 
                 canvas.DrawRect(cellRect, cellPaint);
                 canvas.DrawRect(cellRect, borderPaint);
-                canvas.DrawText(leaderboard[index].FundName, x + 18, y + 31 + contentOffsetY, fundFont, fundPaint);
+                canvas.DrawText(leaderboard[index].FundName, x + 18, y + 31 + contentOffsetY, SKTextAlign.Left, fundFont, fundPaint);
 
                 for (var rank = 0; rank < leaderboard[index].Rankings.Count; rank++)
                 {
@@ -219,7 +219,7 @@ namespace DiscordSupportBot.Interaction.Fund
                     var nameDrawLeft = nameLeft + avatarSize + 12;
                     var nameWidth = scoreLeft - nameDrawLeft - 10;
 
-                    canvas.DrawText(rankEmojis[rank], x + 18, lineY, rankFont, rankTextPaint);
+                    canvas.DrawText(rankEmojis[rank], x + 18, lineY, SKTextAlign.Left, rankFont, rankTextPaint);
 
                     if (ranking.AvatarBytes != null)
                         DrawLeaderboardAvatar(canvas, ranking.AvatarBytes, nameLeft, lineY - avatarSize + 5, avatarSize);
@@ -235,7 +235,7 @@ namespace DiscordSupportBot.Interaction.Fund
                         userFontSize,
                         lineY - avatarSize / 2f + 5);
                     DrawLeaderboardText(canvas, userText, nameDrawLeft, nameBaseline, userFontSize, typeface, emojiTypeface, userPaint);
-                    canvas.DrawText(scoreText, scoreRight - scoreWidth, lineY, scoreFont, scorePaint);
+                    canvas.DrawText(scoreText, scoreRight - scoreWidth, lineY, SKTextAlign.Left, scoreFont, scorePaint);
                 }
             }
 
@@ -267,11 +267,12 @@ namespace DiscordSupportBot.Interaction.Fund
                 if (avatar == null)
                     return false;
 
-                using var clipPath = new SKPath();
-                clipPath.AddCircle(x + size / 2, y + size / 2, size / 2);
+                using var clipPathBuilder = new SKPathBuilder();
+                clipPathBuilder.AddCircle(x + size / 2, y + size / 2, size / 2, SKPathDirection.Clockwise);
+                using var clipPath = clipPathBuilder.Detach();
                 canvas.Save();
                 canvas.ClipPath(clipPath, SKClipOperation.Intersect, true);
-                canvas.DrawBitmap(avatar, new SKRect(x, y, x + size, y + size));
+                canvas.DrawBitmap(avatar, new SKRect(x, y, x + size, y + size), SKSamplingOptions.Default);
                 canvas.Restore();
                 return true;
             }
@@ -344,7 +345,7 @@ namespace DiscordSupportBot.Interaction.Fund
             {
                 var runeText = rune.ToString();
                 var selectedFont = IsLeaderboardEmoji(rune.Value) ? emojiFont : font;
-                canvas.DrawText(runeText, x, baseline, selectedFont, paint);
+                canvas.DrawText(runeText, x, baseline, SKTextAlign.Left, selectedFont, paint);
                 x += selectedFont.MeasureText(runeText, paint);
             }
         }
