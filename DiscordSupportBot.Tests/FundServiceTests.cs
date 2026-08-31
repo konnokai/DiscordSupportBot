@@ -84,6 +84,35 @@ public class FundServiceTests
         Assert.Contains("基金餘額：130,800 → 132,600", description);
     }
 
+    [Fact]
+    public void AppendFundDescription_OwnerRedirect_ShowsRecipientInHistory()
+    {
+        var before = FundService.BuildFundDescription(
+            "<@1>      +500 → <@98>",
+            1,
+            500,
+            130_800,
+            131_300,
+            null,
+            null);
+        var result = new FundService.FundAddResult(
+            FundService.FundType.Lying,
+            2,
+            99,
+            600,
+            131_300,
+            131_900,
+            null,
+            null,
+            false,
+            true);
+
+        var description = FundService.AppendFundDescription(before, result);
+
+        Assert.Contains("<@1>      +500 → <@98>", description);
+        Assert.Contains("<@2>      +600 → <@99>", description);
+    }
+
     [Theory]
     [InlineData("fund-add-one:0:123", 0UL)]
     [InlineData("fund-add-one:0:123:456", 456UL)]
@@ -101,5 +130,11 @@ public class FundServiceTests
     public void FormatFundTitle_UsesDisplayName()
     {
         Assert.Equal("💰 說謊基金入帳｜測試使用者", FundService.FormatFundTitle(FundService.FundType.Lying, "測試使用者"));
+    }
+
+    [Fact]
+    public void FormatFundTitle_OwnerRedirect_UsesSeparateTitle()
+    {
+        Assert.Equal("🎲 說謊基金 Owner 亂彈", FundService.FormatFundTitle(FundService.FundType.Lying, string.Empty, true));
     }
 }
