@@ -150,8 +150,10 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             var originalMessage = await channel.GetMessageAsync(interaction.Message.Id) as IUserMessage
                 ?? throw new InvalidOperationException("無法取得基金原始訊息");
             var originalEmbed = originalMessage.Embeds.FirstOrDefault();
-            var title = originalEmbed?.Title ?? FormatFundTitle(result.FundType, result.RecipientUserId);
-            var description = AppendFundDescription(originalEmbed?.Description ?? string.Empty, title, result);
+            var title = FormatFundTitle(
+                result.FundType,
+                await GetUserDisplayNameAsync(interaction.GuildId ?? throw new InvalidOperationException("無法取得基金所屬伺服器"), result.RecipientUserId));
+            var description = AppendFundDescription(originalEmbed?.Description ?? string.Empty, result);
             description = description[^Math.Min(description.Length, EmbedBuilder.MaxDescriptionLength)..];
 
             var embed = new EmbedBuilder()
@@ -166,7 +168,7 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             await originalMessage.ModifyAsync(properties => properties.Embed = embed.Build());
         }
 
-        internal static async Task AddFundAndRespondAsync(
+        internal async Task AddFundAndRespondAsync(
             IDiscordInteraction interaction,
             FundType fundType,
             ulong guildId,
@@ -184,6 +186,7 @@ namespace DiscordSupportBot.Interaction.Fund.Service
 
             var wasOwnerRedirected = CheckIsAddOwner(fundType, guildId, executeUserId, targetUserId, out var needAddUserId);
             var result = await AddFundAsync(fundType, guildId, channelId, executeUserId, needAddUserId, wasOwnerRedirected);
+            var recipientDisplayName = await GetUserDisplayNameAsync(guildId, needAddUserId);
             var description = BuildFundDescription(
                 string.IsNullOrWhiteSpace(messagePrefix)
                     ? FormatTransaction(result, false)
@@ -200,7 +203,7 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                 .Build();
 
             var embed = new EmbedBuilder()
-                .WithTitle(FormatFundTitle(fundType, needAddUserId))
+                .WithTitle(FormatFundTitle(fundType, recipientDisplayName))
                 .WithDescription(description);
 
             if (result.RankImproved)
@@ -211,10 +214,10 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             await interaction.FollowupAsync(embed: embed.Build(), components: components);
         }
 
-        internal static string FormatFundTitle(FundType fundType, ulong recipientUserId)
-            => $"💰 {GetFundTypeName(fundType)}基金入帳｜<@{recipientUserId}>";
+        internal static string FormatFundTitle(FundType fundType, string recipientDisplayName)
+            => $"💰 {GetFundTypeName(fundType)}基金入帳｜{recipientDisplayName}";
 
-        internal static string AppendFundDescription(string description, string title, FundAddResult result)
+        internal static string AppendFundDescription(string description, FundAddResult result)
         {
             var summaryIndex = description.IndexOf("\n\n本次入帳：", StringComparison.Ordinal);
             var rankIndex = description.IndexOf("\n\n🏆 排名變動：", StringComparison.Ordinal);
@@ -224,8 +227,8 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             if (summaryIndex < 0)
             {
                 var details = string.IsNullOrWhiteSpace(description)
-                    ? FormatTransaction(result, !title.Contains($"<@{result.RecipientUserId}>", StringComparison.Ordinal))
-                    : $"{description.TrimEnd()}\n\n{FormatTransaction(result, !title.Contains($"<@{result.RecipientUserId}>", StringComparison.Ordinal))}";
+                    ? FormatTransaction(result, false)
+                    : $"{description.TrimEnd()}\n\n{FormatTransaction(result, false)}";
                 return BuildFundDescription(
                     details,
                     1,
@@ -245,7 +248,7 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             var finalRank = result.RankImproved
                 ? result.NewRank + 1
                 : rankIndex >= 0 ? ParseSummaryNumber(description, " → 第 ", " 名") : null;
-            var transaction = FormatTransaction(result, !title.Contains($"<@{result.RecipientUserId}>", StringComparison.Ordinal));
+            var transaction = FormatTransaction(result, false);
 
             return BuildFundDescription(
                 $"{description[..detailEnd].TrimEnd()}\n{transaction}",
@@ -255,6 +258,25 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                 result.NewAmount,
                 initialRank,
                 finalRank);
+        }
+
+        private async Task<string> GetUserDisplayNameAsync(ulong guildId, ulong userId)
+        {
+            var guildUser = _client.GetGuild(guildId)?.GetUser(userId);
+            if (!string.IsNullOrWhiteSpace(guildUser?.DisplayName))
+                return guildUser.DisplayName;
+
+            try
+            {
+                var fetchedGuildUser = await _client.Rest.GetGuildUserAsync(guildId, userId);
+                if (!string.IsNullOrWhiteSpace(fetchedGuildUser?.DisplayName))
+                    return fetchedGuildUser.DisplayName;
+            }
+            catch
+            {
+            }
+
+            return _client.GetUser(userId)?.Username ?? $"使用者 {userId}";
         }
 
         internal static string BuildFundDescription(

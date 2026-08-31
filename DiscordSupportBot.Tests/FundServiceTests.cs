@@ -44,7 +44,7 @@ public class FundServiceTests
             false,
             false);
 
-        var description = FundService.AppendFundDescription(before, "💰 說謊基金入帳｜<@99>", result);
+        var description = FundService.AppendFundDescription(before, result);
 
         Assert.Contains("<@2>      +600  🏆 升至第 20 名", description);
         Assert.Contains("🏆 排名變動：第 21 名 → 第 20 名（↑1）", description);
@@ -75,7 +75,7 @@ public class FundServiceTests
             false,
             false);
 
-        var description = FundService.AppendFundDescription(before, "💰 說謊基金入帳｜<@99>", result);
+        var description = FundService.AppendFundDescription(before, result);
 
         Assert.Equal(1, description.Split("🏆 排名變動：").Length - 1);
         Assert.Contains("<@3>      +700  🏆 升至第 19 名", description);
@@ -98,8 +98,8 @@ public class FundServiceTests
     }
 
     [Fact]
-    public void FormatFundTitle_IncludesFundType()
+    public void FormatFundTitle_UsesDisplayName()
     {
-        Assert.Equal("💰 說謊基金入帳｜<@99>", FundService.FormatFundTitle(FundService.FundType.Lying, 99));
+        Assert.Equal("💰 說謊基金入帳｜測試使用者", FundService.FormatFundTitle(FundService.FundType.Lying, "測試使用者"));
     }
 }

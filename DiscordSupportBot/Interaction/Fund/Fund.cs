@@ -29,7 +29,7 @@ namespace DiscordSupportBot.Interaction.Fund
 
             await Context.Interaction.DeferAsync(false);
 
-            await FundService.AddFundAndRespondAsync(
+            await _service.AddFundAndRespondAsync(
                 Context.Interaction,
                 fundType,
                 Context.Guild.Id,
