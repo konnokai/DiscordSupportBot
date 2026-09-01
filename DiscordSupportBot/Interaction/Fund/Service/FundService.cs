@@ -5,10 +5,12 @@ using System.Text.RegularExpressions;
 
 namespace DiscordSupportBot.Interaction.Fund.Service
 {
-    public class FundService : IInteractionService
+    public class FundService : IInteractionService, IDisposable
     {
         private const string AddOneCustomIdPrefix = "fund-add-one:";
         private const string AddOneCooldownKeyPrefix = "SupportBot:Fund:AddOneCooldown";
+        private const string MessageStateCacheKeyPrefix = "SupportBot:Fund:MessageState";
+        private static readonly TimeSpan MessageStateCacheTtl = TimeSpan.FromMinutes(5);
 
         public enum FundType
         {
@@ -39,8 +41,11 @@ namespace DiscordSupportBot.Interaction.Fund.Service
         }
 
         private readonly DiscordSocketClient _client;
-        // ponytail: one lock keeps message edits ordered; split per message only if this becomes a bottleneck.
-        private readonly SemaphoreSlim _addOneMessageLock = new(1, 1);
+        // ponytail: one process-wide lock prevents duplicate service instances from editing stale message state.
+        private static readonly SemaphoreSlim AddOneMessageLock = new(1, 1);
+        private int _initialized;
+
+        internal sealed record FundMessageState(string Title, string Description);
 
         internal sealed record FundAddResult(
             FundType FundType,
@@ -61,9 +66,24 @@ namespace DiscordSupportBot.Interaction.Fund.Service
         public FundService(DiscordSocketClient client)
         {
             _client = client;
+        }
+
+        public void Initialize()
+        {
+            if (Interlocked.Exchange(ref _initialized, 1) != 0)
+                return;
 
             _client.ModalSubmitted += _client_ModalSubmitted;
             _client.ButtonExecuted += HandleAddOneButtonAsync;
+        }
+
+        public void Dispose()
+        {
+            if (Interlocked.Exchange(ref _initialized, 0) == 0)
+                return;
+
+            _client.ModalSubmitted -= _client_ModalSubmitted;
+            _client.ButtonExecuted -= HandleAddOneButtonAsync;
         }
 
         private async Task _client_ModalSubmitted(SocketModal arg)
@@ -127,7 +147,7 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                     return;
                 }
 
-                await _addOneMessageLock.WaitAsync();
+                await AddOneMessageLock.WaitAsync();
                 try
                 {
                     var wasOwnerRedirected = CheckIsAddOwner(fundType, arg.GuildId.Value, arg.User.Id, targetUserId, out var needAddUserId);
@@ -136,7 +156,7 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                 }
                 finally
                 {
-                    _addOneMessageLock.Release();
+                    AddOneMessageLock.Release();
                 }
             }
             catch (Exception ex)
@@ -148,19 +168,30 @@ namespace DiscordSupportBot.Interaction.Fund.Service
 
         private async Task AppendFundResultAsync(SocketMessageComponent interaction, FundAddResult result)
         {
-            var channel = interaction.InteractionChannel ?? throw new InvalidOperationException("無法取得基金訊息頻道");
-            var originalMessage = await channel.GetMessageAsync(interaction.Message.Id) as IUserMessage
-                ?? throw new InvalidOperationException("無法取得基金原始訊息");
-            var originalEmbed = originalMessage.Embeds.FirstOrDefault();
+            var state = await GetCachedMessageStateAsync(interaction.Message.Id);
+            IUserMessage originalMessage = interaction.Message;
+
+            if (state == null)
+            {
+                var channel = await _client.Rest.GetChannelAsync(interaction.Channel.Id) as IMessageChannel
+                    ?? throw new InvalidOperationException("無法取得基金訊息頻道");
+                originalMessage = await channel.GetMessageAsync(interaction.Message.Id) as IUserMessage
+                    ?? throw new InvalidOperationException("無法取得基金原始訊息");
+                var originalEmbed = originalMessage.Embeds.FirstOrDefault();
+                state = new FundMessageState(originalEmbed?.Title ?? string.Empty, originalEmbed?.Description ?? string.Empty);
+            }
+
             var title = result.WasOwnerRedirected
                 ? FormatFundTitle(result.FundType, string.Empty, true)
-                : originalEmbed?.Title ?? FormatFundTitle(
+                : string.IsNullOrEmpty(state.Title) ? FormatFundTitle(
                     result.FundType,
-                    await GetUserDisplayNameAsync(interaction.GuildId ?? throw new InvalidOperationException("無法取得基金所屬伺服器"), result.RecipientUserId));
+                    await GetUserDisplayNameAsync(interaction.GuildId ?? throw new InvalidOperationException("無法取得基金所屬伺服器"), result.RecipientUserId)) : state.Title;
             var description = result.WasOwnerRedirected
-                ? AppendOwnerRedirectDescription(originalEmbed?.Description ?? string.Empty, result)
-                : AppendSingleRecipientDescription(originalEmbed?.Description ?? string.Empty, result);
+                ? AppendOwnerRedirectDescription(state.Description, result)
+                : AppendSingleRecipientDescription(state.Description, result);
             description = description[^Math.Min(description.Length, EmbedBuilder.MaxDescriptionLength)..];
+
+            await CacheMessageStateAsync(interaction.Message.Id, new FundMessageState(title, description));
 
             var embed = new EmbedBuilder()
                 .WithTitle(title)
@@ -217,8 +248,10 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                 .WithButton("讓他飛", $"{AddOneCustomIdPrefix}{(int)fundType}:{targetUserId}:{cooldownScopeId}", ButtonStyle.Success)
                 .Build();
 
+            var title = FormatFundTitle(fundType, recipientDisplayName, wasOwnerRedirected);
+
             var embed = new EmbedBuilder()
-                .WithTitle(FormatFundTitle(fundType, recipientDisplayName, wasOwnerRedirected))
+                .WithTitle(title)
                 .WithDescription(description);
 
             if (result.RankImproved)
@@ -226,8 +259,49 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             else
                 embed.WithOkColor();
 
-            await interaction.FollowupAsync(embed: embed.Build(), components: components);
+            var message = await interaction.FollowupAsync(embed: embed.Build(), components: components);
+            await CacheMessageStateAsync(message.Id, new FundMessageState(title, description));
         }
+
+        private static async Task<FundMessageState> GetCachedMessageStateAsync(ulong messageId)
+        {
+            try
+            {
+                var value = await RedisConnection.RedisDb.StringGetAsync(GetMessageStateCacheKey(messageId));
+                if (!value.HasValue)
+                    return null;
+
+                var state = System.Text.Json.JsonSerializer.Deserialize<FundMessageState>(value.ToString());
+                return state is { Title: not null, Description: not null } ? state : null;
+            }
+            catch (System.Text.Json.JsonException)
+            {
+                return null;
+            }
+            catch (RedisException ex)
+            {
+                Log.Error(ex, $"FundService-GetMessageStateCache: {messageId}");
+                return null;
+            }
+        }
+
+        private static async Task CacheMessageStateAsync(ulong messageId, FundMessageState state)
+        {
+            try
+            {
+                await RedisConnection.RedisDb.StringSetAsync(
+                    GetMessageStateCacheKey(messageId),
+                    System.Text.Json.JsonSerializer.Serialize(state),
+                    MessageStateCacheTtl);
+            }
+            catch (RedisException ex)
+            {
+                Log.Error(ex, $"FundService-SetMessageStateCache: {messageId}");
+            }
+        }
+
+        private static string GetMessageStateCacheKey(ulong messageId)
+            => $"{MessageStateCacheKeyPrefix}:{messageId}";
 
         internal static string FormatFundTitle(FundType fundType, string recipientDisplayName, bool ownerRedirected = false)
             => ownerRedirected
@@ -546,6 +620,10 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             long deleted = 0;
             if (keys.Length > 0)
                 deleted = await RedisConnection.RedisDb.KeyDeleteAsync(keys);
+
+            var messageStateKeys = RedisConnection.RedisServer.Keys(database: 2, pattern: $"{MessageStateCacheKeyPrefix}:*").ToArray();
+            if (messageStateKeys.Length > 0)
+                await RedisConnection.RedisDb.KeyDeleteAsync(messageStateKeys);
 
             await RedisConnection.RedisDb.KeyDeleteAsync(NotifyChannelsKey);
 

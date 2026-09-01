@@ -1,9 +1,33 @@
+using DiscordSupportBot.Interaction;
 using DiscordSupportBot.Interaction.Fund.Service;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DiscordSupportBot.Tests;
 
 public class FundServiceTests
 {
+    [Fact]
+    public void ExplicitFundServiceRegistration_RemainsOneSingleton()
+    {
+        var services = new ServiceCollection().AddSingleton<FundService>();
+
+        services.LoadInteractionFrom(typeof(FundService).Assembly);
+
+        var registration = Assert.Single(services, descriptor => descriptor.ServiceType == typeof(FundService));
+        Assert.Equal(ServiceLifetime.Singleton, registration.Lifetime);
+    }
+
+    [Fact]
+    public void FundMessageState_JsonRoundTrip_PreservesRenderedState()
+    {
+        var state = new FundService.FundMessageState("title", "description");
+
+        var json = System.Text.Json.JsonSerializer.Serialize(state);
+        var restored = System.Text.Json.JsonSerializer.Deserialize<FundService.FundMessageState>(json);
+
+        Assert.Equal(state, restored);
+    }
+
     [Fact]
     public void BuildSingleRecipientDescription_WithoutRankChange_OmitsRankSummary()
     {

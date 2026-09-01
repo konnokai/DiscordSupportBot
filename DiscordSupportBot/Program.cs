@@ -308,6 +308,7 @@ namespace DiscordSupportBot
                 //.AddHttpClient()
                 .AddSingleton(Client)
                 .AddSingleton(_botConfig)
+                .AddSingleton<Interaction.Fund.Service.FundService>()
                 .AddSingleton(new InteractionService(Client, new InteractionServiceConfig()
                 {
                     AutoServiceScopes = true,
@@ -318,6 +319,7 @@ namespace DiscordSupportBot
 
             interactionServices.LoadInteractionFrom(Assembly.GetAssembly(typeof(InteractionHandler)));
             IServiceProvider iService = interactionServices.BuildServiceProvider();
+            iService.GetRequiredService<Interaction.Fund.Service.FundService>().Initialize();
             await iService.GetService<InteractionHandler>().InitializeAsync();
             #endregion
 
