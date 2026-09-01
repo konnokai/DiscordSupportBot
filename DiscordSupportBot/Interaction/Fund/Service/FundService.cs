@@ -231,7 +231,7 @@ namespace DiscordSupportBot.Interaction.Fund.Service
 
         internal static string FormatFundTitle(FundType fundType, string recipientDisplayName, bool ownerRedirected = false)
             => ownerRedirected
-                ? $"🎲 {GetFundTypeName(fundType)}基金 Owner 亂彈"
+                ? $"🎲 {GetFundTypeName(fundType)}基金亂彈"
                 : $"💰 {GetFundTypeName(fundType)}基金入帳｜{recipientDisplayName}";
 
         internal static string AppendSingleRecipientDescription(string description, FundAddResult result)

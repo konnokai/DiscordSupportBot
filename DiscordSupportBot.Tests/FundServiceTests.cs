@@ -153,6 +153,6 @@ public class FundServiceTests
     [Fact]
     public void FormatFundTitle_OwnerRedirect_UsesSeparateTitle()
     {
-        Assert.Equal("🎲 說謊基金 Owner 亂彈", FundService.FormatFundTitle(FundService.FundType.Lying, string.Empty, true));
+        Assert.Equal("🎲 說謊基金亂彈", FundService.FormatFundTitle(FundService.FundType.Lying, string.Empty, true));
     }
 }
