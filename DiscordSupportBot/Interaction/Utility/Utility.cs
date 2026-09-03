@@ -49,10 +49,7 @@ namespace DiscordSupportBot.Interaction.Utility
             await RespondAsync("點我訂閱", components: new ComponentBuilder().WithButton("訂閱", "sub", ButtonStyle.Danger).Build());
         }
 
-        [RequireOwner]
-        [RequireContext(ContextType.Guild)]
-        [RequireGuild(506083124015398932)]
-        [SlashCommand("alipay-payment", "計算支付寶付款換算後的台幣信用卡支付金額")]
+        [SlashCommand("alipay-payment", "以合作金庫匯率來計算支付寶付款換算後的台幣信用卡支付金額")]
         public async Task AlipayPaymentAsync([Summary("amount", "支付寶顯示的人民幣付款金額")] double amount)
         {
             if (!double.IsFinite(amount) || amount <= 0)
@@ -103,7 +100,7 @@ namespace DiscordSupportBot.Interaction.Utility
                     $"`NT${FormatAmount(calculation.TwdAmountAfterCreditCardFee)} → 無條件進位至百位數 → NT${FormatAmount(calculation.FinalTwdAmount)}`\n" +
                     $"**NT${FormatAmount(calculation.FinalTwdAmount)}**");
 
-            await RespondAsync(embed: embed.Build());
+            await RespondAsync(embed: embed.Build(), ephemeral: true);
         }
 
         private static string FormatAmount(decimal value)
