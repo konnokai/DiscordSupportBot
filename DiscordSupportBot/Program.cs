@@ -320,6 +320,7 @@ namespace DiscordSupportBot
             interactionServices.LoadInteractionFrom(Assembly.GetAssembly(typeof(InteractionHandler)));
             IServiceProvider iService = interactionServices.BuildServiceProvider();
             iService.GetRequiredService<Interaction.Fund.Service.FundService>().Initialize();
+            await iService.GetRequiredService<Interaction.Utility.UtilityService>().InitializeAsync();
             await iService.GetService<InteractionHandler>().InitializeAsync();
             #endregion
 
