@@ -42,4 +42,4 @@ Rules:
 - If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
 - Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
 - Do not automatically run `graphify update .` after modifying code. Remind the user to run it manually to keep the graph current.
-- When the user requests a commit, always include any changes under `graphify-out/` in that commit.
+- `graphify-out/` is a local build artifact and is ignored by `.gitignore`. Never stage or commit files under it.
