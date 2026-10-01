@@ -1,4 +1,5 @@
 ﻿using Discord.Commands;
+using DiscordSupportBot.Interaction.Activity;
 
 namespace DiscordSupportBot.Command.Normal
 {
@@ -54,76 +55,28 @@ namespace DiscordSupportBot.Command.Normal
         [Summary("幹話排行榜榜榜榜...")]
         [Alias("Act")]
         [RequireContext(ContextType.Guild)]
-        public async Task Activity([Summary("頁數，預設為第一頁")] int page = 0)
+        public async Task Activity([Summary("頁數，預設為第一頁")] int page = 1)
         {
             await Context.Channel.TriggerTypingAsync().ConfigureAwait(false);
 
-            var userActivity = (await UserActivity.GetActivityAsync(Context.Guild.Id).ConfigureAwait(false)).OrderByDescending((x) => x.ActivityNum).ToList();
-            if (!userActivity.Any()) return;
-            var user = userActivity.FirstOrDefault((x) => x.UserID == Context.User.Id);
+            var components = await ActivityLeaderboard.CreateMessageLeaderboardAsync(_client, Context.Guild, Context.User.Id, page - 1).ConfigureAwait(false);
+            if (components == null) return;
 
-            await Context.SendPaginatedConfirmAsync(page, async (row) =>
-            {
-                EmbedBuilder embedBuilder = new EmbedBuilder().WithOkColor().WithTitle($"{Context.Guild.Name} 發言排行榜");
-                var items = userActivity.Skip(row * 20).Take(20).ToList(); string temp = "";
-
-                for (int i = 0; i < items.Count; i++)
-                {
-                    var item = items[i];
-
-                    IUser user = Program.Client.GetUser(item.UserID);
-                    if (user == null)
-                    {
-                        try { user = await Program.Client.Rest.GetUserAsync(item.UserID); }
-                        catch { }
-                        if (user == null)
-                            continue;
-                    }
-
-                    temp += $"{row * 25 + i + 1}. {user.Username}[<@{item.UserID}>] `{item.ActivityNum}` 則訊息\n";
-                }
-
-                embedBuilder.WithDescription(temp);
-                embedBuilder.WithFooter($"{row + 1} / {userActivity.Count / 25 + 1}" + (user != null ? $" | {Context.User.Username}的排名為: {userActivity.IndexOf(user) + 1}" : ""));
-                return embedBuilder;
-            }, userActivity.Count, 25, false).ConfigureAwait(false);
+            await Context.Channel.SendMessageAsync(components: components, allowedMentions: AllowedMentions.None).ConfigureAwait(false);
         }
 
         [Command("EmoteActivity")]
         [Summary("表情使用排行榜")]
         [Alias("EAct")]
         [RequireContext(ContextType.Guild)]
-        public async Task EmoteActivity([Summary("頁數，預設為第一頁")] int page = 0)
+        public async Task EmoteActivity([Summary("頁數，預設為第一頁")] int page = 1)
         {
             await Context.Channel.TriggerTypingAsync().ConfigureAwait(false);
 
-            var emoteActivity = (await DataBase.Activity.EmoteActivity.GetActivityAsync(Context.Guild.Id).ConfigureAwait(false)).OrderByDescending((x) => x.ActivityNum).ToList();
-            if (!emoteActivity.Any()) return;
+            var components = await ActivityLeaderboard.CreateEmoteLeaderboardAsync(Context.Guild, Context.User.Id, page - 1).ConfigureAwait(false);
+            if (components == null) return;
 
-            await Context.SendPaginatedConfirmAsync(page, (row) =>
-            {
-                EmbedBuilder embedBuilder = new EmbedBuilder().WithOkColor().WithTitle($"{Context.Guild.Name} 表情使用排行榜");
-                var items = emoteActivity.Skip(row * 50).Take(50).ToList();
-                var resultList = new List<string>();
-
-                for (int i = 0; i < Math.Min(items.Count, 25); i++)
-                {
-                    var item = items[i];
-                    resultList.Add($"`{row * 50 + i + 1}.` {item.EmoteName} `{item.ActivityNum} 次`");
-                }
-
-                if (items.Count >= 25)
-                {
-                    for (int i = 25; i < items.Count; i++)
-                    {
-                        var item = items[i];
-                        resultList[i - 25] += ($"  |  `{row * 50 + i + 1}.` {item.EmoteName} `{item.ActivityNum} 次`");
-                    }
-                }
-
-                embedBuilder.WithDescription(string.Join('\n', resultList));
-                return embedBuilder;
-            }, emoteActivity.Count, 50).ConfigureAwait(false);
+            await Context.Channel.SendMessageAsync(components: components, allowedMentions: AllowedMentions.None).ConfigureAwait(false);
         }
 
         [Command("EmoteUseCount")]

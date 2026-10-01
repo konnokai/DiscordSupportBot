@@ -73,7 +73,7 @@ namespace DiscordSupportBot.DataBase.Activity
                     if (!hasSqliteRecord && redisNum <= 0)
                         continue;
 
-                    resultList.Add(new EmoteTable() { EmoteID = guildEmote.Id, EmoteName = guildEmote.ToString(), ActivityNum = Math.Max(0, sqliteNum + redisNum) });
+                    resultList.Add(new EmoteTable() { EmoteID = guildEmote.Id, EmoteName = guildEmote.ToString(), EmoteUrl = guildEmote.Url, ActivityNum = Math.Max(0, sqliteNum + redisNum) });
                 }
 
                 return resultList;

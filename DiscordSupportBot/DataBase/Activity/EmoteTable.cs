@@ -7,6 +7,10 @@
         /// 此屬性僅會由 <see cref="EmoteActivity.GetActivityAsync(ulong)"/> 設定
         /// </summary>
         public string EmoteName { get; set; }
+        /// <summary>
+        /// 此屬性僅會由 <see cref="EmoteActivity.GetActivityAsync(ulong)"/> 設定
+        /// </summary>
+        public string EmoteUrl { get; set; }
         public int ActivityNum { get; set; }
     }
 }

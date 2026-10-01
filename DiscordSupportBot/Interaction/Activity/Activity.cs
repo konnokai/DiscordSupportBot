@@ -6,83 +6,72 @@ namespace DiscordSupportBot.Interaction.Activity
     {
         [SlashCommand("message-activity", "幹話排行榜")]
         [RequireContext(ContextType.Guild)]
-        public async Task MessageActivityAsync([Summary("頁數", "預設為第一頁")] int page = 0)
+        public async Task MessageActivityAsync([Summary("頁數", "預設為第一頁")] int page = 1)
         {
             await DeferAsync();
 
-            var userActivity = (await UserActivity.GetActivityAsync(Context.Guild.Id).ConfigureAwait(false)).OrderByDescending((x) => x.ActivityNum).ToList();
-            if (userActivity.Count == 0)
+            var components = await ActivityLeaderboard.CreateMessageLeaderboardAsync(Context.Client, Context.Guild, Context.User.Id, page - 1).ConfigureAwait(false);
+            if (components == null)
             {
                 await Context.Interaction.SendErrorAsync("此伺服器無訊息紀錄", true).ConfigureAwait(false);
                 return;
             }
 
-            var user = userActivity.FirstOrDefault((x) => x.UserID == Context.User.Id);
-
-            await Context.SendPaginatedConfirmAsync(page, async (row) =>
-            {
-                EmbedBuilder embedBuilder = new EmbedBuilder().WithOkColor().WithTitle($"{Context.Guild.Name} 發言排行榜");
-                var items = userActivity.Skip(row * 20).Take(20).ToList(); string temp = "";
-
-                for (int i = 0; i < items.Count; i++)
-                {
-                    var item = items[i];
-
-                    IUser user = Program.Client.GetUser(item.UserID);
-                    if (user == null)
-                    {
-                        try { user = await Program.Client.Rest.GetUserAsync(item.UserID); }
-                        catch { }
-                        if (user == null)
-                            continue;
-                    }
-
-                    temp += $"{row * 25 + i + 1}. {user.Username}[<@{item.UserID}>] `{item.ActivityNum}` 則訊息\n";
-                }
-
-                embedBuilder.WithDescription(temp);
-                embedBuilder.WithFooter($"{row + 1} / {userActivity.Count / 25 + 1}" + (user != null ? $" | {Context.User.Username}的排名為: {userActivity.IndexOf(user) + 1}" : ""));
-                return embedBuilder;
-            }, userActivity.Count, 25, false, false, true).ConfigureAwait(false);
+            await FollowupAsync(components: components, allowedMentions: AllowedMentions.None).ConfigureAwait(false);
         }
 
         [SlashCommand("emote-activity", "表情使用排行榜")]
         [RequireContext(ContextType.Guild)]
-        public async Task EmoteActivityAsync([Summary("頁數", "預設為第一頁")] int page = 0)
+        public async Task EmoteActivityAsync([Summary("頁數", "預設為第一頁")] int page = 1)
         {
             await DeferAsync();
 
-            var emoteActivity = (await EmoteActivity.GetActivityAsync(Context.Guild.Id).ConfigureAwait(false)).OrderByDescending((x) => x.ActivityNum).ToList();
-            if (emoteActivity.Count == 0)
+            var components = await ActivityLeaderboard.CreateEmoteLeaderboardAsync(Context.Guild, Context.User.Id, page - 1).ConfigureAwait(false);
+            if (components == null)
             {
                 await Context.Interaction.SendErrorAsync("此伺服器無表情紀錄", true).ConfigureAwait(false);
                 return;
             }
 
-            await Context.SendPaginatedConfirmAsync(page, (row) =>
+            await FollowupAsync(components: components, allowedMentions: AllowedMentions.None).ConfigureAwait(false);
+        }
+
+        [ComponentInteraction($"{ActivityLeaderboard.PageButtonPrefix}:*:*:*")]
+        [RequireContext(ContextType.Guild)]
+        public Task ChangePageAsync(string kind, ulong ownerId, int page)
+            => UpdateLeaderboardAsync(kind, ownerId, page);
+
+        [ComponentInteraction($"{ActivityLeaderboard.MyRankButtonPrefix}:*")]
+        [RequireContext(ContextType.Guild)]
+        public Task JumpToMyRankAsync(ulong ownerId)
+            => UpdateLeaderboardAsync(ActivityLeaderboard.KindMessage, ownerId, null);
+
+        private async Task UpdateLeaderboardAsync(string kind, ulong ownerId, int? page)
+        {
+            if (Context.User.Id != ownerId)
             {
-                EmbedBuilder embedBuilder = new EmbedBuilder().WithOkColor().WithTitle($"{Context.Guild.Name} 表情使用排行榜");
-                var items = emoteActivity.Skip(row * 50).Take(50).ToList();
-                var resultList = new List<string>();
+                await RespondAsync("僅指令執行者可以翻頁", ephemeral: true).ConfigureAwait(false);
+                return;
+            }
 
-                for (int i = 0; i < Math.Min(items.Count, 25); i++)
-                {
-                    var item = items[i];
-                    resultList.Add($"`{row * 50 + i + 1}.` {item.EmoteName} `{item.ActivityNum} 次`");
-                }
+            await DeferAsync();
 
-                if (items.Count >= 25)
-                {
-                    for (int i = 25; i < items.Count; i++)
-                    {
-                        var item = items[i];
-                        resultList[i - 25] += ($"  |  `{row * 50 + i + 1}.` {item.EmoteName} `{item.ActivityNum} 次`");
-                    }
-                }
+            var components = kind == ActivityLeaderboard.KindEmote
+                ? await ActivityLeaderboard.CreateEmoteLeaderboardAsync(Context.Guild, ownerId, page ?? 0).ConfigureAwait(false)
+                : await ActivityLeaderboard.CreateMessageLeaderboardAsync(Context.Client, Context.Guild, ownerId, page).ConfigureAwait(false);
+            if (components == null)
+            {
+                await FollowupAsync("排行榜已經沒有資料了", ephemeral: true).ConfigureAwait(false);
+                return;
+            }
 
-                embedBuilder.WithDescription(string.Join('\n', resultList));
-                return embedBuilder;
-            }, emoteActivity.Count, 50, true, false, true).ConfigureAwait(false);
+            // 更新訊息時 Discord.Net 不會自動補 V2 flag，要自己帶
+            await ModifyOriginalResponseAsync((x) =>
+            {
+                x.Components = components;
+                x.AllowedMentions = AllowedMentions.None;
+                x.Flags = MessageFlags.ComponentsV2;
+            }).ConfigureAwait(false);
         }
 
         [SlashCommand("emote-use-count", "表情使用量")]
