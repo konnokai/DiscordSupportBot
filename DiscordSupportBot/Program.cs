@@ -223,8 +223,8 @@ namespace DiscordSupportBot
 
             try
             {
-                await EmoteActivity.SaveDatebaseAsync();
-                await UserActivity.SaveDatebaseAsync();
+                await EmoteActivity.SaveDatabaseAsync();
+                await UserActivity.SaveDatabaseAsync();
             }
             catch (Exception ex)
             {
@@ -504,8 +504,8 @@ namespace DiscordSupportBot
             await _saveDatabaseLock.WaitAsync();
             try
             {
-                await EmoteActivity.SaveDatebaseAsync();
-                await UserActivity.SaveDatebaseAsync();
+                await EmoteActivity.SaveDatabaseAsync();
+                await UserActivity.SaveDatabaseAsync();
             }
             finally
             {

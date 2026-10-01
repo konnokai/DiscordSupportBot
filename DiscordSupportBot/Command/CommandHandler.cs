@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace DiscordSupportBot.Command;
-public class CommandHandler : ICommandService
+public partial class CommandHandler : ICommandService
 {
     private readonly DiscordSocketClient Client;
     private readonly CommandService _commands;
@@ -20,6 +20,8 @@ public class CommandHandler : ICommandService
     {
         await _commands.AddModulesAsync(assembly: Assembly.GetEntryAssembly(), services: _services).ConfigureAwait(false);
         Client.MessageReceived += (msg) => { var _ = Task.Run(() => HandleCommandAsync(msg)); return Task.CompletedTask; };
+        Client.ReactionAdded += (msg, channel, reaction) => { var _ = Task.Run(() => EmoteActivity.OnReactionAddedAsync(msg, channel, reaction)); return Task.CompletedTask; };
+        Client.ReactionRemoved += (msg, channel, reaction) => { var _ = Task.Run(() => EmoteActivity.OnReactionRemovedAsync(msg, channel, reaction)); return Task.CompletedTask; };
     }
 
     private async Task HandleCommandAsync(SocketMessage messageParam)
@@ -47,7 +49,7 @@ public class CommandHandler : ICommandService
             return;
         }
 
-        if (UserActivity.IsInited) await UserActivity.AddActivity(guild.Id, message.Author.Id).ConfigureAwait(false);
+        await UserActivity.AddActivityAsync(guild.Id, message.Author.Id).ConfigureAwait(false);
 
         int argPos = 0;
         if (message.HasStringPrefix("!!!", ref argPos))
@@ -85,13 +87,13 @@ public class CommandHandler : ICommandService
                 return;
             }
 
-            if (EmoteActivity.IsInited && Regex.IsMatch(content, @"(<a?:.*?:.*?>)"))
+            if (EmoteRegex().IsMatch(content))
             {
-                foreach (Match m in Regex.Matches(content, @"(<a?:.*?:.*?>)"))
+                foreach (Match m in EmoteRegex().Matches(content))
                 {
                     try
                     {
-                        var emote = guild.Emotes.FirstOrDefault((x) => x.Id.ToString() == m.Value.TrimEnd('>').Split(new char[] { ':' })[2]);
+                        var emote = guild.Emotes.FirstOrDefault((x) => x.Id.ToString() == m.Value.TrimEnd('>').Split([':'])[2]);
                         if (emote != null) await EmoteActivity.AddActivityAsync(guild.Id, emote.Id).ConfigureAwait(false);
                     }
                     catch (Exception ex) { Log.Error(ex.Message); }
@@ -99,4 +101,7 @@ public class CommandHandler : ICommandService
             }
         }
     }
+
+    [GeneratedRegex(@"(<a?:.*?:.*?>)")]
+    private static partial Regex EmoteRegex();
 }

@@ -172,8 +172,8 @@ namespace DiscordSupportBot.Command.Administration
         [RequireUserPermission(GuildPermission.Administrator)]
         public async Task ResetACT(ResetType resetType)
         {
-            var redisEmoteKeyList = RedisConnection.RedisServer.Keys(pattern: $"SupportBot:Activity:Emote:{Context.Guild.Id}:*", cursor: 0, pageSize: 2500).ToArray();
-            var redisUserKeyList = RedisConnection.RedisServer.Keys(pattern: $"SupportBot:Activity:User:{Context.Guild.Id}:*", cursor: 0, pageSize: 100000).ToArray();
+            var redisEmoteKeyList = RedisConnection.RedisServer.Keys(RedisConnection.RedisDb.Database, pattern: $"SupportBot:Activity:Emote:{Context.Guild.Id}:*", pageSize: 1000).ToArray();
+            var redisUserKeyList = RedisConnection.RedisServer.Keys(RedisConnection.RedisDb.Database, pattern: $"SupportBot:Activity:UserMessage:{Context.Guild.Id}:*", pageSize: 1000).ToArray();
 
             switch (resetType)
             {
