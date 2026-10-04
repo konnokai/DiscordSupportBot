@@ -3,11 +3,24 @@ using DiscordSupportBot.Interaction.LinkFix.Service;
 
 namespace DiscordSupportBot.Interaction.LinkFix
 {
+    [Group("link-fix", "連結修正")]
+    [RequireContext(ContextType.Guild)]
+    [DefaultMemberPermissions(GuildPermission.ManageMessages)]
+    [RequireUserPermission(GuildPermission.ManageMessages)]
     public class LinkFix : TopLevelModule<LinkFixService>
     {
-        [SlashCommand("link-fix", "連結修正")]
-        [RequireContext(ContextType.Guild)]
-        [RequireUserPermission(GuildPermission.ManageMessages)]
+        // 推薦的修正網域，供 apply-recommend-fix 一次套用
+        private static readonly (string OldDomain, string NewDomain)[] RecommendedFixes =
+        [
+            ("cafe.naver.com", "ebfix.konnokai.me"),
+            ("bilibili.com", "vxbilibili.com"),
+            ("threads.com", "ebfix.konnokai.me"),
+            ("b23.tv", "vxb23.tv"),
+            ("facebook.com", "fb.ebfix.konnokai.me"),
+            ("instagram.com", "ig.ebfix.konnokai.me")
+        ];
+
+        [SlashCommand("set", "設定或移除連結修正")]
         public async Task LinkFixAsync(string oldDomain, string? newDomain = null)
         {
             if (string.IsNullOrWhiteSpace(newDomain))
@@ -44,9 +57,7 @@ namespace DiscordSupportBot.Interaction.LinkFix
                 await Context.Interaction.SendErrorAsync($"{Format.Bold(oldDomain)} 已存在"); // 原則上不會觸發
         }
 
-        [SlashCommand("link-fix-list", "連結修正清單")]
-        [RequireContext(ContextType.Guild)]
-        [RequireUserPermission(GuildPermission.ManageMessages)]
+        [SlashCommand("list", "連結修正清單")]
         public async Task LinkFixList()
         {
             var linkFixes = _service.GetLinkFixes(Context.Guild.Id);
@@ -66,6 +77,21 @@ namespace DiscordSupportBot.Interaction.LinkFix
             }, linkFixes.Count, 10);
         }
 
+        [SlashCommand("apply-recommend-fix", "套用推薦的連結修正")]
+        public async Task ApplyRecommendFixAsync()
+        {
+            await DeferAsync();
+
+            foreach (var (oldDomain, newDomain) in RecommendedFixes)
+                await _service.AddLinkFixAsync(Context.Guild.Id, oldDomain, newDomain);
+
+            var items = RecommendedFixes.Select(x => $"{Format.Bold(x.OldDomain)} -> {Format.Bold(x.NewDomain)}");
+            await Context.Interaction.FollowupAsync(embed: new EmbedBuilder()
+                .WithTitle("已套用推薦的連結修正")
+                .WithDescription(string.Join('\n', items))
+                .WithOkColor()
+                .Build());
+        }
 
         private string CleanDomain(string domain)
         {
