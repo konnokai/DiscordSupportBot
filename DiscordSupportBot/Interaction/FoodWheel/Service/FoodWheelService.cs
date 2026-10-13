@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using OpenCCNET;
 using System.Collections.Concurrent;
 
 namespace DiscordSupportBot.Interaction.FoodWheel.Service
@@ -12,43 +11,31 @@ namespace DiscordSupportBot.Interaction.FoodWheel.Service
             "水餃", "鍋貼", "蚵仔煎", "肉絲炒飯", "蔥油餅夾蛋", "滷味拼盤", "肉圓", "蛋餅", "羊肉炒飯", "麻醬麵", "鴨肉飯", "排骨飯", "魚丸湯麵", "肉羹飯", "蝦仁炒蛋飯", "炸醬麵", "雞腿便當", "拉麵",
             "三明治套餐", "鹽酥雞飯", "蔥抓餅夾肉", "豬排飯", "燒雞腿飯", "沙茶牛肉飯", "蝦仁煨麵", "海鮮炒麵", "客家小炒", "麻油雞飯", "蔥燒牛肉麵", "三杯雞飯", "蒜泥白肉飯", "什錦炒麵", "烤鴨",
             "左宗棠雞飯", "紅燒獅子頭", "蒜蓉蝦仁飯", "菜脯蛋炒飯", "蔥爆牛肉飯", "香酥排骨麵", "塔香鱔魚意麵", "五更腸旺", "蚵仔煎飯", "梅干扣肉飯", "沙茶羊肉飯", "蜜汁叉燒飯", "蒸餃", "陽春麵加蛋",
-            "牛肉炒飯", "麻辣香鍋", "花雕雞飯", "紅燒牛肉麵", "炸醬米粉", "鹽水雞飯", "蔥油餅夾肉鬆", "滷肉飯加蛋", "牛肉湯麵", "麻辣燙", "炸雞排飯", "炒米粉", "牛肉燴飯", "蒜香雞腿飯", "洨"
+            "牛肉炒飯", "麻辣香鍋", "花雕雞飯", "紅燒牛肉麵", "炸醬米粉", "鹽水雞飯", "蔥油餅夾肉鬆", "滷肉飯加蛋", "牛肉湯麵", "麻辣燙", "炸雞排飯", "炒米粉", "牛肉燴飯", "蒜香雞腿飯", "洨",
+            // 台灣小吃與在地料理
+            "蚵仔麵線", "大腸麵線", "擔仔麵", "切仔麵", "乾麵", "鍋燒意麵", "米粉湯", "碗粿", "蘿蔔糕", "筒仔米糕", "油飯", "割包", "飯糰", "潤餅", "臭豆腐", "大腸包小腸",
+            "雞肉飯", "火雞肉飯", "控肉飯", "豬腳飯", "豬血糕", "鹹粥", "虱目魚粥", "虱目魚肚湯", "當歸鴨", "薑母鴨", "羊肉爐", "四神湯", "貢丸湯", "土魠魚羹", "麻油雞麵線", "酸菜白肉鍋",
+            "麻辣鴨血", "鹽酥雞", "雞排", "甜不辣", "胡椒餅", "水煎包", "燒餅油條", "棺材板", "蝦捲", "炸排骨飯", "麻油腰花", "溫體牛肉湯", "炒粄條", "客家鹹豬肉", "炒海瓜子", "鳳梨蝦球",
+            "沙茶魷魚", "三杯中卷", "三杯杏鮑菇", "菜脯蛋", "鹹蛋苦瓜", "蒜炒空心菜", "薑絲大腸", "皮蛋瘦肉粥", "排骨苦瓜湯", "蛋包飯", "日式咖哩飯", "日式牛丼", "親子丼", "韭菜盒",
+            // 取自 HowToCook 食譜中偏台式的菜
+            "麻油拌麵", "蔥油拌麵", "蛋炒飯", "揚州炒飯", "炒年糕", "手抓餅", "鮮肉燒賣", "煎餃", "照燒雞腿飯", "玉米排骨湯", "排骨山藥玉米湯", "陳皮排骨湯", "紫菜蛋花湯", "番茄蛋花湯",
+            "糖醋排骨", "糖醋里肌", "糖醋肉", "紅燒肉", "紅燒豬腳", "肉末蒸蛋", "冬瓜釀肉", "韭菜炒蛋", "番茄炒蛋", "白灼蝦", "清蒸鱸魚"
         ];
 
         public IReadOnlyList<string> DrinkList { get; } =
         [
             "可樂", "雪碧", "芬達", "紅茶", "綠茶", "奶茶", "咖啡", "果汁", "水", "運動飲料", "能量飲料", "酒", "魔爪", "紅牛", "茶裏王", "布丁奶茶", "康師傅冰紅茶", "維他露P", "養樂多", "蘋果西打",
             "葡萄汁", "柳橙汁", "檸檬水", "椰子水", "蜂蜜水", "薑母茶", "花茶", "氣泡水", "冰沙", "奶昔", "優酪乳", "豆漿", "杏仁茶", "紅豆牛奶", "綠豆湯", "薏仁水", "冬瓜茶", "洛神花茶", "金桔檸檬汁",
-            "百香果汁", "芒果汁", "西瓜汁"
+            "百香果汁", "芒果汁", "西瓜汁",
+            // 台灣手搖與傳統飲品
+            "珍珠奶茶", "波霸奶茶", "鮮奶茶", "紅茶拿鐵", "四季春茶", "烏龍茶", "高山茶", "青茶", "梅子綠茶", "蜂蜜檸檬", "愛玉檸檬", "仙草茶", "青草茶", "烏梅汁", "甘蔗汁", "麥茶",
+            "米漿", "黑糖薑茶", "木瓜牛奶", "西瓜牛奶", "柚子茶", "多多綠茶", "冬瓜檸檬", "仙草奶凍", "酸梅湯", "楊枝甘露"
         ];
 
         /// <summary>
         /// 使用者項目快取: (UserId, WheelType, WheelEntryKind) -> 項目集合
         /// </summary>
         private readonly ConcurrentDictionary<(ulong UserId, WheelType Type, WheelEntryKind Kind), ConcurrentDictionary<string, byte>> _entries = new();
-
-        /// <summary>
-        /// 主清單快照 (硬編碼 ∪ 遠端食譜)，刷新時整個 reference 原子替換
-        /// </summary>
-        private sealed record RecipeSnapshot(
-            IReadOnlyList<string> Food,
-            IReadOnlyList<string> Drink,
-            IReadOnlyDictionary<string, string> Links);
-
-        private volatile RecipeSnapshot _snapshot;
-
-        private sealed class RemoteRecipe
-        {
-            [JsonProperty("name")] public string Name { get; set; }
-            [JsonProperty("category")] public string Category { get; set; }
-            [JsonProperty("source_path")] public string SourcePath { get; set; }
-        }
-
-        private const string RecipesUrl = "https://eat.ryanuo.cc/recipes.json";
-        private static readonly HttpClient _httpClient = new();
-        private static readonly HashSet<string> _foodCategories = ["荤菜", "素菜", "主食", "水产", "早餐", "汤与粥", "甜品"];
-        private static bool _openCcInitialized;
-        private readonly Timer _refreshTimer;
 
         public FoodWheelService()
         {
@@ -59,76 +46,10 @@ namespace DiscordSupportBot.Interaction.FoodWheel.Service
                 var set = _entries.GetOrAdd((entry.UserId, (WheelType)entry.WheelType, (WheelEntryKind)entry.Kind), _ => new());
                 set.TryAdd(entry.Item, 0);
             }
-
-            _snapshot = new(FoodList, DrinkList, new Dictionary<string, string>());
-
-            Task.Run(RefreshRemoteRecipesAsync);
-
-            // 下次台灣時間 (UTC+8) 週一 15:00
-            var nowTw = DateTime.UtcNow.AddHours(8);
-            var next = nowTw.Date.AddDays(((int)DayOfWeek.Monday - (int)nowTw.DayOfWeek + 7) % 7).AddHours(15);
-            if (next <= nowTw) next = next.AddDays(7);
-            _refreshTimer = new Timer((_) => _ = RefreshRemoteRecipesAsync(), null, next - nowTw, TimeSpan.FromDays(7));
         }
 
         public IReadOnlyList<string> GetMasterList(WheelType type)
-            => type == WheelType.Drink ? _snapshot.Drink : _snapshot.Food;
-
-        /// <summary>
-        /// 取得遠端食譜項目對應的 HowToCook 食譜連結
-        /// </summary>
-        public bool TryGetRecipeLink(string item, out string url)
-            => _snapshot.Links.TryGetValue(item, out url);
-
-        /// <summary>
-        /// 抓取遠端食譜清單，轉繁體後與硬編碼清單合併去重
-        /// </summary>
-        private async Task RefreshRemoteRecipesAsync()
-        {
-            try
-            {
-                if (!_openCcInitialized)
-                {
-                    // 字典目錄以執行檔位置為準，避免工作目錄不同時找不到資源
-                    // MaxMatch 不需載入 Jieba，啟動快且短菜名的轉換結果實測比 Jieba 分詞更準確
-                    ZhConverter.Initialize(
-                        Path.Combine(AppContext.BaseDirectory, "Dictionary"),
-                        Path.Combine(AppContext.BaseDirectory, "JiebaResource"),
-                        segmentMode: SegmentMode.MaxMatch);
-                    _openCcInitialized = true;
-                }
-
-                var json = await _httpClient.GetStringAsync(RecipesUrl);
-                var recipes = JsonConvert.DeserializeObject<List<RemoteRecipe>>(json) ?? [];
-
-                var food = new List<string>(FoodList); var foodSeen = new HashSet<string>(FoodList);
-                var drink = new List<string>(DrinkList); var drinkSeen = new HashSet<string>(DrinkList);
-                var links = new Dictionary<string, string>();
-
-                foreach (var recipe in recipes)
-                {
-                    List<string> target; HashSet<string> seen;
-                    if (recipe.Category == "饮料") { target = drink; seen = drinkSeen; }
-                    else if (_foodCategories.Contains(recipe.Category)) { target = food; seen = foodSeen; }
-                    else continue; // 排除 半成品加工 / 酱料和其它材料
-
-                    var name = ZhConverter.HansToTW(recipe.Name, true);
-                    if (!seen.Add(name))
-                        continue;
-
-                    target.Add(name);
-                    links[name] = "https://github.com/Anduin2017/HowToCook/blob/master/" +
-                        string.Join('/', recipe.SourcePath.Split('/').Select(Uri.EscapeDataString));
-                }
-
-                _snapshot = new(food, drink, links);
-                Log.Info($"食譜清單已更新: 食物 {food.Count} 項, 飲料 {drink.Count} 項");
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "RefreshRemoteRecipes"); // 失敗保留上一份快照 (至少有硬編碼清單)
-            }
-        }
+            => type == WheelType.Drink ? DrinkList : FoodList;
 
         /// <summary>
         /// 取得使用者指定種類 (黑名單 / 自訂) 的項目清單
