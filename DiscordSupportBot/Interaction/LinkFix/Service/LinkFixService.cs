@@ -39,9 +39,10 @@ namespace DiscordSupportBot.Interaction.LinkFix.Service
             if (string.IsNullOrWhiteSpace(content))
                 return;
 
-            var words = content.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            foreach (var word in words)
+            foreach (var wordMatch in WordRegex().Matches(content).Cast<Match>())
             {
+                var word = wordMatch.Value;
+
                 // Enhance: Skip words that are likely to be markdown links or code blocks
                 if (word.StartsWith('<') && word.EndsWith('>') || word.StartsWith("~~") && word.EndsWith("~~"))
                     continue;
@@ -59,8 +60,8 @@ namespace DiscordSupportBot.Interaction.LinkFix.Service
 
                 try
                 {
-                    // Enhance: Preserve spoiler formatting if present
-                    var hasSpoiler = word.StartsWith("||") && word.EndsWith("||");
+                    // 暴雷標記可能包住整段文字，不能只看單一詞，所以用網址在全文中的位置判斷
+                    var hasSpoiler = IsInSpoiler(content, wordMatch.Index + match.Index);
                     var newUrl = match.Groups["prefix"].Value + newDomain + match.Groups["suffix"].Value.Replace("||", "");
                     await userMessage.ReplyAsync(hasSpoiler ? "||" + newUrl + "||" : newUrl, allowedMentions: AllowedMentions.None);
 
@@ -75,6 +76,18 @@ namespace DiscordSupportBot.Interaction.LinkFix.Service
                 catch (Exception) { /* Ignore */ }
             }
         }
+
+        public static bool IsInSpoiler(string content, int index)
+        {
+            var count = 0;
+            for (var i = content.IndexOf("||", StringComparison.Ordinal); i >= 0 && i < index; i = content.IndexOf("||", i + 2, StringComparison.Ordinal))
+                count++;
+
+            return count % 2 == 1;
+        }
+
+        [GeneratedRegex(@"\S+")]
+        private static partial Regex WordRegex();
 
         [GeneratedRegex(@"(?<prefix>https?://)(?:www.)?(?<domain>[a-zA-Z0-9\-\.]+)(?<suffix>/.*)?")]
         private partial Regex FullUrlRegex();
