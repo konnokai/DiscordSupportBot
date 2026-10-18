@@ -14,40 +14,64 @@ namespace DiscordSupportBot.Interaction
         private readonly IServiceProvider _services;
 
         /// <summary>
-        /// 會被全球註冊的 Slash 指令「規格」雜湊（指令名稱、描述，以及各參數的位置/名稱/型別/是否必填/描述）。
+        /// 會被全球註冊的 Slash 指令「規格」雜湊（指令名稱、描述，以及各參數的位置/名稱/型別/是否必填/描述/選項）。
         /// <para>只要規格有任何變動，雜湊即改變，供啟動時判斷是否需要重新註冊全球指令（取代僅比對指令總數的舊做法）。</para>
         /// </summary>
         public string CommandSignature
+            => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(
+                Encoding.UTF8.GetBytes(BuildSignatureText(_interactions.SlashCommands))));
+
+        internal static string BuildSignatureText(IReadOnlyCollection<SlashCommandInfo> slashCommands)
         {
-            get
-            {
-                var sb = new StringBuilder();
+            var sb = new StringBuilder();
 
-                var commands = _interactions.SlashCommands
-                    .Where((cmd) => !cmd.Module.DontAutoRegister) // 只納入會被全球註冊的指令（排除伺服器專屬指令）
-                    .Select((cmd) =>
-                    {
-                        string groupPrefix = string.IsNullOrEmpty(cmd.Module.SlashGroupName) ? "" : cmd.Module.SlashGroupName + " ";
-                        // 參數維持宣告順序（即 Discord 上的位置），逐一記錄位置/名稱/型別/是否必填/描述
-                        var parameters = cmd.Parameters
-                            .Select((p, index) => $"{index}:{p.Name}:{p.ParameterType.Name}:{(p.IsRequired ? "R" : "O")}:{(p.IsAutocomplete ? "A" : "N")}:{p.Description}")
-                            .ToList();
-                        return (Name: groupPrefix + cmd.Name, cmd.Description, Parameters: parameters);
-                    })
-                    .OrderBy((x) => x.Name, StringComparer.Ordinal) // 指令間排序以求穩定；參數內部維持位置順序
-                    .ToList();
-
-                foreach (var cmd in commands)
+            var commands = slashCommands
+                .Where((cmd) => !cmd.Module.DontAutoRegister) // 只納入會被全球註冊的指令（排除伺服器專屬指令）
+                .Select((cmd) =>
                 {
-                    sb.Append(cmd.Name).Append('|').Append(cmd.Description).Append('|');
-                    foreach (var p in cmd.Parameters)
-                        sb.Append(p).Append(';');
-                    sb.Append('\n');
-                }
+                    string groupPrefix = string.IsNullOrEmpty(cmd.Module.SlashGroupName) ? "" : cmd.Module.SlashGroupName + " ";
+                    // 參數維持宣告順序（即 Discord 上的位置），逐一記錄位置/名稱/型別/是否必填/描述/選項
+                    // 選項要納入，否則只改 enum 成員（例如新增基金類型）時不會重新註冊
+                    var parameters = cmd.Parameters
+                        .Select((p, index) =>
+                        {
+                            var choices = FormatChoices(p);
+                            return $"{index}:{p.Name}:{p.ParameterType.Name}:{(p.IsRequired ? "R" : "O")}:{(p.IsAutocomplete ? "A" : "N")}:{p.Description}{choices}";
+                        })
+                        .ToList();
+                    return (Name: groupPrefix + cmd.Name, cmd.Description, Parameters: parameters);
+                })
+                .OrderBy((x) => x.Name, StringComparer.Ordinal) // 指令間排序以求穩定；參數內部維持位置順序
+                .ToList();
 
-                using var sha = System.Security.Cryptography.SHA256.Create();
-                return Convert.ToHexString(sha.ComputeHash(Encoding.UTF8.GetBytes(sb.ToString())));
+            foreach (var cmd in commands)
+            {
+                sb.Append(cmd.Name).Append('|').Append(cmd.Description).Append('|');
+                foreach (var p in cmd.Parameters)
+                    sb.Append(p).Append(';');
+                sb.Append('\n');
             }
+
+            return sb.ToString();
+        }
+
+        // 選項不一定存在 ParameterInfo.Choices：enum 參數是註冊時才由 Discord.Net 的 EnumConverter 展開，
+        // 所以這裡照它的規則自己列一次，否則只改 enum 成員時簽章不會變。
+        private static string FormatChoices(SlashCommandParameterInfo parameter)
+        {
+            if (parameter.Choices.Count > 0)
+                return ":" + string.Join(',', parameter.Choices.Select((c) => $"{c.Name}={c.Value}"));
+
+            var type = Nullable.GetUnderlyingType(parameter.ParameterType) ?? parameter.ParameterType;
+            if (!type.IsEnum)
+                return string.Empty;
+
+            var choices = Enum.GetNames(type)
+                .SelectMany((name) => type.GetMember(name))
+                .Where((member) => !member.IsDefined(typeof(HideAttribute), true))
+                .Select((member) => $"{member.GetCustomAttribute<ChoiceDisplayAttribute>()?.Name ?? member.Name}={member.Name}");
+
+            return ":" + string.Join(',', choices);
         }
 
         public InteractionHandler(IServiceProvider services, InteractionService interactions, DiscordSocketClient client)
