@@ -230,10 +230,72 @@ public class ActivityLeaderboardTests
         }
     }
 
+    [Fact]
+    public void GetEmotesAtOrBelowUsage_IncludesNeverUsedAndSortsAscending()
+    {
+        var emotes = new List<EmoteTable>
+        {
+            new() { EmoteID = 1, ActivityNum = 4 },
+            new() { EmoteID = 2, ActivityNum = 0 },
+            new() { EmoteID = 3, ActivityNum = 2 },
+            new() { EmoteID = 4, ActivityNum = 0 },
+            new() { EmoteID = 5, ActivityNum = 9 },
+        };
+
+        // 門檻含本數：上限 4 要包含使用 4 次的表情
+        Assert.Equal([2UL, 4UL, 3UL, 1UL], ActivityLeaderboard.GetEmotesAtOrBelowUsage(emotes, 4).Select((x) => x.EmoteID));
+        Assert.Equal([2UL, 4UL, 3UL], ActivityLeaderboard.GetEmotesAtOrBelowUsage(emotes, 3).Select((x) => x.EmoteID));
+        Assert.Equal([2UL, 4UL], ActivityLeaderboard.GetEmotesAtOrBelowUsage(emotes, 0).Select((x) => x.EmoteID));
+    }
+
+    [Fact]
+    public void BuildUnusedEmotePage_ZeroMaxUsage_ShowsUnusedTitleAndList()
+    {
+        var emotes = new List<EmoteTable>
+        {
+            new() { EmoteID = 1, EmoteName = "<:a:1>", EmoteUrl = "https://cdn/1.png", ActivityNum = 0 },
+            new() { EmoteID = 2, EmoteName = "<:b:2>", EmoteUrl = "https://cdn/2.png", ActivityNum = 0 },
+            new() { EmoteID = 3, EmoteName = "<:c:3>", EmoteUrl = "https://cdn/3.png", ActivityNum = 2 },
+        };
+
+        var component = ActivityLeaderboard.BuildUnusedEmotePage("Guild", emotes, 0, 0, OwnerId);
+        var section = Assert.Single(Flatten(component).OfType<SectionComponent>());
+
+        Assert.Equal("https://cdn/1.png", Assert.IsType<ThumbnailComponent>(section.Accessory).Media.Url);
+        Assert.Equal("🥇\n0 次", Assert.Single(section.Components.OfType<TextDisplayComponent>()).Content);
+        Assert.StartsWith("## Guild 未使用表情排行榜\n-# 共 3 個表情 · 第 1 / 1 頁", GetTextDisplays(component)[0]);
+        Assert.Equal(["🥈 <:b:2> · 0 次", "🥉 <:c:3> · 2 次"], GetListLines(component));
+        Assert.Empty(Flatten(component).OfType<ActionRowComponent>());
+    }
+
+    [Fact]
+    public void BuildUnusedEmotePage_MaxUsageAboveZero_ShowsMaxUsageInTitleAndButtons()
+    {
+        var emotes = Enumerable.Range(1, 100).Select((i) => new EmoteTable
+        {
+            EmoteID = (ulong)i,
+            EmoteName = $"<:e{i}:{i}>",
+            EmoteUrl = "https://cdn/e.png",
+            ActivityNum = i / 10,
+        }).ToList();
+
+        var component = ActivityLeaderboard.BuildUnusedEmotePage("Guild", emotes, 5, 1, OwnerId);
+        var buttons = GetButtons(component);
+
+        Assert.StartsWith("## Guild 使用次數不超過 5 次的表情\n-# 共 100 個表情 · 第 2 / 4 頁", GetTextDisplays(component)[0]);
+        Assert.Equal(3, buttons.Count);
+        Assert.Equal($"act-unused:5:{OwnerId}:0", buttons[0].CustomId);
+        Assert.False(buttons[0].IsDisabled);
+        Assert.Equal("2 / 4", buttons[1].Label);
+        Assert.Equal($"act-unused:5:{OwnerId}:2", buttons[2].CustomId);
+        Assert.False(buttons[2].IsDisabled);
+    }
+
     // 第 i 名的 UserID 是 i，次數是 count - i + 1，已經照名次排好
     [Theory]
     [InlineData("act:msg:999:2", "ChangePageAsync")]
     [InlineData("act:emote:999:-1", "ChangePageAsync")]
+    [InlineData("act-unused:5:999:2", "ChangeUnusedPageAsync")]
     [InlineData("act-me:999", "JumpToMyRankAsync")]
     public async Task ButtonCustomIds_RouteToActivityHandlers(string customId, string expectedMethod)
     {

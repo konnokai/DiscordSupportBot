@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace DiscordSupportBot.Interaction.Activity
 {
     /// <summary>
@@ -8,8 +10,10 @@ namespace DiscordSupportBot.Interaction.Activity
         public const int PageSize = 25;
         public const string KindMessage = "msg";
         public const string KindEmote = "emote";
+        public const string KindUnusedEmote = "unused";
         public const string PageButtonPrefix = "act";
         public const string MyRankButtonPrefix = "act-me";
+        public const string UnusedPageButtonPrefix = "act-unused";
         const string PageIndicatorId = "act-page";
 
         static readonly Color AccentColor = new(0, 229, 132);
@@ -29,6 +33,10 @@ namespace DiscordSupportBot.Interaction.Activity
 
         public static List<EmoteTable> SortEmotes(IEnumerable<EmoteTable> emotes)
             => emotes.OrderByDescending((x) => x.ActivityNum).ThenBy((x) => x.EmoteID).ToList();
+
+        /// <summary>使用次數不超過門檻的表情，由少到多排序；從未使用過的表情也在裡面</summary>
+        public static List<EmoteTable> GetEmotesAtOrBelowUsage(IEnumerable<EmoteTable> emotes, int maxUsage)
+            => emotes.Where((x) => x.ActivityNum <= maxUsage).OrderBy((x) => x.ActivityNum).ThenBy((x) => x.EmoteID).ToList();
 
         // 點號要跳脫，不然行首的「4. 」會被 Discord 當成有序清單而縮排
         public static string FormatRank(int rank)
@@ -61,6 +69,19 @@ namespace DiscordSupportBot.Interaction.Activity
                 return null;
 
             return BuildEmotePage(guild.Name, used, emotes.Count - used.Count, ClampPage(page, used.Count), ownerId);
+        }
+
+        /// <returns>沒有使用次數不超過門檻的表情時回傳 null</returns>
+        public static async Task<MessageComponent> CreateUnusedEmoteLeaderboardAsync(SocketGuild guild, ulong ownerId, int maxUsage, int page)
+        {
+            maxUsage = Math.Max(0, maxUsage);
+
+            var emotes = await EmoteActivity.GetActivityAsync(guild.Id).ConfigureAwait(false);
+            var low = GetEmotesAtOrBelowUsage(emotes, maxUsage);
+            if (low.Count == 0)
+                return null;
+
+            return BuildUnusedEmotePage(guild.Name, low, maxUsage, ClampPage(page, low.Count), ownerId);
         }
 
         /// <summary>
@@ -136,7 +157,7 @@ namespace DiscordSupportBot.Interaction.Activity
             ActionRowBuilder actionRow = null;
             if (lastPage > 0)
             {
-                actionRow = BuildPageButtons(KindMessage, ownerId, page, lastPage);
+                actionRow = BuildPageButtons(PageButtonPrefix, KindMessage, ownerId, page, lastPage);
                 if (ownerIndex >= 0)
                 {
                     actionRow.WithButton(new ButtonBuilder()
@@ -153,7 +174,25 @@ namespace DiscordSupportBot.Interaction.Activity
         public static MessageComponent BuildEmotePage(string guildName, IReadOnlyList<EmoteTable> sortedUsed, int unusedCount, int page, ulong ownerId)
         {
             var lastPage = GetLastPage(sortedUsed.Count);
-            var items = GetPageItems(sortedUsed, page).ToList();
+            var footer = unusedCount > 0 ? $"-# 另有 {unusedCount:N0} 個表情未使用" : null;
+            var actionRow = lastPage > 0 ? BuildPageButtons(PageButtonPrefix, KindEmote, ownerId, page, lastPage) : null;
+
+            return BuildEmoteList($"{Format.Sanitize(guildName)} 表情使用排行榜", $"共 {sortedUsed.Count:N0} 個表情", sortedUsed, footer, page, actionRow);
+        }
+
+        public static MessageComponent BuildUnusedEmotePage(string guildName, IReadOnlyList<EmoteTable> sorted, int maxUsage, int page, ulong ownerId)
+        {
+            var lastPage = GetLastPage(sorted.Count);
+            var title = maxUsage <= 0 ? "未使用表情排行榜" : $"使用次數不超過 {maxUsage:N0} 次的表情";
+            var actionRow = lastPage > 0 ? BuildPageButtons(UnusedPageButtonPrefix, maxUsage.ToString(CultureInfo.InvariantCulture), ownerId, page, lastPage) : null;
+
+            return BuildEmoteList($"{Format.Sanitize(guildName)} {title}", $"共 {sorted.Count:N0} 個表情", sorted, null, page, actionRow);
+        }
+
+        static MessageComponent BuildEmoteList(string title, string summary, IReadOnlyList<EmoteTable> sorted, string footer, int page, ActionRowBuilder actionRow)
+        {
+            var lastPage = GetLastPage(sorted.Count);
+            var items = GetPageItems(sorted, page).ToList();
             var startRank = page * PageSize + 1;
 
             TopEntry top = null;
@@ -174,19 +213,17 @@ namespace DiscordSupportBot.Interaction.Activity
                 lines.Add($"{FormatRank(rank)} {item.EmoteName} · {item.ActivityNum:N0} 次");
             }
 
-            var footer = unusedCount > 0 ? $"-# 另有 {unusedCount:N0} 個表情未使用" : null;
-            var actionRow = lastPage > 0 ? BuildPageButtons(KindEmote, ownerId, page, lastPage) : null;
-
-            return BuildPage($"{Format.Sanitize(guildName)} 表情使用排行榜", $"共 {sortedUsed.Count:N0} 個表情", page, lastPage, top, lines, footer, actionRow);
+            return BuildPage(title, summary, page, lastPage, top, lines, footer, actionRow);
         }
 
-        static ActionRowBuilder BuildPageButtons(string kind, ulong ownerId, int page, int lastPage)
+        // custom_id 的中間段落：一般排行榜帶類型，未使用排行帶門檻
+        static ActionRowBuilder BuildPageButtons(string prefix, string viewArg, ulong ownerId, int page, int lastPage)
         {
             // 停用的按鈕也要有不重複的 custom_id，所以上一頁、下一頁直接帶 page ± 1
             return new ActionRowBuilder()
-                .WithButton(new ButtonBuilder().WithLabel("◀").WithCustomId($"{PageButtonPrefix}:{kind}:{ownerId}:{page - 1}").WithStyle(ButtonStyle.Secondary).WithDisabled(page <= 0))
+                .WithButton(new ButtonBuilder().WithLabel("◀").WithCustomId($"{prefix}:{viewArg}:{ownerId}:{page - 1}").WithStyle(ButtonStyle.Secondary).WithDisabled(page <= 0))
                 .WithButton(new ButtonBuilder().WithLabel($"{page + 1} / {lastPage + 1}").WithCustomId(PageIndicatorId).WithStyle(ButtonStyle.Secondary).WithDisabled(true))
-                .WithButton(new ButtonBuilder().WithLabel("▶").WithCustomId($"{PageButtonPrefix}:{kind}:{ownerId}:{page + 1}").WithStyle(ButtonStyle.Secondary).WithDisabled(page >= lastPage));
+                .WithButton(new ButtonBuilder().WithLabel("▶").WithCustomId($"{prefix}:{viewArg}:{ownerId}:{page + 1}").WithStyle(ButtonStyle.Secondary).WithDisabled(page >= lastPage));
         }
 
         static MessageComponent BuildPage(string title, string summary, int page, int lastPage, TopEntry top, List<string> lines, string footer, ActionRowBuilder actionRow)

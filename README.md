@@ -11,7 +11,7 @@
 |------|------|----------|
 | 🎲 抽獎 | 建立／開獎／刪除抽獎、顯示參與名單 | `/lottery create-lottery`、`start-lottery`、`delete-lottery`、`show-participant-list` |
 | 💰 基金 | 對成員加基金、單一／全部排行榜、每月自動重置 | `/add-fund`、`/fund-leaderboard`、`/all-fund-leaderboard`、訊息選單「對該訊息的作者添加基金」 |
-| 📊 統計 | 發言活躍度、表情使用排行與使用量 | `/message-activity`、`/emote-activity`、`/emote-use-count` |
+| 📊 統計 | 發言活躍度、表情使用排行、未使用表情排行與使用量 | `/message-activity`、`/emote-activity`、`/emote-unused`、`/emote-use-count` |
 | 🍔 隨機 | 食物轉盤 | `/food-wheel` |
 | 🔗 連結修正 | 自動將無法預覽的網址轉換為可嵌入版本 | `/link-fix set`、`/link-fix list`、`/link-fix apply-recommend-fix` |
 | 🔊 語音 | 加入指定頻道後自動建立專屬語音頻道 | `/set-auto-voice-channel`、`/remove-auto-voice-channel` |

@@ -79,6 +79,20 @@ namespace DiscordSupportBot.Command.Normal
             await Context.Channel.SendMessageAsync(components: components, allowedMentions: AllowedMentions.None).ConfigureAwait(false);
         }
 
+        [Command("EmoteUnused")]
+        [Summary("未使用表情排行榜")]
+        [Alias("EUnused")]
+        [RequireContext(ContextType.Guild)]
+        public async Task EmoteUnused([Summary("至多次數，預設 0 只列出未使用過的表情")] int maxUsage = 0, [Summary("頁數，預設為第一頁")] int page = 1)
+        {
+            await Context.Channel.TriggerTypingAsync().ConfigureAwait(false);
+
+            var components = await ActivityLeaderboard.CreateUnusedEmoteLeaderboardAsync(Context.Guild, Context.User.Id, maxUsage, page - 1).ConfigureAwait(false);
+            if (components == null) return;
+
+            await Context.Channel.SendMessageAsync(components: components, allowedMentions: AllowedMentions.None).ConfigureAwait(false);
+        }
+
         [Command("EmoteUseCount")]
         [Summary("表情使用量")]
         [Alias("EUC")]

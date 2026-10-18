@@ -65,13 +65,11 @@ namespace DiscordSupportBot.DataBase.Activity
                 var guildEmotes = await Program.Client.GetGuild(gid).GetEmotesAsync().ConfigureAwait(false);
                 var resultList = new List<EmoteTable>();
 
+                // 沒有紀錄的表情也要列出，計數為 0（未使用表情排行要靠它）
                 foreach (var guildEmote in guildEmotes)
                 {
-                    var hasSqliteRecord = sqliteCounts.TryGetValue(guildEmote.Id, out var sqliteNum);
+                    sqliteCounts.TryGetValue(guildEmote.Id, out var sqliteNum);
                     redisCounts.TryGetValue(guildEmote.Id, out var redisNum);
-
-                    if (!hasSqliteRecord && redisNum <= 0)
-                        continue;
 
                     resultList.Add(new EmoteTable() { EmoteID = guildEmote.Id, EmoteName = guildEmote.ToString(), EmoteUrl = guildEmote.Url, ActivityNum = Math.Max(0, sqliteNum + redisNum) });
                 }

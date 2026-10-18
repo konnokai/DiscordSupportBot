@@ -36,17 +36,40 @@ namespace DiscordSupportBot.Interaction.Activity
             await FollowupAsync(components: components, allowedMentions: AllowedMentions.None).ConfigureAwait(false);
         }
 
+        [SlashCommand("emote-unused", "未使用表情排行榜")]
+        [RequireContext(ContextType.Guild)]
+        public async Task EmoteUnusedAsync(
+            [Summary("至多次數", "只列出使用次數不超過此值的表情，設定 5 會列出 0～5 次的表情，預設 0 只列出未使用過的表情")][MinValue(0)] int maxUsage = 0,
+            [Summary("頁數", "預設為第一頁")] int page = 1)
+        {
+            await DeferAsync();
+
+            var components = await ActivityLeaderboard.CreateUnusedEmoteLeaderboardAsync(Context.Guild, Context.User.Id, maxUsage, page - 1).ConfigureAwait(false);
+            if (components == null)
+            {
+                await Context.Interaction.SendErrorAsync($"沒有使用次數不超過 {maxUsage:N0} 次的表情", true).ConfigureAwait(false);
+                return;
+            }
+
+            await FollowupAsync(components: components, allowedMentions: AllowedMentions.None).ConfigureAwait(false);
+        }
+
         [ComponentInteraction($"{ActivityLeaderboard.PageButtonPrefix}:*:*:*")]
         [RequireContext(ContextType.Guild)]
         public Task ChangePageAsync(string kind, ulong ownerId, int page)
             => UpdateLeaderboardAsync(kind, ownerId, page);
+
+        [ComponentInteraction($"{ActivityLeaderboard.UnusedPageButtonPrefix}:*:*:*")]
+        [RequireContext(ContextType.Guild)]
+        public Task ChangeUnusedPageAsync(int maxUsage, ulong ownerId, int page)
+            => UpdateLeaderboardAsync(ActivityLeaderboard.KindUnusedEmote, ownerId, page, maxUsage);
 
         [ComponentInteraction($"{ActivityLeaderboard.MyRankButtonPrefix}:*")]
         [RequireContext(ContextType.Guild)]
         public Task JumpToMyRankAsync(ulong ownerId)
             => UpdateLeaderboardAsync(ActivityLeaderboard.KindMessage, ownerId, null);
 
-        private async Task UpdateLeaderboardAsync(string kind, ulong ownerId, int? page)
+        private async Task UpdateLeaderboardAsync(string kind, ulong ownerId, int? page, int maxUsage = 0)
         {
             if (Context.User.Id != ownerId)
             {
@@ -56,9 +79,12 @@ namespace DiscordSupportBot.Interaction.Activity
 
             await DeferAsync();
 
-            var components = kind == ActivityLeaderboard.KindEmote
-                ? await ActivityLeaderboard.CreateEmoteLeaderboardAsync(Context.Guild, ownerId, page ?? 0).ConfigureAwait(false)
-                : await ActivityLeaderboard.CreateMessageLeaderboardAsync(Context.Client, Context.Guild, ownerId, page).ConfigureAwait(false);
+            var components = kind switch
+            {
+                ActivityLeaderboard.KindUnusedEmote => await ActivityLeaderboard.CreateUnusedEmoteLeaderboardAsync(Context.Guild, ownerId, maxUsage, page ?? 0).ConfigureAwait(false),
+                ActivityLeaderboard.KindEmote => await ActivityLeaderboard.CreateEmoteLeaderboardAsync(Context.Guild, ownerId, page ?? 0).ConfigureAwait(false),
+                _ => await ActivityLeaderboard.CreateMessageLeaderboardAsync(Context.Client, Context.Guild, ownerId, page).ConfigureAwait(false),
+            };
             if (components == null)
             {
                 await FollowupAsync("排行榜已經沒有資料了", ephemeral: true).ConfigureAwait(false);
@@ -110,7 +136,7 @@ namespace DiscordSupportBot.Interaction.Activity
             var emoteTable = emoteActivityList.FirstOrDefault((x) => x.EmoteID == emoteData.Id);
             if (emoteTable == null)
             {
-                await Context.Interaction.SendErrorAsync("該表情在資料庫內無資料").ConfigureAwait(false);
+                await Context.Interaction.SendErrorAsync("該表情不存在於伺服器內").ConfigureAwait(false);
                 return;
             }
 
