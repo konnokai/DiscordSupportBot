@@ -58,18 +58,30 @@ namespace DiscordSupportBot.Interaction.Admin.HoneyPot
                     return;
 
                 var guild = guildChannel.Guild;
-                var guildUser = guild.GetUser(arg.Author.Id);
+                // 成員快取不一定有這個人，訊息本身帶的作者資料比較可靠
+                var guildUser = arg.Author as SocketGuildUser ?? guild.GetUser(arg.Author.Id);
 
                 if (guildUser == null)
+                {
+                    Log.Warn($"蜜罐頻道 {guildChannel.Name} ({guildChannel.Id}) 收到 {arg.Author.Username} ({arg.Author.Id}) 的訊息，但取不到伺服器成員資料，略過");
                     return;
+                }
 
                 // 管理員免疫
                 if (guildUser.Roles.Any((x) => x.Permissions.Administrator))
+                {
+                    Log.Info($"蜜罐頻道 {guildChannel.Name} ({guildChannel.Id}) 收到管理員 {guildUser.Username} ({guildUser.Id}) 的訊息，略過");
                     return;
+                }
 
                 // 免疫比機器人身分組高的用戶
-                if (guild.GetUser(_client.CurrentUser.Id) is SocketGuildUser botUser && botUser.Roles.Max((x) => x.Position) <= guildUser.Roles.Max((x) => x.Position))
+                var botTopPosition = guild.CurrentUser.Roles.Max((x) => x.Position);
+                var userTopPosition = guildUser.Roles.Max((x) => x.Position);
+                if (botTopPosition <= userTopPosition)
+                {
+                    Log.Warn($"蜜罐頻道 {guildChannel.Name} ({guildChannel.Id}) 收到 {guildUser.Username} ({guildUser.Id}) 的訊息，但對方最高身分組位置 {userTopPosition} 不低於機器人的 {botTopPosition}，略過");
                     return;
+                }
 
                 // 添加蜜罐反應表情
                 //try

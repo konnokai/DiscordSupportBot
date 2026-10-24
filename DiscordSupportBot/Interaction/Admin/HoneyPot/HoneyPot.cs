@@ -32,6 +32,8 @@ namespace DiscordSupportBot.Interaction.Admin.HoneyPot
                 }
                 else
                 {
+                    // 換頻道時舊頻道要從快取拿掉，不然重開機前舊頻道還會繼續停權人
+                    _service.RemoveHoneyPotChannel(guildConfig.HoneyPotChannelId);
                     guildConfig.HoneyPotChannelId = channel.Id;
                     db.GuildConfig.Update(guildConfig);
                 }
