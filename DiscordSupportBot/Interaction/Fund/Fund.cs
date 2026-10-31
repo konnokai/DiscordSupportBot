@@ -448,7 +448,7 @@ namespace DiscordSupportBot.Interaction.Fund
 
             var modalBuilder = new ModalBuilder();
             modalBuilder.WithTitle("添加說謊基金");
-            modalBuilder.WithCustomId($"add_lying_fund:{Context.Guild.Id}:{message.Author.Id}");
+            modalBuilder.WithCustomId($"add_lying_fund:{Context.Guild.Id}:{message.Author.Id}:{message.Id}");
 
             if (!string.IsNullOrEmpty(message.Content))
             {
@@ -474,8 +474,6 @@ namespace DiscordSupportBot.Interaction.Fund
             {
                 modalBuilder.AddTextDisplay("無法顯示訊息內容，但不影響添加基金");
             }
-
-            modalBuilder.AddTextInput("勿編輯，此攔供訊息跳轉用", "jump_url", required: true, value: message.GetJumpUrl());
 
             modalBuilder.AddSelectMenu("添加類型", selectMenuBuilder);
 

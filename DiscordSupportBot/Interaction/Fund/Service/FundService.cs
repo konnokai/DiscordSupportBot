@@ -99,26 +99,28 @@ namespace DiscordSupportBot.Interaction.Fund.Service
 
             await arg.DeferAsync(false);
 
-            var guildId = ulong.Parse(arg.Data.CustomId.Split(':')[1]);
-            var targetUserId = ulong.Parse(arg.Data.CustomId.Split(':')[2]);
-            var fundType = Enum.Parse<FundType>(arg.Data.Components
-                .First(x => x.CustomId == "select_fund_type").Values.First());
-            var jumpUrl = arg.Data.Components.First((x) => x.CustomId == "jump_url").Value;
-
             try
             {
+                var customIdParts = arg.Data.CustomId.Split(':');
+                var guildId = ulong.Parse(customIdParts[1]);
+                var targetUserId = ulong.Parse(customIdParts[2]);
+                var messageId = ulong.Parse(customIdParts[3]);
+                var fundType = Enum.Parse<FundType>(arg.Data.Components
+                    .First(x => x.CustomId == "select_fund_type").Values.First());
+                var jumpUrl = $"https://discord.com/channels/{guildId}/{arg.ChannelId.Value}/{messageId}";
+
                 await AddFundAndRespondAsync(
                     arg,
                     fundType,
                     guildId,
-                    arg.Channel.Id,
+                    arg.ChannelId.Value,
                     arg.User.Id,
                     targetUserId,
                     $"[點我回原訊息]({jumpUrl})\n\n");
             }
             catch (Exception ex)
             {
-                Log.Error(ex, $"FundService-ModalSubmitted: {guildId} | {targetUserId} | {fundType}");
+                Log.Error(ex, $"FundService-ModalSubmitted: {arg.Data.CustomId}");
                 await arg.SendErrorAsync($"處理過程發生錯誤: {ex.Message}", true);
             }
         }
@@ -130,6 +132,8 @@ namespace DiscordSupportBot.Interaction.Fund.Service
 
             await arg.DeferAsync(false);
 
+            string cooldownKey = null;
+            var fundAttempted = false;
             try
             {
                 if (arg.GuildId == null || !TryParseAddOneCustomId(arg.Data.CustomId, out var fundType, out var targetUserId, out var cooldownScopeId))
@@ -138,9 +142,9 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                     return;
                 }
 
-                var cooldownKey = GetAddOneCooldownKey(cooldownScopeId == 0 ? arg.Message.Id : cooldownScopeId, arg.User.Id);
+                var key = GetAddOneCooldownKey(cooldownScopeId == 0 ? arg.Message.Id : cooldownScopeId, arg.User.Id);
                 var canUseButton = await RedisConnection.RedisDb.StringSetAsync(
-                    cooldownKey,
+                    key,
                     1,
                     expiry: TimeSpan.FromHours(1),
                     when: When.NotExists);
@@ -150,11 +154,16 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                     return;
                 }
 
+                // 只刪自己搶到的 key，避免錯誤時刪掉別人已設好的冷卻
+                cooldownKey = key;
+
                 await AddOneMessageLock.WaitAsync();
                 try
                 {
                     var wasOwnerRedirected = CheckIsAddOwner(fundType, arg.GuildId.Value, arg.User.Id, targetUserId, out var needAddUserId);
-                    var result = await AddFundAsync(fundType, arg.GuildId.Value, arg.Channel.Id, arg.User.Id, needAddUserId, wasOwnerRedirected);
+                    // AddFundAsync 內含 ZINCRBY，出錯時無法確定有沒有入帳，保守保留冷卻
+                    fundAttempted = true;
+                    var result = await AddFundAsync(fundType, arg.GuildId.Value, arg.ChannelId.Value, arg.User.Id, needAddUserId, wasOwnerRedirected);
                     await AppendFundResultAsync(arg, result);
                 }
                 finally
@@ -164,6 +173,19 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             }
             catch (Exception ex)
             {
+                // 入帳前就失敗的點擊不該被冷卻鎖住，讓使用者可以重試
+                if (cooldownKey != null && !fundAttempted)
+                {
+                    try
+                    {
+                        await RedisConnection.RedisDb.KeyDeleteAsync(cooldownKey);
+                    }
+                    catch (RedisException redisEx)
+                    {
+                        Log.Error(redisEx, $"FundService-RemoveCooldown: {cooldownKey}");
+                    }
+                }
+
                 Log.Error(ex, $"FundService-AddOneButton: {arg.GuildId} | {arg.User.Id} | {arg.Data.CustomId}");
                 await arg.SendErrorAsync($"處理過程發生錯誤: {ex.Message}", true);
             }
@@ -172,15 +194,10 @@ namespace DiscordSupportBot.Interaction.Fund.Service
         private async Task AppendFundResultAsync(SocketMessageComponent interaction, FundAddResult result)
         {
             var state = await GetCachedMessageStateAsync(interaction.Message.Id);
-            IUserMessage originalMessage = interaction.Message;
 
             if (state == null)
             {
-                var channel = await _client.Rest.GetChannelAsync(interaction.Channel.Id) as IMessageChannel
-                    ?? throw new InvalidOperationException("無法取得基金訊息頻道");
-                originalMessage = await channel.GetMessageAsync(interaction.Message.Id) as IUserMessage
-                    ?? throw new InvalidOperationException("無法取得基金原始訊息");
-                var originalEmbed = originalMessage.Embeds.FirstOrDefault();
+                var originalEmbed = interaction.Message.Embeds.FirstOrDefault();
                 state = new FundMessageState(originalEmbed?.Title ?? string.Empty, originalEmbed?.Description ?? string.Empty);
             }
 
@@ -205,7 +222,8 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             else
                 embed.WithOkColor();
 
-            await originalMessage.ModifyAsync(properties => properties.Embed = embed.Build());
+            // 走互動 token 更新，沒有頻道讀取權限也能更新原本的訊息
+            await interaction.ModifyOriginalResponseAsync(properties => properties.Embed = embed.Build());
         }
 
         internal async Task AddFundAndRespondAsync(
