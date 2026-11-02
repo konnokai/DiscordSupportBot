@@ -10,6 +10,7 @@ namespace DiscordSupportBot.DataBase
         public DbSet<Lottery> Lottery { get; set; }
         public DbSet<FoodWheelEntry> FoodWheelEntry { get; set; }
         public DbSet<AutoCreatePrivateThreadConfig> AutoCreatePrivateThreadConfig { get; set; }
+        public DbSet<AutoCreatePrivateThreadBinding> AutoCreatePrivateThreadBinding { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
             => options.UseSqlite($"Data Source={Program.GetDataFilePath("DataBase.db")}");
@@ -20,6 +21,10 @@ namespace DiscordSupportBot.DataBase
             config.Property(x => x.MentionUserIds).IsRequired();
             config.Property(x => x.MentionRoleIds).IsRequired();
             config.HasIndex(x => x.MessageId)
+                .IsUnique();
+
+            modelBuilder.Entity<AutoCreatePrivateThreadBinding>()
+                .HasIndex(x => new { x.ChannelId, x.UserId })
                 .IsUnique();
         }
 

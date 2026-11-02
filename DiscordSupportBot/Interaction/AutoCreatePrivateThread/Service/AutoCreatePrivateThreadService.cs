@@ -252,18 +252,6 @@ namespace DiscordSupportBot.Interaction.AutoCreatePrivateThread.Service
                     return;
                 }
 
-                var oldThread = channel.Threads.FirstOrDefault(x =>
-                    x.IsPrivateThread &&
-                    !x.IsArchived &&
-                    x.Name == component.User.Id.ToString());
-                if (oldThread != null)
-                {
-                    await component.FollowupAsync(
-                        $"已經存在你的私密討論串 [點我跳轉](https://discord.com/channels/{guild.Id}/{oldThread.Id})",
-                        ephemeral: true).ConfigureAwait(false);
-                    return;
-                }
-
                 var clicker = component.User as SocketGuildUser ?? guild.GetUser(component.User.Id);
                 if (clicker == null)
                 {
@@ -280,6 +268,29 @@ namespace DiscordSupportBot.Interaction.AutoCreatePrivateThread.Service
                 {
                     await component.FollowupAsync(
                         "Bot 缺少查看頻道、發送訊息、建立／管理私密討論串或在討論串發言的權限。",
+                        ephemeral: true).ConfigureAwait(false);
+                    return;
+                }
+
+                var oldThread = await FindReusableThreadAsync(guild.Id, channel, clicker.Id).ConfigureAwait(false);
+                if (oldThread != null)
+                {
+                    var reuseAction = GetThreadReuseAction(oldThread.IsArchived, oldThread.IsLocked);
+                    if (reuseAction == ThreadReuseAction.Locked)
+                    {
+                        await component.FollowupAsync(
+                            "你的私密討論串已被管理員鎖定，請聯絡管理員。",
+                            ephemeral: true).ConfigureAwait(false);
+                        return;
+                    }
+
+                    if (reuseAction == ThreadReuseAction.Unarchive)
+                        await oldThread.ModifyAsync(x => x.Archived = false).ConfigureAwait(false);
+
+                    await oldThread.AddUserAsync(clicker).ConfigureAwait(false);
+                    var reopened = reuseAction == ThreadReuseAction.Unarchive ? "，已重新開啟" : "";
+                    await component.FollowupAsync(
+                        $"已經存在你的私密討論串{reopened} [點我跳轉](https://discord.com/channels/{guild.Id}/{oldThread.Id})",
                         ephemeral: true).ConfigureAwait(false);
                     return;
                 }
@@ -307,6 +318,8 @@ namespace DiscordSupportBot.Interaction.AutoCreatePrivateThread.Service
                     thread = null;
                     throw;
                 }
+
+                await SaveBindingAsync(guild.Id, channel.Id, clicker.Id, thread.Id).ConfigureAwait(false);
 
                 var userIds = new HashSet<ulong> { clicker.Id };
                 var skippedUserCount = 0;
@@ -377,13 +390,23 @@ namespace DiscordSupportBot.Interaction.AutoCreatePrivateThread.Service
             catch (Exception ex)
             {
                 if (thread != null && !notificationStarted)
+                {
                     await DeleteOrphanThreadAsync(thread, component.Message.Id, component.User.Id).ConfigureAwait(false);
+                    try
+                    {
+                        await DeleteBindingAsync(channel.Id, component.User.Id).ConfigureAwait(false);
+                    }
+                    catch (Exception bindingException)
+                    {
+                        Log.Error(bindingException, $"AutoCreatePrivateThread-DeleteBinding: message={component.Message.Id}, user={component.User.Id}");
+                    }
+                }
 
                 Log.Error(ex, $"AutoCreatePrivateThread-Button: message={component.Message.Id}, user={component.User.Id}");
                 try
                 {
                     await component.FollowupAsync(
-                        $"建立私密討論串時發生錯誤，請確認 Bot 具有管理及建立私密討論串的權限。\n{ex.Message}",
+                        "處理私密討論串時發生錯誤，請確認 Bot 具有管理及建立私密討論串的權限。",
                         ephemeral: true).ConfigureAwait(false);
                 }
                 catch (Exception followupException)
@@ -487,6 +510,106 @@ namespace DiscordSupportBot.Interaction.AutoCreatePrivateThread.Service
                     state.Semaphore.Dispose();
                 }
             }
+        }
+
+        internal enum ThreadReuseAction
+        {
+            Reuse,
+            Unarchive,
+            Locked
+        }
+
+        internal static ThreadReuseAction GetThreadReuseAction(bool isArchived, bool isLocked)
+            => isLocked
+                ? ThreadReuseAction.Locked
+                : isArchived
+                    ? ThreadReuseAction.Unarchive
+                    : ThreadReuseAction.Reuse;
+
+        internal static bool IsBotOwnedThread(bool isPrivateThread, string name, ulong ownerId, ulong userId, ulong botId)
+            => isPrivateThread && name == userId.ToString() && ownerId == botId;
+
+        private async Task<IThreadChannel> FindReusableThreadAsync(ulong guildId, SocketTextChannel channel, ulong userId)
+        {
+            var binding = await GetBindingAsync(channel.Id, userId).ConfigureAwait(false);
+            if (binding != null)
+            {
+                var boundThread = await _client.Rest.GetChannelAsync(binding.ThreadId).ConfigureAwait(false) as IThreadChannel;
+                if (boundThread != null)
+                    return boundThread;
+
+                await DeleteBindingAsync(channel.Id, userId).ConfigureAwait(false);
+            }
+
+            // 舊資料沒有映射時，用名稱回退；只認 Bot 建立的討論串，避免被同名 thread 冒名
+            var cachedThreads = channel.Threads
+                .Where(x => IsBotOwnedThread(
+                    x.IsPrivateThread,
+                    x.Name,
+                    ((IThreadChannel)x).OwnerId,
+                    userId,
+                    _client.CurrentUser.Id))
+                .OrderByDescending(x => x.Id)
+                .ToArray();
+            var cachedThread = cachedThreads.FirstOrDefault(x => !x.IsArchived) ?? cachedThreads.FirstOrDefault();
+            if (cachedThread == null)
+                return null;
+
+            var existingThread = await _client.Rest.GetChannelAsync(cachedThread.Id).ConfigureAwait(false) as IThreadChannel;
+            if (existingThread == null)
+                return null;
+
+            await SaveBindingAsync(guildId, channel.Id, userId, existingThread.Id).ConfigureAwait(false);
+            return existingThread;
+        }
+
+        private static async Task<AutoCreatePrivateThreadBinding> GetBindingAsync(ulong channelId, ulong userId)
+        {
+            using var db = new SupportContext();
+            return await db.AutoCreatePrivateThreadBinding
+                .AsNoTracking()
+                .SingleOrDefaultAsync(x => x.ChannelId == channelId && x.UserId == userId)
+                .ConfigureAwait(false);
+        }
+
+        private static async Task SaveBindingAsync(ulong guildId, ulong channelId, ulong userId, ulong threadId)
+        {
+            using var db = new SupportContext();
+            var binding = await db.AutoCreatePrivateThreadBinding
+                .SingleOrDefaultAsync(x => x.ChannelId == channelId && x.UserId == userId)
+                .ConfigureAwait(false);
+
+            if (binding == null)
+            {
+                binding = new AutoCreatePrivateThreadBinding
+                {
+                    GuildId = guildId,
+                    ChannelId = channelId,
+                    UserId = userId,
+                    ThreadId = threadId
+                };
+                db.AutoCreatePrivateThreadBinding.Add(binding);
+            }
+            else
+            {
+                binding.GuildId = guildId;
+                binding.ThreadId = threadId;
+            }
+
+            await db.SaveChangesAsync().ConfigureAwait(false);
+        }
+
+        private static async Task DeleteBindingAsync(ulong channelId, ulong userId)
+        {
+            using var db = new SupportContext();
+            var binding = await db.AutoCreatePrivateThreadBinding
+                .SingleOrDefaultAsync(x => x.ChannelId == channelId && x.UserId == userId)
+                .ConfigureAwait(false);
+            if (binding == null)
+                return;
+
+            db.AutoCreatePrivateThreadBinding.Remove(binding);
+            await db.SaveChangesAsync().ConfigureAwait(false);
         }
 
         private static async Task DeleteOrphanThreadAsync(SocketThreadChannel thread, ulong messageId, ulong userId)
