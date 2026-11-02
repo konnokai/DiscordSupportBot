@@ -321,7 +321,7 @@ namespace DiscordSupportBot.Interaction.AutoCreatePrivateThread.Service
 
                 await SaveBindingAsync(guild.Id, channel.Id, clicker.Id, thread.Id).ConfigureAwait(false);
 
-                var userIds = new HashSet<ulong> { clicker.Id };
+                var userIds = new HashSet<ulong>();
                 var skippedUserCount = 0;
                 foreach (var userId in configuredUserIds)
                 {
@@ -333,20 +333,11 @@ namespace DiscordSupportBot.Interaction.AutoCreatePrivateThread.Service
                         continue;
                     }
 
-                    userIds.Add(user.Id);
                     if (user.Id == clicker.Id)
                         continue;
 
-                    try
-                    {
-                        await thread.AddUserAsync(user).ConfigureAwait(false);
-                    }
-                    catch (Exception ex)
-                    {
-                        skippedUserCount++;
-                        userIds.Remove(user.Id);
-                        Log.Error(ex, $"AutoCreatePrivateThread-AddUser: user={user.Id}, thread={thread.Id}");
-                    }
+                    // mention 會自動把使用者加入討論串；先 AddUserAsync 會多一則系統訊息，變成雙重通知
+                    userIds.Add(user.Id);
                 }
 
                 var canMentionEveryone = guild.CurrentUser.GetPermissions(channel).MentionEveryone;
