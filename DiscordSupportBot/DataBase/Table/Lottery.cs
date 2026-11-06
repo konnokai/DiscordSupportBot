@@ -31,6 +31,14 @@
         /// 參與抽獎清單 (使用Json保存並轉換成List<ulong>)
         /// </summary>
         public string ParticipantList { get; set; } = "[]";
+        /// <summary>
+        /// 最後一次開獎的得獎者 (使用Json保存並轉換成List<ulong>)，"[]" 代表尚未開獎
+        /// </summary>
+        public string WinnerList { get; set; } = "[]";
+        /// <summary>
+        /// 所有曾經得獎的人 (使用Json保存並轉換成List<ulong>)，供重抽時累計排除
+        /// </summary>
+        public string WinnerHistoryList { get; set; } = "[]";
     }
 }
 

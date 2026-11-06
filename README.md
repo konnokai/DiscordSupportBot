@@ -9,7 +9,7 @@
 
 | 分類 | 功能 | 主要指令 |
 |------|------|----------|
-| 🎲 抽獎 | 建立／開獎／刪除抽獎、顯示參與名單 | `/lottery create-lottery`、`start-lottery`、`delete-lottery`、`show-participant-list` |
+| 🎲 抽獎 | 建立／開獎／重新抽取（可排除上次或累計得獎者）／刪除抽獎、顯示參與名單 | `/lottery create-lottery`、`start-lottery`、`reroll-lottery`、`delete-lottery`、`show-participant-list` |
 | 💰 基金 | 對成員加基金、單一／全部排行榜、每月自動重置 | `/add-fund`、`/fund-leaderboard`、`/all-fund-leaderboard`、訊息選單「對該訊息的作者添加基金」 |
 | 📊 統計 | 發言活躍度、表情使用排行、未使用表情排行與使用量 | `/message-activity`、`/emote-activity`、`/emote-unused`、`/emote-use-count` |
 | 🍔 隨機 | 食物轉盤 | `/food-wheel` |

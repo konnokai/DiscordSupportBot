@@ -7,7 +7,7 @@
 # 隱私權政策（繁體中文）
 
 **適用對象：** 輔助小幫手（Discord Support Bot，以下簡稱「本 Bot」）
-**最後更新日期：** 2026 年 6 月 12 日
+**最後更新日期：** 2026 年 11 月 6 日
 
 本隱私權政策說明本 Bot 在您使用其功能時，會收集哪些資料、如何使用與儲存，以及您可如何要求刪除。使用本 Bot 即表示您同意本政策之內容。
 
@@ -26,7 +26,7 @@
 | 發言計數 | 活躍度統計 | 各使用者於各伺服器的發言次數（僅次數，**不含訊息內容**） |
 | 表情使用計數 | 表情統計 | 各伺服器自訂表情之使用次數 |
 | 基金點數 | 基金系統 | 各使用者於各伺服器的點數分數 |
-| 抽獎資料 | 抽獎系統 | 抽獎參與者的使用者 ID 清單、由管理員自行輸入之獎項說明文字 |
+| 抽獎資料 | 抽獎系統 | 抽獎參與者與得獎者的使用者 ID 清單、由管理員自行輸入之獎項說明文字 |
 | 伺服器設定 | 各管理功能 | 自動語音頻道、成員數頻道、Nitro 數頻道、蜜罐頻道、連結修正網域對應、通知頻道等設定 |
 | 使用者註冊資料 | `/id register`（特定伺服器專屬） | 使用者**主動提供**之遊戲帳號 ID 與遊玩平台 |
 
@@ -57,7 +57,7 @@
 
 - 資料儲存於本 Bot 擁有者所管理之伺服器，使用 **Redis** 與 **SQLite** 資料庫保存。
 - 本 Bot 擁有者採取合理之技術與管理措施保護所儲存之資料，惟無法保證網際網路傳輸或儲存之絕對安全。
-- 資料僅保留至提供功能所需之期間；部分統計資料（如基金排行榜）可能依功能設計定期重置。
+- 資料僅保留至提供功能所需之期間；部分統計資料（如基金排行榜）可能依功能設計定期重置。抽獎資料會保留至管理員刪除該抽獎為止。
 
 ## 5. 資料分享
 
@@ -105,7 +105,7 @@
 # Privacy Policy (English)
 
 **Applies to:** Discord Support Bot (the "Bot")
-**Last updated:** June 12, 2026
+**Last updated:** November 6, 2026
 
 This Privacy Policy explains what data the Bot collects when you use its features, how that data is used and stored, and how you can request its deletion. By using the Bot, you agree to this Policy.
 
@@ -124,7 +124,7 @@ The Bot collects only the data **necessary** to provide its features, namely:
 | Message counts | Activity statistics | Per-user message counts per server (counts only — **no message content**) |
 | Emote usage counts | Emote statistics | Usage counts of each server's custom emotes |
 | Fund points | Fund system | Per-user point scores per server |
-| Giveaway data | Giveaway system | Participant user-ID lists and prize description text entered by administrators |
+| Giveaway data | Giveaway system | Participant and winner user-ID lists and prize description text entered by administrators |
 | Server settings | Administrative features | Auto voice channel, member-count channel, Nitro-count channel, honeypot channel, link-fix domain mappings, notification channels, etc. |
 | User-registered data | `/id register` (server-specific) | Game account ID and platform that users **voluntarily** provide |
 
@@ -155,7 +155,7 @@ To provide the features above, the Bot requests and uses the following Discord p
 
 - Data is stored on infrastructure managed by the Bot owner, using **Redis** and **SQLite** databases.
 - The Bot owner applies reasonable technical and organizational measures to protect stored data, but cannot guarantee the absolute security of internet transmission or storage.
-- Data is retained only for as long as needed to provide the relevant feature; some statistics (such as the fund leaderboard) may be periodically reset by design.
+- Data is retained only for as long as needed to provide the relevant feature; some statistics (such as the fund leaderboard) may be periodically reset by design. Giveaway data is retained until an administrator deletes the giveaway.
 
 ## 5. Data Sharing
 

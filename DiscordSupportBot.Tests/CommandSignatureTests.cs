@@ -27,4 +27,25 @@ public class CommandSignatureTests
         Assert.Contains("變態", signature);
         Assert.Contains("色狗", signature);
     }
+
+    [Fact]
+    public async Task RerollLottery_HasOptionalExcludeWinnersOption()
+    {
+        using var client = new DiscordSocketClient();
+        var services = new ServiceCollection()
+            .AddSingleton(client)
+            .BuildServiceProvider();
+
+        var interactions = new InteractionService(client);
+        await interactions.AddModuleAsync(typeof(DiscordSupportBot.Interaction.Lottery.Lottery), services);
+
+        var reroll = Assert.Single(interactions.SlashCommands, (x) => x.Name == "reroll-lottery");
+        var option = Assert.Single(reroll.Parameters, (x) => x.Name == "exclude-winners");
+        var allWinnersOption = Assert.Single(reroll.Parameters, (x) => x.Name == "exclude-all-winners");
+
+        Assert.False(option.IsRequired);
+        Assert.Equal("重抽時排除目前名單中的得獎者，提高其他人的中獎機率", option.Description);
+        Assert.False(allWinnersOption.IsRequired);
+        Assert.Equal("累計排除所有曾得獎者；與 exclude-winners 同時開啟時以此為準", allWinnersOption.Description);
+    }
 }

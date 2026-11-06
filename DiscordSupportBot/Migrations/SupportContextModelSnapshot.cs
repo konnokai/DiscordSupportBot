@@ -197,6 +197,12 @@ namespace DiscordSupportBot.Migrations
                     b.Property<string>("ParticipantList")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("WinnerHistoryList")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("WinnerList")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.ToTable("Lottery");
