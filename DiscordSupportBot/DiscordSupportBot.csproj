@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>DiscordSupportBot</RootNamespace>
   </PropertyGroup>
 
@@ -15,25 +15,22 @@
 
   <ItemGroup>
     <PackageReference Include="Ben.Demystifier" Version="0.4.1" />
-    <PackageReference Include="Dapper" Version="2.1.79" />
-    <PackageReference Include="Discord.Net" Version="3.20.1" />
-    <PackageReference Include="JsonExtensions" Version="1.2.3" />
-    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="9.0.19" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.19">
+    <PackageReference Include="Dapper" Version="2.1.89" />
+    <PackageReference Include="Discord.Net" Version="3.20.2" />
+    <PackageReference Include="JsonExtensions" Version="2.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.15">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.19" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.19">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.15" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.15">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Polly" Version="8.7.0" />
-    <PackageReference Include="SkiaSharp" Version="4.151.1" />
-    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="4.151.1" />
-    <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.11" />
-    <PackageReference Include="StackExchange.Redis" Version="3.1.31" />
-    <PackageReference Include="System.Linq.Async" Version="7.0.1" />
+    <PackageReference Include="Polly" Version="8.9.1" />
+    <PackageReference Include="SkiaSharp" Version="4.156.0" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="4.156.0" />
+    <PackageReference Include="StackExchange.Redis" Version="3.4.31" />
   </ItemGroup>
 
   <ItemGroup>

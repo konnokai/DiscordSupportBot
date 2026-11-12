@@ -35,14 +35,14 @@
 
 ## 🛠️ 技術棧
 
-- .NET 8 / C#
-- [Discord.Net](https://github.com/discord-net/Discord.Net) 3.19
+- .NET 10 / C#
+- [Discord.Net](https://github.com/discord-net/Discord.Net) 3.20
 - Redis（[StackExchange.Redis](https://github.com/StackExchange/StackExchange.Redis)）— 即時統計與排行榜
-- SQLite + Entity Framework Core 9 — 持久化設定與統計資料
+- SQLite + Entity Framework Core 10 — 持久化設定與統計資料
 
 ## 📦 環境需求
 
-- [.NET 8 SDK](https://dotnet.microsoft.com/download)
+- [.NET 10 SDK](https://dotnet.microsoft.com/download)
 - 一個可連線的 [Redis](https://redis.io/) 伺服器
 - 一個 Discord Bot Token（[如何取得](https://discord.com/developers/applications)）
 

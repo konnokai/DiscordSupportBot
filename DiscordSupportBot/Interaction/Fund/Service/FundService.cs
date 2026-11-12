@@ -606,7 +606,7 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             var list = new List<(ulong, long)>();
             foreach (var entry in entries)
             {
-                if (ulong.TryParse(entry.Element, out var uid))
+                if (ulong.TryParse((string?)entry.Element, out var uid))
                 {
                     list.Add((uid, (long)entry.Score));
                 }
@@ -633,7 +633,7 @@ namespace DiscordSupportBot.Interaction.Fund.Service
         {
             var channelEntries = await RedisConnection.RedisDb.SetMembersAsync(NotifyChannelsKey);
             var channelIds = channelEntries
-                .Select(e => ulong.TryParse(e, out var id) ? id : 0UL)
+                .Select(e => ulong.TryParse((string?)e, out var id) ? id : 0UL)
                 .Where(id => id != 0)
                 .ToList();
 

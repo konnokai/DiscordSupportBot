@@ -2,7 +2,7 @@
 
 ## Project Shape
 
-- This is a .NET 8 C# Discord bot. `DiscordSupportBot.sln` contains the executable project and the xUnit project `DiscordSupportBot.Tests`.
+- This is a .NET 10 C# Discord bot. `DiscordSupportBot.sln` contains the executable project and the xUnit project `DiscordSupportBot.Tests`.
 - `DiscordSupportBot/Program.cs` is the entrypoint. It initializes configuration, SQLite, Redis, and both Discord command frameworks.
 - Slash commands and interaction services are under `DiscordSupportBot/Interaction`; legacy prefix commands are under `DiscordSupportBot/Command` and use the `!!!` prefix.
 - Modules are loaded from the executable entry assembly. Interaction services implementing `IInteractionService` and command services implementing `ICommandService` are discovered by the existing reflection/DI setup.
@@ -23,7 +23,7 @@ dotnet test DiscordSupportBot.Tests/DiscordSupportBot.Tests.csproj --configurati
 - Local run: `dotnet run --project DiscordSupportBot`.
 - Non-Docker runs require root `bot_config.json`. If it is missing, startup writes `bot_config_example.json` and exits; `DiscordToken` and `WebHookUrl` are required, and `RedisOption` defaults to `127.0.0.1:6379,syncTimeout=3000`.
 - Docker Compose reads root `.env`, mounts root `./Data` to `/app/Data`, and uses `host.docker.internal` for host services. Use `docker compose up -d`, `docker compose logs -f`, and `docker compose down`.
-- Runtime data paths are relative to the executable base directory. Local runs use `DiscordSupportBot/bin/<Configuration>/net8.0/Data`; Docker uses `/app/Data`.
+- Runtime data paths are relative to the executable base directory. Local runs use `DiscordSupportBot/bin/<Configuration>/net10.0/Data`; Docker uses `/app/Data`.
 - Enable Discord Message Content and Server Members privileged intents. Presence is requested only when `IsEnablePresenceIntent` is enabled.
 - Debug slash-command registration uses `TestSlashCommandGuildId` for fast guild-scoped testing. Release registration is gated by `Data/CommandSignature.bin`; command name, description, parameter, or parameter-choice (enum) changes trigger registration.
 - Never commit `bot_config.json` or `.env`; use `.env_sample` for the variable names.
