@@ -31,9 +31,7 @@ dotnet test DiscordSupportBot.Tests/DiscordSupportBot.Tests.csproj --configurati
 ## Persistence
 
 - `RedisConnection` always uses Redis database 2. Fund leaderboards are ZSET-only; do not add a Hash as a second fund-storage source.
-- SQLite files and runtime artifacts are under the runtime `Data` directory. Startup calls `EnsureCreated()` only when `Data/DataBase.db` is absent and does not apply EF migrations automatically; handle schema changes explicitly and keep `DiscordSupportBot/Migrations` consistent.
-- `AutoCreatePrivateThreadBinding` maps `(ChannelId, UserId)` to the private thread; apply its migration to every existing database before deploying, because `EnsureCreated()` does not add tables to an existing database.
-- The lottery winner columns (`WinnerList`, `WinnerHistoryList`) are added by `AddLotteryWinnerColumns`; apply its migration to every existing database before deploying, otherwise every `Lottery` query will fail on the missing columns.
+- SQLite files and runtime artifacts are under the runtime `Data` directory. Startup applies pending EF migrations with `Database.Migrate()`; existing databases must have a complete `__EFMigrationsHistory`, otherwise startup fails instead of rebuilding the schema.
 
 ## Graphify
 

@@ -2,6 +2,7 @@
 using Discord.Interactions;
 using Discord.Webhook;
 using DiscordSupportBot.Interaction;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 using System.Diagnostics;
@@ -56,10 +57,8 @@ namespace DiscordSupportBot
 
             using (var db = new SupportContext())
             {
-                if (!File.Exists(GetDataFilePath("DataBase.db")))
-                {
-                    db.Database.EnsureCreated();
-                }
+                // 啟動時自動套用未執行的 migration；正式資料庫必須已有 __EFMigrationsHistory
+                db.Database.Migrate();
             }
 
             try
@@ -320,6 +319,8 @@ namespace DiscordSupportBot
             interactionServices.LoadInteractionFrom(Assembly.GetAssembly(typeof(InteractionHandler)));
             IServiceProvider iService = interactionServices.BuildServiceProvider();
             iService.GetRequiredService<Interaction.Fund.Service.FundService>().Initialize();
+            // ButtonRoleService 在建構時註冊按鈕事件，必須在啟動時建立，否則重啟後舊訊息的按鈕沒有反應
+            iService.GetRequiredService<Interaction.Admin.Service.ButtonRoleService>();
             await iService.GetRequiredService<Interaction.Utility.UtilityService>().InitializeAsync();
             await iService.GetService<InteractionHandler>().InitializeAsync();
             #endregion

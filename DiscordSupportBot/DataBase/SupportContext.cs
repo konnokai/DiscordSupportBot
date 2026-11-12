@@ -11,6 +11,7 @@ namespace DiscordSupportBot.DataBase
         public DbSet<FoodWheelEntry> FoodWheelEntry { get; set; }
         public DbSet<AutoCreatePrivateThreadConfig> AutoCreatePrivateThreadConfig { get; set; }
         public DbSet<AutoCreatePrivateThreadBinding> AutoCreatePrivateThreadBinding { get; set; }
+        public DbSet<ButtonRole> ButtonRole { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
             => options.UseSqlite($"Data Source={Program.GetDataFilePath("DataBase.db")}");
@@ -25,6 +26,10 @@ namespace DiscordSupportBot.DataBase
 
             modelBuilder.Entity<AutoCreatePrivateThreadBinding>()
                 .HasIndex(x => new { x.ChannelId, x.UserId })
+                .IsUnique();
+
+            modelBuilder.Entity<ButtonRole>()
+                .HasIndex(x => new { x.MessageId, x.EmojiName })
                 .IsUnique();
         }
 

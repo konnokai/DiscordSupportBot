@@ -6,41 +6,18 @@ namespace DiscordSupportBot.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "TrustedGuild",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    GuildId = table.Column<ulong>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TrustedGuild", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UpdateGuildInfo",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    GuildId = table.Column<ulong>(nullable: false),
-                    ChannelMemberId = table.Column<ulong>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UpdateGuildInfo", x => x.Id);
-                });
+            migrationBuilder.DropColumn(
+                name: "ChannelTimeId",
+                table: "UpdateGuildInfo");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "TrustedGuild");
-
-            migrationBuilder.DropTable(
-                name: "UpdateGuildInfo");
+            migrationBuilder.AddColumn<ulong>(
+                name: "ChannelTimeId",
+                table: "UpdateGuildInfo",
+                nullable: false,
+                defaultValue: 0ul);
         }
     }
 }

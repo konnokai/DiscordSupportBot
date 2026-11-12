@@ -15,7 +15,7 @@ namespace DiscordSupportBot.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.19");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.15");
 
             modelBuilder.Entity("DiscordSupportBot.DataBase.Table.AutoCreatePrivateThreadBinding", b =>
                 {
@@ -78,6 +78,47 @@ namespace DiscordSupportBot.Migrations
                         .IsUnique();
 
                     b.ToTable("AutoCreatePrivateThreadConfig");
+                });
+
+            modelBuilder.Entity("DiscordSupportBot.DataBase.Table.ButtonRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("AddedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ButtonGuid")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ButtonName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<ulong>("ChannelId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("EmojiName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<ulong>("GuildId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ulong>("MessageId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<ulong>("RoleId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MessageId", "EmojiName")
+                        .IsUnique();
+
+                    b.ToTable("ButtonRole");
                 });
 
             modelBuilder.Entity("DiscordSupportBot.DataBase.Table.FoodWheelEntry", b =>
