@@ -39,6 +39,8 @@ namespace DiscordSupportBot.Interaction.LinkFix.Service
             if (string.IsNullOrWhiteSpace(content))
                 return;
 
+            var replied = false;
+
             foreach (var wordMatch in WordRegex().Matches(content).Cast<Match>())
             {
                 var word = wordMatch.Value;
@@ -64,17 +66,30 @@ namespace DiscordSupportBot.Interaction.LinkFix.Service
                     var hasSpoiler = IsInSpoiler(content, wordMatch.Index + match.Index);
                     var newUrl = match.Groups["prefix"].Value + newDomain + match.Groups["suffix"].Value.Replace("||", "");
                     await userMessage.ReplyAsync(hasSpoiler ? "||" + newUrl + "||" : newUrl, allowedMentions: AllowedMentions.None);
-
-                    try
-                    {
-                        await userMessage.ModifyAsync((act) => act.Flags = MessageFlags.SuppressEmbeds); // Suppress embeds to avoid confusion with the original link
-                    }
-                    catch { /* Ignore */ }
+                    replied = true;
 
                     Log.Info($"[{textChannel.Guild}/{textChannel}/{userMessage.Author.Username}] (LinkFix): [{word}] => [{newUrl}]");
                 }
                 catch (Exception) { /* Ignore */ }
             }
+
+            if (replied)
+                _ = SuppressEmbedsAsync(userMessage);
+        }
+
+        /// <summary>
+        /// 原始訊息的預覽是 Discord 非同步產生的，馬上壓制會來不及蓋掉；看到預覽就壓，沒預覽的網址等 10 秒後照樣壓一次
+        /// </summary>
+        private static async Task SuppressEmbedsAsync(SocketUserMessage userMessage)
+        {
+            try
+            {
+                for (var i = 0; i < 10 && userMessage.Embeds.Count == 0; i++)
+                    await Task.Delay(TimeSpan.FromSeconds(1));
+
+                await userMessage.ModifyAsync((act) => act.Flags = MessageFlags.SuppressEmbeds);
+            }
+            catch { /* Ignore */ }
         }
 
         public static bool IsInSpoiler(string content, int index)
