@@ -17,7 +17,9 @@ namespace DiscordSupportBot.Interaction.LinkFix
             ("threads.com", "ebfix.konnokai.me"),
             ("b23.tv", "vxb23.tv"),
             ("facebook.com", "fb.ebfix.konnokai.me"),
-            ("instagram.com", "ig.ebfix.konnokai.me")
+            ("instagram.com", "ig.ebfix.konnokai.me"),
+            ("x.com", "fixvx.com"),
+            ("twitter.com", "fixvx.com")
         ];
 
         [SlashCommand("set", "設定或移除連結修正")]
