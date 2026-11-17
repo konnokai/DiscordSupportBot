@@ -25,7 +25,8 @@ namespace DiscordSupportBot.Interaction.LinkFix.Service
 
         private async Task HandleMessageReceived(SocketMessage message)
         {
-            if (message is not SocketUserMessage userMessage)
+            // 忽略機器人，否則會對其他機器人（含 webhook）的訊息回覆，可能互相觸發
+            if (message is not SocketUserMessage userMessage || userMessage.Author.IsBot)
                 return;
 
             if (userMessage.Channel is not SocketTextChannel textChannel)
