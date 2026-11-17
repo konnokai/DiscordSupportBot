@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using DiscordSupportBot.Interaction;
 using DiscordSupportBot.Interaction.Fund;
 using DiscordSupportBot.Interaction.Fund.Service;
+using DiscordSupportBot.Interaction.LinkFix;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DiscordSupportBot.Tests;
@@ -21,11 +22,29 @@ public class CommandSignatureTests
         var interactions = new InteractionService(client);
         await interactions.AddModuleAsync(typeof(Fund), services);
 
-        var signature = InteractionHandler.BuildSignatureText(interactions.SlashCommands);
+        var signature = InteractionHandler.BuildSignatureText(interactions.SlashCommands, interactions.ContextCommands);
 
         // 新增基金類型時選擇清單會變，簽章必須跟著變，Release 才會重新註冊指令
         Assert.Contains("變態", signature);
         Assert.Contains("色狗", signature);
+        Assert.Contains("context|Message|對該訊息的作者添加基金", signature);
+    }
+
+    [Fact]
+    public async Task Signature_ListsMessageCommands()
+    {
+        using var client = new DiscordSocketClient();
+        var services = new ServiceCollection()
+            .AddSingleton(client)
+            .BuildServiceProvider();
+
+        var interactions = new InteractionService(client);
+        await interactions.AddModuleAsync(typeof(LinkFixMessageCommand), services);
+
+        var signature = InteractionHandler.BuildSignatureText(interactions.SlashCommands, interactions.ContextCommands);
+
+        // 訊息指令也要進簽章，Release 才會在新增或改名時重新註冊
+        Assert.Contains("context|Message|刪除機器人訊息", signature);
     }
 
     [Fact]

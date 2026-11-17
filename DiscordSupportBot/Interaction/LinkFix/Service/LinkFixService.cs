@@ -101,6 +101,15 @@ namespace DiscordSupportBot.Interaction.LinkFix.Service
             return count % 2 == 1;
         }
 
+        /// <summary>
+        /// 連結修正的回覆內容只會有修正後的網址（可能被暴雷標記包住），用來辨識可刪除的訊息
+        /// </summary>
+        public static bool IsLinkFixContent(string? content)
+            => content is not null && LinkFixContentRegex().IsMatch(content);
+
+        [GeneratedRegex(@"^(?:\|\|)?https?://\S+$")]
+        private static partial Regex LinkFixContentRegex();
+
         [GeneratedRegex(@"\S+")]
         private static partial Regex WordRegex();
 

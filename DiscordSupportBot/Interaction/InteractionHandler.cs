@@ -14,14 +14,14 @@ namespace DiscordSupportBot.Interaction
         private readonly IServiceProvider _services;
 
         /// <summary>
-        /// 會被全球註冊的 Slash 指令「規格」雜湊（指令名稱、描述，以及各參數的位置/名稱/型別/是否必填/描述/選項）。
+        /// 會被全球註冊的 Slash 指令與訊息／使用者指令「規格」雜湊（指令名稱、描述，以及各參數的位置/名稱/型別/是否必填/描述/選項）。
         /// <para>只要規格有任何變動，雜湊即改變，供啟動時判斷是否需要重新註冊全球指令（取代僅比對指令總數的舊做法）。</para>
         /// </summary>
         public string CommandSignature
             => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(
-                Encoding.UTF8.GetBytes(BuildSignatureText(_interactions.SlashCommands))));
+                Encoding.UTF8.GetBytes(BuildSignatureText(_interactions.SlashCommands, _interactions.ContextCommands))));
 
-        internal static string BuildSignatureText(IReadOnlyCollection<SlashCommandInfo> slashCommands)
+        internal static string BuildSignatureText(IReadOnlyCollection<SlashCommandInfo> slashCommands, IReadOnlyCollection<ContextCommandInfo> contextCommands)
         {
             var sb = new StringBuilder();
 
@@ -51,6 +51,13 @@ namespace DiscordSupportBot.Interaction
                     sb.Append(p).Append(';');
                 sb.Append('\n');
             }
+
+            // 訊息／使用者指令出現在右鍵選單，名稱一樣要納入，否則新增時不會重新註冊
+            foreach (var cmd in contextCommands
+                .Where((cmd) => !cmd.Module.DontAutoRegister)
+                .OrderBy((cmd) => cmd.Name, StringComparer.Ordinal)
+                .ThenBy((cmd) => cmd.CommandType))
+                sb.Append("context|").Append(cmd.CommandType).Append('|').Append(cmd.Name).Append('\n');
 
             return sb.ToString();
         }
@@ -121,6 +128,7 @@ namespace DiscordSupportBot.Interaction
             _client.MessageCommandExecuted += MessageCommandExecuted;
             _client.ButtonExecuted += _client_ButtonExecuted;
             _interactions.SlashCommandExecuted += SlashCommandExecuted;
+            _interactions.ContextCommandExecuted += ContextCommandExecuted;
         }
 
         private Task _client_ButtonExecuted(SocketMessageComponent button)
@@ -159,31 +167,43 @@ namespace DiscordSupportBot.Interaction
             var commandData = arg2.Interaction.Data as SocketSlashCommandData;
             if (commandData.Options.Count > 0) slashCommand += GetOptionsValue(commandData.Options.First());
 
+            var guild = arg2.Guild?.Name ?? "私人訊息";
             if (arg3.IsSuccess)
             {
-                Log.Info($"[{arg2.Guild.Name}/{arg2.Channel.Name}] {arg2.User.Username} 執行 `{slashCommand}`");
+                Log.Info($"[{guild}/{arg2.Channel.Name}] {arg2.User.Username} 執行 `{slashCommand}`");
             }
             else
             {
-                Log.Error($"[{arg2.Guild.Name}/{arg2.Channel.Name}] {arg2.User.Username} 執行 `{slashCommand}` 發生錯誤\r\n{arg3.ErrorReason}");
-                switch (arg3.Error)
-                {
-                    case InteractionCommandError.UnmetPrecondition:
-                        arg2.Interaction.SendErrorAsync(arg3.ErrorReason);
-                        break;
-                    case InteractionCommandError.UnknownCommand:
-                        arg2.Interaction.SendErrorAsync("未知的指令，也許被移除或變更了");
-                        break;
-                    case InteractionCommandError.BadArgs:
-                        arg2.Interaction.SendErrorAsync("輸入的參數錯誤");
-                        break;
-                    default:
-                        arg2.Interaction.SendErrorAsync("未知的錯誤，請向Bot擁有者回報");
-                        break;
-                }
+                Log.Error($"[{guild}/{arg2.Channel.Name}] {arg2.User.Username} 執行 `{slashCommand}` 發生錯誤\r\n{arg3.ErrorReason}");
+                _ = SendCommandErrorAsync(arg2, arg3);
             }
 
             return Task.CompletedTask;
+        }
+
+        // 右鍵指令沒有回應時使用者只會看到「應用程式沒有回應」，錯誤一律回覆給使用者
+        private Task ContextCommandExecuted(ContextCommandInfo arg1, IInteractionContext arg2, IResult arg3)
+        {
+            var guild = arg2.Guild?.Name ?? "私人訊息";
+            if (arg3.IsSuccess)
+            {
+                Log.Info($"[{guild}/{arg2.Channel.Name}] {arg2.User.Username} 執行訊息指令 `{arg1.Name}`");
+                return Task.CompletedTask;
+            }
+
+            Log.Error($"[{guild}/{arg2.Channel.Name}] {arg2.User.Username} 執行訊息指令 `{arg1.Name}` 發生錯誤\r\n{arg3.ErrorReason}");
+            return SendCommandErrorAsync(arg2, arg3);
+        }
+
+        private static Task SendCommandErrorAsync(IInteractionContext context, IResult result)
+        {
+            return result.Error switch
+            {
+                InteractionCommandError.UnmetPrecondition => context.Interaction.SendErrorAsync(result.ErrorReason),
+                InteractionCommandError.UnknownCommand => context.Interaction.SendErrorAsync("未知的指令，也許被移除或變更了"),
+                InteractionCommandError.BadArgs => context.Interaction.SendErrorAsync("輸入的參數錯誤"),
+                _ => context.Interaction.SendErrorAsync("未知的錯誤，請向Bot擁有者回報"),
+            };
         }
 
         private string GetOptionsValue(SocketSlashCommandDataOption socketSlashCommandDataOption)
