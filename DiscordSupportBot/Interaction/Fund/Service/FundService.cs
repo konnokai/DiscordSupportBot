@@ -41,6 +41,8 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             // 只能加在最後：按鈕的 customId 用 (int)FundType，插在中間會讓舊訊息的按鈕指到別的基金
             [ChoiceDisplay("變態")]
             Hentai,
+            [ChoiceDisplay("給給")]
+            Gayge,
         }
 
         private readonly DiscordSocketClient _client;

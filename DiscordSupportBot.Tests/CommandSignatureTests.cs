@@ -27,6 +27,7 @@ public class CommandSignatureTests
         // 新增基金類型時選擇清單會變，簽章必須跟著變，Release 才會重新註冊指令
         Assert.Contains("變態", signature);
         Assert.Contains("色狗", signature);
+        Assert.Contains("給給", signature);
         Assert.Contains("context|Message|對該訊息的作者添加基金", signature);
     }
 
