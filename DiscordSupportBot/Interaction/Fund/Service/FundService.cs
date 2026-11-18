@@ -123,6 +123,9 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             catch (Exception ex)
             {
                 Log.Error(ex, $"FundService-ModalSubmitted: {arg.Data.CustomId}");
+                // 第一則 followup 會蓋掉公開的「思考中」；先刪掉才能用 ephemeral 送錯誤
+                try { await arg.DeleteOriginalResponseAsync(); }
+                catch { }
                 await arg.SendErrorAsync($"處理過程發生錯誤: {ex.Message}", true);
             }
         }
@@ -163,6 +166,14 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                 try
                 {
                     var wasOwnerRedirected = CheckIsAddOwner(fundType, arg.GuildId.Value, arg.User.Id, targetUserId, out var needAddUserId);
+                    if (needAddUserId == 0)
+                    {
+                        // 沒有對象可以亂彈，這次不入帳也不佔冷卻
+                        await RedisConnection.RedisDb.KeyDeleteAsync(cooldownKey);
+                        await arg.SendErrorAsync("找不到可以亂彈的對象，這次不執行", true);
+                        return;
+                    }
+
                     // AddFundAsync 內含 ZINCRBY，出錯時無法確定有沒有入帳，保守保留冷卻
                     fundAttempted = true;
                     var result = await AddFundAsync(fundType, arg.GuildId.Value, arg.ChannelId.Value, arg.User.Id, needAddUserId, wasOwnerRedirected);
@@ -238,13 +249,24 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             string messagePrefix = "")
         {
             var cooldownScopeId = interaction.Id;
+            var cooldownKey = GetAddOneCooldownKey(cooldownScopeId, executeUserId);
             await RedisConnection.RedisDb.StringSetAsync(
-                GetAddOneCooldownKey(cooldownScopeId, executeUserId),
+                cooldownKey,
                 1,
                 expiry: TimeSpan.FromHours(1),
                 when: When.NotExists);
 
             var wasOwnerRedirected = CheckIsAddOwner(fundType, guildId, executeUserId, targetUserId, out var needAddUserId);
+            if (needAddUserId == 0)
+            {
+                // 沒有對象可以亂彈，這次不入帳也不佔冷卻
+                await RedisConnection.RedisDb.KeyDeleteAsync(cooldownKey);
+                // 先刪掉公開的「思考中」，不然第一則 followup 會蓋掉它並變成公開訊息
+                await interaction.DeleteOriginalResponseAsync();
+                await interaction.SendErrorAsync("找不到可以亂彈的對象，這次不執行", true);
+                return;
+            }
+
             var result = await AddFundAsync(fundType, guildId, channelId, executeUserId, needAddUserId, wasOwnerRedirected);
             var recipientDisplayName = wasOwnerRedirected
                 ? string.Empty
@@ -518,30 +540,51 @@ namespace DiscordSupportBot.Interaction.Fund.Service
         private static string GetAddOneCooldownKey(ulong scopeId, ulong userId)
             => $"{AddOneCooldownKeyPrefix}:{scopeId}:{userId}";
 
+        // resultUserId 為 0 代表找不到可亂彈的對象，呼叫端要拒絕這次執行
         internal static bool CheckIsAddOwner(FundType fundType, ulong guildId, ulong executeUserId, ulong targetUserId, out ulong resultUserId)
         {
             resultUserId = targetUserId;
 
             if (targetUserId == Program.ApplicatonOwner.Id)
             {
-                resultUserId = executeUserId;
-
                 // 只用 ZSET -> 取得成員列表（降冪）
-                var zEntries = RedisConnection.RedisDb.SortedSetRangeByRank(GetFundLeaderboardRedisKey(fundType, guildId), 0, -1, Order.Descending);
-                if (zEntries != null && zEntries.Length != 0)
-                {
-                    var zList = zEntries.ToList();
-                    zList.Add(executeUserId); // 將指令執行者也加入隨機選擇的範圍
-                    var randomMember = zList[new Random().Next(0, zList.Count)].ToString();
-                    if (!ulong.TryParse(randomMember, out resultUserId)) // 原則上不會失敗，直接忽略
-                    {
-                    }
-                }
+                resultUserId = PickOwnerRedirectRecipient(
+                    RedisConnection.RedisDb
+                        .SortedSetRangeByRank(GetFundLeaderboardRedisKey(fundType, guildId), 0, -1, Order.Descending)
+                        .Select(entry => entry.ToString()),
+                    executeUserId,
+                    Program.ApplicatonOwner.Id,
+                    Program.Client.GetGuild(guildId)?.Users
+                        .Where(user => !user.IsBot)
+                        .Select(user => user.Id));
 
                 return true;
             }
 
             return false;
+        }
+
+        // Owner 不能當亂彈對象，否則基金會又彈回 Owner 身上
+        internal static ulong PickOwnerRedirectRecipient(
+            IEnumerable<string> leaderboardUserIds,
+            ulong executeUserId,
+            ulong ownerUserId,
+            IEnumerable<ulong> guildUserIds)
+        {
+            var candidates = leaderboardUserIds
+                .Select(entry => ulong.TryParse(entry, out var userId) ? userId : 0)
+                .Append(executeUserId) // 將指令執行者也加入隨機選擇的範圍
+                .Where(userId => userId != 0 && userId != ownerUserId)
+                .ToList();
+
+            // 排行榜只剩 Owner 時改抽伺服器成員，避免基金彈回 Owner
+            if (candidates.Count == 0 && guildUserIds != null)
+                candidates = guildUserIds.Where(userId => userId != 0 && userId != ownerUserId).ToList();
+
+            // 連伺服器成員都沒有時回傳 0，呼叫端要拒絕這次執行，不能彈回 Owner
+            return candidates.Count == 0
+                ? 0
+                : candidates[Random.Shared.Next(candidates.Count)];
         }
 
         const long MinIncrementAmount = 200;

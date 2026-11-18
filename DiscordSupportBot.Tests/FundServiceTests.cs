@@ -155,6 +155,46 @@ public class FundServiceTests
         Assert.Contains("亂彈紀錄：2 次｜命中：1 人｜累計 +1,100", description);
     }
 
+    [Fact]
+    public void PickOwnerRedirectRecipient_ExcludesOwnerFromLeaderboard()
+    {
+        var recipient = FundService.PickOwnerRedirectRecipient(["77", "42"], 42, 77, []);
+
+        Assert.Equal(42UL, recipient);
+    }
+
+    [Fact]
+    public void PickOwnerRedirectRecipient_ExcludesOwnerExecutor()
+    {
+        var recipient = FundService.PickOwnerRedirectRecipient(["42"], 77, 77, []);
+
+        Assert.Equal(42UL, recipient);
+    }
+
+    [Fact]
+    public void PickOwnerRedirectRecipient_OnlyOwnerLeft_PicksGuildMember()
+    {
+        var recipient = FundService.PickOwnerRedirectRecipient(["77"], 77, 77, [77, 5]);
+
+        Assert.Equal(5UL, recipient);
+    }
+
+    [Fact]
+    public void PickOwnerRedirectRecipient_NoOtherGuildMember_ReturnsNoRecipient()
+    {
+        var recipient = FundService.PickOwnerRedirectRecipient(["77"], 77, 77, [77]);
+
+        Assert.Equal(0UL, recipient);
+    }
+
+    [Fact]
+    public void PickOwnerRedirectRecipient_EmptyLeaderboard_KeepsNonOwnerExecutor()
+    {
+        var recipient = FundService.PickOwnerRedirectRecipient([], 5, 77, []);
+
+        Assert.Equal(5UL, recipient);
+    }
+
     [Theory]
     [InlineData("fund-add-one:0:123", 0UL)]
     [InlineData("fund-add-one:0:123:456", 456UL)]
