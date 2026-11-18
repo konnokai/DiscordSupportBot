@@ -9,7 +9,12 @@ namespace DiscordSupportBot.Interaction.FoodWheel
     {
         [SlashCommand("spin", "不知道吃啥就轉一下")]
         public Task FoodWheelAsync()
-            => WheelCommandHelper.SpinAsync(Context, _service, WheelType.Food, "吃");
+            => WheelCommandHelper.SpinAsync(Context, _service, WheelType.Food);
+
+        // 群組前綴不會加進 custom id，轉盤按鈕的 id 是 wheel-respin:{type}:{ownerId}
+        [ComponentInteraction($"{WheelCommandHelper.RespinCustomIdPrefix}:*:*", ignoreGroupNames: true)]
+        public Task RespinAsync(int type, ulong ownerId)
+            => WheelCommandHelper.RespinAsync(Context, _service, (WheelType)type, ownerId);
 
         [Group("blacklist", "食物黑名單 (僅影響你自己)")]
         public class BlacklistModule : TopLevelModule<FoodWheelService>
@@ -50,7 +55,7 @@ namespace DiscordSupportBot.Interaction.FoodWheel
     {
         [SlashCommand("spin", "不知道喝啥就轉一下")]
         public Task DrinkWheelAsync()
-            => WheelCommandHelper.SpinAsync(Context, _service, WheelType.Drink, "喝");
+            => WheelCommandHelper.SpinAsync(Context, _service, WheelType.Drink);
 
         [Group("blacklist", "飲料黑名單 (僅影響你自己)")]
         public class BlacklistModule : TopLevelModule<FoodWheelService>
@@ -90,22 +95,58 @@ namespace DiscordSupportBot.Interaction.FoodWheel
     /// </summary>
     internal static class WheelCommandHelper
     {
-        public static async Task SpinAsync(IInteractionContext context, FoodWheelService service, WheelType type, string verb)
+        internal const string RespinCustomIdPrefix = "wheel-respin";
+
+        public static async Task SpinAsync(IInteractionContext context, FoodWheelService service, WheelType type)
         {
-            var items = service.GetEffectiveItems(context.User.Id, type);
-            if (items.Count == 0)
+            var draw = await service.DrawAsync(context.User.Id, type);
+            if (draw is not { } result)
             {
-                await context.Interaction.SendErrorAsync($"你已將全部{TypeName(type)}選項加入黑名單，沒有可抽的項目了");
+                await context.Interaction.SendErrorAsync(NoItemMessage(type));
                 return;
             }
 
-            var selected = items[Random.Shared.Next(items.Count)];
-            await context.Interaction.RespondAsync(embed: new EmbedBuilder()
-                .WithOkColor()
-                .WithDescription($"{verb} {Format.Underline(selected)} 吧!")
-                .WithFooter($"{TypeName(type)}清單數量: {items.Count}")
-                .Build());
+            await context.Interaction.RespondAsync(
+                embed: BuildSpinEmbed(result.Item, type, result.TotalItems),
+                components: BuildRespinComponents(type, context.User.Id));
         }
+
+        public static async Task RespinAsync(IInteractionContext context, FoodWheelService service, WheelType type, ulong ownerId)
+        {
+            if (context.User.Id != ownerId)
+            {
+                await context.Interaction.SendErrorAsync("只有指令執行者可以重抽");
+                return;
+            }
+
+            var draw = await service.DrawAsync(ownerId, type);
+            if (draw is not { } result)
+            {
+                await context.Interaction.SendErrorAsync(NoItemMessage(type));
+                return;
+            }
+
+            await ((IComponentInteraction)context.Interaction).UpdateAsync((x) =>
+            {
+                x.Embed = BuildSpinEmbed(result.Item, type, result.TotalItems);
+                x.Components = BuildRespinComponents(type, ownerId);
+            });
+        }
+
+        private static Embed BuildSpinEmbed(string item, WheelType type, int totalItems)
+            => new EmbedBuilder()
+                .WithOkColor()
+                .WithDescription($"{Verb(type)} {Format.Underline(item)} 吧!")
+                .WithFooter($"{TypeName(type)}清單數量: {totalItems}")
+                .Build();
+
+        private static MessageComponent BuildRespinComponents(WheelType type, ulong ownerId)
+            => new ComponentBuilder()
+                .WithButton("重抽", $"{RespinCustomIdPrefix}:{(int)type}:{ownerId}", ButtonStyle.Secondary)
+                .Build();
+
+        private static string NoItemMessage(WheelType type)
+            => $"你已將全部{TypeName(type)}選項加入黑名單，沒有可抽的項目了";
 
         public static async Task BlacklistAddAsync(IInteractionContext context, FoodWheelService service, WheelType type, string item)
         {
@@ -200,6 +241,9 @@ namespace DiscordSupportBot.Interaction.FoodWheel
 
             await context.Interaction.SendConfirmAsync($"自訂{TypeName(type)}項目 ({items.Count})", string.Join('\n', items.Select((x) => Format.Bold(x))), ephemeral: true);
         }
+
+        private static string Verb(WheelType type)
+            => type == WheelType.Drink ? "喝" : "吃";
 
         private static string TypeName(WheelType type)
             => type == WheelType.Drink ? "飲料" : "食物";
