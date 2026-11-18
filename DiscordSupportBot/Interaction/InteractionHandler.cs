@@ -129,6 +129,7 @@ namespace DiscordSupportBot.Interaction
             _client.ButtonExecuted += _client_ButtonExecuted;
             _interactions.SlashCommandExecuted += SlashCommandExecuted;
             _interactions.ContextCommandExecuted += ContextCommandExecuted;
+            _interactions.ComponentCommandExecuted += ComponentCommandExecuted;
         }
 
         private Task _client_ButtonExecuted(SocketMessageComponent button)
@@ -192,6 +193,23 @@ namespace DiscordSupportBot.Interaction
             }
 
             Log.Error($"[{guild}/{arg2.Channel.Name}] {arg2.User.Username} 執行訊息指令 `{arg1.Name}` 發生錯誤\r\n{arg3.ErrorReason}");
+            return SendCommandErrorAsync(arg2, arg3);
+        }
+
+        // 按鈕的 custom id 也可能是舊訊息留下的未知指令，成功時不重複記錄（ButtonExecuted 已經記過了）
+        private Task ComponentCommandExecuted(ComponentCommandInfo arg1, IInteractionContext arg2, IResult arg3)
+        {
+            if (arg3.IsSuccess)
+                return Task.CompletedTask;
+
+            var guild = arg2.Guild?.Name ?? "私人訊息";
+            var customId = (arg2.Interaction.Data as IComponentInteractionData)?.CustomId ?? arg1?.Name;
+            Log.Error($"[{guild}/{arg2.Channel.Name}] {arg2.User.Username} 點擊按鈕 `{customId}` 發生錯誤\r\n{arg3.ErrorReason}");
+
+            // 已經回應過就沒得再回覆錯誤，只留 log
+            if (arg2.Interaction is SocketInteraction { HasResponded: true })
+                return Task.CompletedTask;
+
             return SendCommandErrorAsync(arg2, arg3);
         }
 
