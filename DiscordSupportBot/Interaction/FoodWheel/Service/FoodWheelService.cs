@@ -32,6 +32,9 @@ namespace DiscordSupportBot.Interaction.FoodWheel.Service
             "米漿", "黑糖薑茶", "木瓜牛奶", "西瓜牛奶", "柚子茶", "多多綠茶", "冬瓜檸檬", "仙草奶凍", "酸梅湯", "楊枝甘露"
         ];
 
+        private const string RecentRedisKeyPrefix = "SupportBot:FoodWheel:Recent:";
+        private static readonly TimeSpan RecentTtl = TimeSpan.FromHours(1);
+
         /// <summary>
         /// 使用者項目快取: (UserId, WheelType, WheelEntryKind) -> 項目集合
         /// </summary>
@@ -94,6 +97,45 @@ namespace DiscordSupportBot.Interaction.FoodWheel.Service
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// 抽出一個項目並記錄在 Redis，一小時內不會再抽到同一個；全部抽過就清掉紀錄重新一輪
+        /// <para>TTL 每次抽完都重設，所以最後一次抽的一小時後整份紀錄過期</para>
+        /// </summary>
+        /// <returns>抽中的項目與可抽清單數量；沒有可抽項目時為 null</returns>
+        public async Task<(string Item, int TotalItems)?> DrawAsync(ulong userId, WheelType type)
+        {
+            var items = GetEffectiveItems(userId, type);
+            if (items.Count == 0)
+                return null;
+
+            var key = $"{RecentRedisKeyPrefix}{userId}:{(int)type}";
+            var recent = (await RedisConnection.RedisDb.SetMembersAsync(key))
+                .Select((x) => x.ToString())
+                .ToHashSet();
+
+            var selected = PickItem(items, recent, out var startNewRound);
+            if (startNewRound)
+                await RedisConnection.RedisDb.KeyDeleteAsync(key);
+            await RedisConnection.RedisDb.SetAddAsync(key, selected);
+            await RedisConnection.RedisDb.KeyExpireAsync(key, RecentTtl);
+
+            return (selected, items.Count);
+        }
+
+        /// <summary>
+        /// 排除最近抽過的項目後隨機選一個
+        /// </summary>
+        /// <param name="startNewRound">全部項目都抽過了，呼叫端要清掉紀錄重新開始</param>
+        internal static string PickItem(IReadOnlyList<string> items, IReadOnlySet<string> recent, out bool startNewRound)
+        {
+            var candidates = items.Where((x) => !recent.Contains(x)).ToList();
+            startNewRound = candidates.Count == 0;
+            if (startNewRound)
+                candidates = items.ToList();
+
+            return candidates[Random.Shared.Next(candidates.Count)];
         }
 
         /// <summary>
