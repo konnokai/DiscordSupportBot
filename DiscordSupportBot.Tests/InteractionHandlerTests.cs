@@ -12,6 +12,9 @@ public class InteractionHandlerTests
         var handler = new InteractionHandler(null!, null!, null!);
         var result = ExecuteResult.FromError(InteractionCommandError.UnknownCommand, "No component command");
 
-        await handler.ComponentCommandExecuted(null!, null!, result);
+        var task = handler.ComponentCommandExecuted(null!, null!, result);
+
+        // 有記錯誤或回覆就會用到 arg2，傳 null 會直接 NRE
+        Assert.True(task.IsCompletedSuccessfully);
     }
 }

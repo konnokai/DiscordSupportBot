@@ -201,9 +201,11 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                     {
                         await RedisConnection.RedisDb.KeyDeleteAsync(cooldownKey);
                     }
-                    catch (RedisException redisEx)
+                    // RedisTimeoutException 繼承 TimeoutException 而不是 RedisException，這裡要全部接住。
+                    // 背景工作的例外沒有人會看到，漏掉就只剩冷卻沒刪、使用者沒收到錯誤
+                    catch (Exception deleteEx)
                     {
-                        Log.Error(redisEx, $"FundService-RemoveCooldown: {cooldownKey}");
+                        Log.Error(deleteEx, $"FundService-RemoveCooldown: {cooldownKey}");
                     }
                 }
 

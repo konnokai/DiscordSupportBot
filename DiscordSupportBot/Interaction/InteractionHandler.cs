@@ -196,8 +196,9 @@ namespace DiscordSupportBot.Interaction
             return SendCommandErrorAsync(arg2, arg3);
         }
 
-        // arg1 為 null 代表這個 custom id 不是 InteractionService 的元件指令，而是由各服務的
-        // ButtonExecuted 事件處理（例如基金按鈕）。這是正常流程，不能回錯誤蓋掉真正的處理程式
+        // arg1 為 null 代表這個 custom id 不是 InteractionService 註冊的元件指令或 Modal，
+        // 而是由各服務的 ButtonExecuted／ModalSubmitted 事件處理（例如基金按鈕），屬於正常流程。
+        // 這裡不能回錯誤，不然會蓋掉真正的處理程式；舊訊息留下的失效按鈕只會留在點擊 log
         internal Task ComponentCommandExecuted(ComponentCommandInfo arg1, IInteractionContext arg2, IResult arg3)
         {
             if (arg1 == null || arg3.IsSuccess)
