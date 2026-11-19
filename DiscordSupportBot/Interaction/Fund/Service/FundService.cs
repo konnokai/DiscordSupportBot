@@ -130,17 +130,25 @@ namespace DiscordSupportBot.Interaction.Fund.Service
             }
         }
 
-        private async Task HandleAddOneButtonAsync(SocketMessageComponent arg)
+        private Task HandleAddOneButtonAsync(SocketMessageComponent arg)
         {
             if (arg.HasResponded || !arg.Data.CustomId.StartsWith(AddOneCustomIdPrefix, StringComparison.Ordinal))
-                return;
+                return Task.CompletedTask;
 
-            await arg.DeferAsync(false);
+            // Discord.Net 會等 ButtonExecuted 的所有 handler 做完才處理下一個事件。
+            // 在 gateway 上等 Redis 或 REST 會拖慢後面的互動，超過 3 秒才回覆就只剩 10062
+            _ = Task.Run(() => HandleAddOneButtonCoreAsync(arg));
+            return Task.CompletedTask;
+        }
 
+        private async Task HandleAddOneButtonCoreAsync(SocketMessageComponent arg)
+        {
             string cooldownKey = null;
             var fundAttempted = false;
             try
             {
+                await arg.DeferAsync(false);
+
                 if (arg.GuildId == null || !TryParseAddOneCustomId(arg.Data.CustomId, out var fundType, out var targetUserId, out var cooldownScopeId))
                 {
                     await arg.SendErrorAsync("基金按鈕資料無效", true);
@@ -200,7 +208,16 @@ namespace DiscordSupportBot.Interaction.Fund.Service
                 }
 
                 Log.Error(ex, $"FundService-AddOneButton: {arg.GuildId} | {arg.User.Id} | {arg.Data.CustomId}");
-                await arg.SendErrorAsync($"處理過程發生錯誤: {ex.Message}", true);
+
+                // DeferAsync 本身失敗時還沒回應過，只能用 RespondAsync
+                try
+                {
+                    await arg.SendErrorAsync($"處理過程發生錯誤: {ex.Message}", arg.HasResponded);
+                }
+                catch (Exception sendEx)
+                {
+                    Log.Error(sendEx, $"FundService-AddOneButtonErrorReply: {arg.GuildId} | {arg.User.Id}");
+                }
             }
         }
 

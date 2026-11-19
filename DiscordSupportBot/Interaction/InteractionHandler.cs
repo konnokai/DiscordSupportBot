@@ -196,14 +196,15 @@ namespace DiscordSupportBot.Interaction
             return SendCommandErrorAsync(arg2, arg3);
         }
 
-        // 按鈕的 custom id 也可能是舊訊息留下的未知指令，成功時不重複記錄（ButtonExecuted 已經記過了）
-        private Task ComponentCommandExecuted(ComponentCommandInfo arg1, IInteractionContext arg2, IResult arg3)
+        // arg1 為 null 代表這個 custom id 不是 InteractionService 的元件指令，而是由各服務的
+        // ButtonExecuted 事件處理（例如基金按鈕）。這是正常流程，不能回錯誤蓋掉真正的處理程式
+        internal Task ComponentCommandExecuted(ComponentCommandInfo arg1, IInteractionContext arg2, IResult arg3)
         {
-            if (arg3.IsSuccess)
+            if (arg1 == null || arg3.IsSuccess)
                 return Task.CompletedTask;
 
             var guild = arg2.Guild?.Name ?? "私人訊息";
-            var customId = (arg2.Interaction.Data as IComponentInteractionData)?.CustomId ?? arg1?.Name;
+            var customId = (arg2.Interaction.Data as IComponentInteractionData)?.CustomId ?? arg1.Name;
             Log.Error($"[{guild}/{arg2.Channel.Name}] {arg2.User.Username} 點擊按鈕 `{customId}` 發生錯誤\r\n{arg3.ErrorReason}");
 
             // 已經回應過就沒得再回覆錯誤，只留 log
